@@ -30,25 +30,34 @@ students will learn and apply the following concepts:
 
 • CloudWego
 ○ https://www.cloudwego.io/
+
 • Kitex
 ○ https://www.cloudwego.io/docs/kitex
 ○ https://www.cloudwego.io/docs/kitex/tutorials/advanced-feature/generic-call/
 ○ https://github.com/cloudwego/kitex-examples
 ○ https://github.com/kitex-contrib/
+
 ▪ For load balance and registry components
+
 • Hertz
 ○ https://www.cloudwego.io/docs/hertz/
 ○ https://github.com/cloudwego/hertz-examples
+
 • Golang
 ○ https://go.dev/
 ○ https://go.dev/learn/
+
 • HTTP
 ○ https://www.cloudflare.com/learning/ddos/glossary/hypertext-transfer-protocol-http/
+
 • JSON
 ○ https://www.json.org/json-en.html
+
 • Thrift
 ○ https://thrift.apache.org/
+
 • Load Balance
 ○ https://www.nginx.com/resources/glossary/load-balancing/
+
 • Service Registry and Discovery
 ○ https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/
