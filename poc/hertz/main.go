@@ -18,6 +18,7 @@ func main() {
 	})
 
 	// Test -> A method that should return a string passed as param in body
+	// This code doesn't work yet
 	h.POST("/echo", func(c context.Context) error {
 		var input map[string]interface{}
 		if err := c.BindJSON(&input); err != nil {
