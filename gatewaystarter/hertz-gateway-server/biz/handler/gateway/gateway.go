@@ -5,9 +5,9 @@ package gateway
 import (
 	"context"
 
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	gateway "hertzserver/biz/model/gateway"
+
+	"github.com/cloudwego/hertz/pkg/app"
 )
 
 // HelloMethod .
@@ -17,11 +17,14 @@ func HelloMethod(ctx context.Context, c *app.RequestContext) {
 	var req gateway.HelloReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.String(400, err.Error())
 		return
 	}
 
 	resp := new(gateway.HelloResp)
 
-	c.JSON(consts.StatusOK, resp)
+	// You can modify the logic of the entire function, not just the current template
+	resp.RespBody = "hello," + req.Name // added logic
+
+	c.JSON(200, resp)
 }
