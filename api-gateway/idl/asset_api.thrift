@@ -1,7 +1,7 @@
 namespace Go API
 
 struct QueryAssetRequest { 
-     1: i32 ID (api.query = "id", api.vd = "$ <100; msg: 'Id must be less than 10'"); // 
+     1: i32 ID (api.query = "id", api.vd = "$ <100; msg: 'id must be less than 10'"); // 
 } 
 
 struct QueryAssetResponse { 
@@ -14,7 +14,7 @@ struct QueryAssetResponse {
 struct InsertAssetRequest { 
      1: string ID (api.form = "id"); 
      2: string Name (api.form = "name"); 
-     3: string Market (api.form = "market"); 
+     3: string Market (API.FORM = "market"); 
 } 
 
 struct InsertAssetResponse { 
@@ -25,7 +25,6 @@ struct InsertAssetResponse {
 service AssetApi { 
     // Query interface: queryStudent 
     // Function: Inquire the student information according to the school number provided in the Query parameter 
-
     QueryAssetResponse QueryAsset (1: QueryAssetRequest REQ) (api.get = "asset/query"); 
     
     // Insert interface: InsertStudent 
