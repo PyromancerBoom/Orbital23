@@ -6,7 +6,7 @@ import (
 	"context"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
-	asset_management "orbital_poc/kitex_server/kitex_gen/asset_management"
+	asset_management "api-gateway/kitex_server/kitex_gen/asset_management"
 )
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.

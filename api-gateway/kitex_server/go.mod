@@ -1,4 +1,4 @@
-module orbital_poc/kitex_server
+module api-gateway/kitex_server
 
 go 1.20
 

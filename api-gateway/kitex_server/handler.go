@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	asset_management "orbital_poc/kitex_server/kitex_gen/asset_management"
+	asset_management "api-gateway/kitex_server/kitex_gen/asset_management"
 )
 
 // AssetManagementImpl implements the last service interface defined in the IDL.

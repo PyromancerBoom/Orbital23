@@ -4,7 +4,7 @@ package assetmanagement
 
 import (
 	server "github.com/cloudwego/kitex/server"
-	asset_management "orbital_poc/kitex_server/kitex_gen/asset_management"
+	asset_management "api-gateway/kitex_server/kitex_gen/asset_management"
 )
 
 // NewInvoker creates a server.Invoker with the given handler and options.

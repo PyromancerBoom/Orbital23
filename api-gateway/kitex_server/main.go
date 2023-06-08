@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	asset_management "orbital_poc/kitex_server/kitex_gen/asset_management/assetmanagement"
+	asset_management "api-gateway/kitex_server/kitex_gen/asset_management/assetmanagement"
 )
 
 func main() {
