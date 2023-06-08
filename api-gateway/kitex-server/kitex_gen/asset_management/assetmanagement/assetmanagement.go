@@ -3,10 +3,10 @@
 package assetmanagement
 
 import (
-	asset_management "api-gateway/kitex-server/kitex_gen/asset_management"
 	"context"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
+	asset_management "kitex-server/kitex_gen/asset_management"
 )
 
 func serviceInfo() *kitex.ServiceInfo {

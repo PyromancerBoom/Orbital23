@@ -1,8 +1,8 @@
 package main
 
 import (
-	asset_management "api-gateway/kitex-server/kitex_gen/asset_management"
 	"context"
+	asset_management "kitex-server/kitex_gen/asset_management"
 )
 
 // AssetManagementImpl implements the last service interface defined in the IDL.

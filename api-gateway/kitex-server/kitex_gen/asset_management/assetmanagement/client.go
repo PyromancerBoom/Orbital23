@@ -3,10 +3,10 @@
 package assetmanagement
 
 import (
-	asset_management "api-gateway/kitex-server/kitex_gen/asset_management"
 	"context"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
+	asset_management "kitex-server/kitex_gen/asset_management"
 )
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.

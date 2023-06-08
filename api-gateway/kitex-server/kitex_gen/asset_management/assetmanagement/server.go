@@ -2,8 +2,8 @@
 package assetmanagement
 
 import (
-	asset_management "api-gateway/kitex-server/kitex_gen/asset_management"
 	server "github.com/cloudwego/kitex/server"
+	asset_management "kitex-server/kitex_gen/asset_management"
 )
 
 // NewServer creates a server.Server with the given handler and options.

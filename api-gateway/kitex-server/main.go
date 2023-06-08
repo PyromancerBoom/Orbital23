@@ -1,7 +1,7 @@
 package main
 
 import (
-	asset_management "api-gateway/kitex-server/kitex_gen/asset_management/assetmanagement"
+	asset_management "kitex-server/kitex_gen/asset_management/assetmanagement"
 	"log"
 )
 
