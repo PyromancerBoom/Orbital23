@@ -1,76 +1,52 @@
-### Goals and Objectives
+# Orbital
 
-The primary goal of this project is to implement an API Gateway that accepts HTTP requests
-encoded in JSON format and uses the Generic-Call feature of Kitex to translate these
-requests into Thrift binary format requests. The API Gateway will then forward the request to
+This is a repository for the ByteDance and Tiktok Orbital 2023.
 
-one of the backend RPC servers discovered from the registry center. To achieve this goal,
-students will learn and apply the following concepts:
+## About
 
-1. Golang: Gain proficiency in the Go programming language, which will be the primary
-   language used for building the API Gateway, and become familiar with its syntax, data
-   structures, and best practices.
-2. HTTP: Understand the fundamentals of HTTP, including request and response
-   structure, HTTP methods, and status codes.
-3. JSON: Learn about JSON data interchange format and its application in encoding
-   and decoding data.
-4. Thrift: Acquire knowledge about Apache Thrift, an interface definition language (IDL)
-   and binary communication protocol.
-5. Load Balancing: Acquire knowledge of load balancing strategies for evenly
-   distributing requests among available backend RPC servers, and integrate one of the Load
-   Balancers provided by Kitex into the project to manage request distribution effectively.
-6. Service Register and Discovery: Understand the principles of service registry and
-   discovery mechanisms, and utilize one of the registry components offered by Kitex in this
-   project, enabling Kitex-based services to register themselves and be discoverable by the API
-   Gateway.
-7. Building HTTP and RPC servers: Learn to build HTTP servers using Hertz and RPC
-   servers using Kitex.
+This is the starter project for our API Gateway based on the POC we made and consists of communication[^1] between one Hertz server and one RPC server. The Hertz server is generated using the asset_api.thrift IDL file, while the Kitex server and client are generated using the asset_management.thrift IDL file.
 
-### Reference
+The Hertz server listens to requests at port 4200 on two exposed endpoints at "/asset/insert" [POST] and "/asset/query" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using the internal Kitex client built inside the Hertz server). The Kitex server sits on port 8888 and responds to the RPC calls made to it.
 
-• CloudWego
+## Endpoints
 
-○ https://www.cloudwego.io/
+| Endpoint      | Method | Description                                                                                           |
+| ------------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| /asset/query  | GET    | Used to query about an asset, with its `id` speficied in the url query section                        |
+| /asset/insert | POST   | Used to insert an new asset into the RPC database[^2] . Usage can be inferred from the tutorial below |
 
-• Kitex
-○ https://www.cloudwego.io/docs/kitex
+## How to use? [^3]
 
-○ https://www.cloudwego.io/docs/kitex/tutorials/advanced-feature/generic-call/
+**Step 1:**
 
-○ https://github.com/cloudwego/kitex-examples
+Initialise the Kitex server using the command: "go run ." from the "./kitex_server" directory
 
-○ https://github.com/kitex-contrib/
+**Step 2:**
 
-▪ For load balance and registry components
+Initialise the Hertz server using the command: "go run ." from the "./hertz_server" directory
 
-• Hertz
+**Step 3:**
 
-○ https://www.cloudwego.io/docs/hertz/
+Send a POST request to the "asset/insert" endpoint by:
 
-○ https://github.com/cloudwego/hertz-examples
+```
+curl --location --request POST 'http://127.0.0.1:4200/asset/insert' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"Name": "APPLE",
+	"ID": "1",
+	"Market": "US"
+}'
+```
 
-• Golang
+**Step 4:**
 
-○ https://go.dev/
+Send a GET request to the "asset/query" endpoint by:
 
-○ https://go.dev/learn/
+```
+curl --location --request GET 'http://127.0.0.1:4200/asset/query?id=1'
+```
 
-• HTTP
-
-○ https://www.cloudflare.com/learning/ddos/glossary/hypertext-transfer-protocol-http/
-
-• JSON
-
-○ https://www.json.org/json-en.html
-
-• Thrift
-
-○ https://thrift.apache.org/
-
-• Load Balance
-
-○ https://www.nginx.com/resources/glossary/load-balancing/
-
-• Service Registry and Discovery
-
-○ https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/
+[^1]: Kitex server is using the port "8888" and Hertz server using the port "4200", so please keep these ports free for the demo servers to run.
+[^2]: We are not current using an actual database in the demo. The data structure used is a go splice which acts as a makeshift database.
+[^3]: It is assumed that go is already installed in your system

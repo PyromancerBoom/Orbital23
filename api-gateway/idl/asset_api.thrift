@@ -26,7 +26,6 @@ service AssetApi {
     // Query interface: queryStudent 
     // Function: Inquire the student information according to the school number provided in the Query parameter 
     QueryAssetResponse QueryAsset (1: QueryAssetRequest REQ) (api.get = "asset/query"); 
-    
     // Insert interface: InsertStudent 
     // Function: Use the school number as the key, insert the student's information 
     InsertAssetResponse InsertAsset (1: InsertAssetRequest REQ) (api.post = "asset/insert"); 
