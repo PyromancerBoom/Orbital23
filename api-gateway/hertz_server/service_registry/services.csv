@@ -1,4 +1,0 @@
-serviceID,serviceName,host_port
-456,Service1,127.0.0.1:8080
-123,Service2,127.0.0.1:8888
-789,Service3,127.0.0.1:9000
