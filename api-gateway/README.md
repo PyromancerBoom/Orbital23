@@ -30,7 +30,7 @@ curl --location --request POST 'http://127.0.0.1:4200/asset/insert' \
 --header 'Content-Type: application/json' \
 --data-raw '{
 "Name": "APPLE",
-	"ID": "1",
+	"ID": "2",
 	"Market": "US"
 }'
 ```

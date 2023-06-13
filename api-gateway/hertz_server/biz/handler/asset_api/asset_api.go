@@ -3,6 +3,7 @@ package asset_api
 import (
 	"context"
 	"fmt"
+	"log"
 
 	asset_api "api-gateway/hertz_server/biz/model/asset_api"
 	"api-gateway/hertz_server/kitex_gen/asset_management"
@@ -12,7 +13,16 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	serviceregistry "api-gateway/hertz_server/service_registry"
 )
+
+var sr *serviceregistry.ServiceRegistry
+
+// Create a new instance of ServiceRegistry
+func init() {
+	sr = serviceregistry.NewServiceRegistry()
+}
 
 // QueryAsset handles the GET request to query asset information.
 // @router asset/query [GET]
@@ -27,11 +37,18 @@ func QueryAsset(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// Getting host port from service registry
+	hostPort, err := sr.GetHostPort("123")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("HostPort:", hostPort)
+
 	// Print a message indicating that a query request has been received
 	fmt.Println("Received Query Request")
 
 	// Create a Kitex client to make an RPC call to the asset management service
-	client, err := assetmanagement.NewClient("asset", clientK.WithHostPorts("127.0.0.1:8888"))
+	client, err := assetmanagement.NewClient("asset", clientK.WithHostPorts(hostPort))
 	if err != nil {
 		panic(err)
 	}
@@ -80,11 +97,18 @@ func InsertAsset(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// Getting host port from service registry
+	hostPort, err := sr.GetHostPort("123")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("HostPort:", hostPort)
+
 	// Print a message indicating that an insert request has been received
 	fmt.Println("Received Insert Request")
 
 	// Create a Kitex client to make an RPC call to the asset management service
-	client, err := assetmanagement.NewClient("asset", clientK.WithHostPorts("127.0.0.1:8888"))
+	client, err := assetmanagement.NewClient("asset", clientK.WithHostPorts(hostPort))
 	if err != nil {
 		panic(err)
 	}
