@@ -25,8 +25,9 @@ service ApiGateway {
     GatewayResponse processGetRequest(1: GatewayRequest REQ) (api.post = "hertzgateway/get");
     GatewayResponse processPostRequest(1: GatewayRequest REQ) (api.post = "hertzgateway/post");
 }
-
 ---
+
+### About the POC
 This is the starter project for our API Gateway based on the POC we made and consists of communication[^1] between one Hertz server and one RPC server. The Hertz server is generated using the asset_api.thrift IDL file, while the Kitex server and client are generated using the asset_management.thrift IDL file.
 
 The Hertz server listens to requests at port 4200 on two exposed endpoints at "/asset/insert" [POST] and "/asset/query" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using the internal Kitex client built inside the Hertz server). The Kitex server sits on port 8888 and responds to the RPC calls made to it.
