@@ -17,7 +17,7 @@ The Hertz server listens to requests at port 4200 on two exposed endpoints at "/
 
 **Step 1:**
 
-Initialise the Kitex server using the command: "go run ." from the "./kitex_server" directory
+Initialise the Kitex server using the command: "go run ." from the "./kitex_server" directory. Enter host port as "8888"
 
 **Step 2:**
 
