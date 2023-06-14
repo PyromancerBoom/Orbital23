@@ -4,7 +4,7 @@ This is a repository for the ByteDance and Tiktok Orbital 2023.
 
 ## About
 
-***Note : As of Milestone1 and for the POC, we have used a dedicated client to communicate with kitex server. However, for the main project, we plan to use the Generic call feature inside the hertz API Gateway server. This server would forward requests various GET, POST, DELETE, etc requests based on the service Id and other details fetched from the service registry to the target backend service.***
+***Note : As of Milestone-1 and for the POC, we have used a dedicated client to communicate with kitex server. However, for the main project, we plan to use the Generic call feature inside the hertz API Gateway server. This server would forward requests various GET, POST, DELETE, etc requests based on the service Id and other details fetched from the service registry to the target backend service.***
 
 This is the starter project for our API Gateway based on the POC we made and consists of communication[^1] between one Hertz server and one RPC server. The Hertz server is generated using the asset_api.thrift IDL file, while the Kitex server and client are generated using the asset_management.thrift IDL file.
 
