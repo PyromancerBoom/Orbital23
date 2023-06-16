@@ -24,11 +24,13 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// serviceFromRequest := c.Param("service")
-	// methodFromRequest := c.Param("method")
+	// c.Param("service")
+	// c.Param("method")
+	serviceFromRequest := "AssetManagement"
+	methodFromRequest := "queryAsset"
 
 	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile("AssetManagement", "queryAsset")
+	idl, err := idlmap.GetIdlFile(serviceFromRequest, methodFromRequest)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
