@@ -3,23 +3,56 @@
 package apigateway
 
 import (
-	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 	"context"
-	"encoding/json"
-	"fmt"
 
-	idlmap "api-gateway/hertz_server/biz/model/idlmap"
-
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/client/genericclient"
-	"github.com/cloudwego/kitex/pkg/generic"
+	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"fmt"
+
+	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 )
 
+// ProcessGetRequest .
+// @router /{:serviceName}/{:serviceMethod} [GET]
+func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req apigateway.GatewayRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	fmt.Println("Reached Here")
+
+	print(c)
+	c.Param("method")
+	serviceName := "UserService"
+	serviceMethod := "insertUser"
+
+	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
+
+	// Checking if service and method are valid
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Printf("IDL path '%s'\n", idl)
+
+	fmt.Println("Received response from backend service")
+
+	resp := new(apigateway.GatewayResponse)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
 // ProcessPostRequest .
-// @router /{serviceName}/{serviceMethod} [POST]
+// @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req apigateway.GatewayRequest
@@ -28,6 +61,8 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+
+	fmt.Println("Reached Here")
 
 	// c.Param("service")
 	// c.Param("method")
@@ -43,91 +78,12 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Create the generic client
-	p, err := generic.NewThriftFileProvider(idl)
-	if err != nil {
-		panic(err)
-	}
-
-	g, err := generic.JSONThriftGeneric(p)
-	if err != nil {
-		panic(err)
-	}
-
-	cli, err := genericclient.NewClient(serviceName, g, client.WithHostPorts("127.0.0.1:8888"))
-	if err != nil {
-		panic(err)
-	}
-
-	// Convert the request body to JSON string
-	reqJSON, err := json.Marshal(req)
-	if err != nil {
-		panic(err)
-	}
-
-	// Make the generic POST request
-	respJSON, err := cli.GenericCall(ctx, serviceMethod, string(reqJSON))
-	if err != nil {
-		panic(err)
-	}
+	fmt.Printf("IDL path '%s'\n", idl)
 
 	fmt.Println("Received response from backend service")
 
-	// Send the response back to the client
-	c.JSON(consts.StatusOK, respJSON)
-}
+	resp := new(apigateway.GatewayResponse)
 
-// ProcessGetRequest .
-// @router /{serviceName}/{serviceMethod} [GET]
-func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req apigateway.GatewayRequest
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
+	c.JSON(consts.StatusOK, resp)
 
-	serviceName := "UserService"
-	serviceMethod := "insertUser"
-
-	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
-
-	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Create the generic client
-	p, err := generic.NewThriftFileProvider(idl)
-	if err != nil {
-		panic(err)
-	}
-
-	g, err := generic.JSONThriftGeneric(p)
-	if err != nil {
-		panic(err)
-	}
-
-	cli, err := genericclient.NewClient(serviceName, g, client.WithHostPorts("127.0.0.1:8888"))
-	if err != nil {
-		panic(err)
-	}
-
-	// Convert the request parameters to a JSON string
-	reqJSON, err := json.Marshal(req)
-	if err != nil {
-		panic(err)
-	}
-
-	// Make the generic GET request
-	respJSON, err := cli.GenericCall(ctx, serviceMethod, string(reqJSON))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Received response from backend service")
-	c.JSON(consts.StatusOK, respJSON)
 }

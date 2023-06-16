@@ -25,3 +25,8 @@ func _processpostrequestMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _servicenameMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

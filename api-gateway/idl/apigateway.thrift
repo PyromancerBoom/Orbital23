@@ -14,6 +14,6 @@ struct GatewayResponse {
 
 // Assuming service name is unique
 service ApiGateway {
-    GatewayResponse processGetRequest(1: GatewayRequest request) (api.get = "/{serviceName}/{serviceMethod}");
-    GatewayResponse processPostRequest(1: GatewayRequest request) (api.post = "/{serviceName}/{serviceMethod}");
+    GatewayResponse processGetRequest(1: GatewayRequest request) (api.get = '/:serviceName/:serviceMethod');
+    GatewayResponse processPostRequest(1: GatewayRequest request) (api.post = '/:serviceName/:serviceMethod');
 }
