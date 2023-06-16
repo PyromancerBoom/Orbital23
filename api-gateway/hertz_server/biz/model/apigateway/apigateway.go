@@ -9,10 +9,10 @@ import (
 )
 
 type GatewayRequest struct {
-	ServiceName   string `thrift:"serviceName,1" form:"servicename" json:"serviceName"`
-	ServiceMethod string `thrift:"serviceMethod,2" form:"servicenethod" json:"serviceMethod"`
-	RequestData   string `thrift:"requestData,3" form:"requestdata" json:"requestData"`
-	ServiceId     string `thrift:"serviceId,4" form:"serviceid" json:"serviceId"`
+	ServiceName   string `thrift:"serviceName,1" json:"serviceName" path:"serviceName"`
+	ServiceMethod string `thrift:"serviceMethod,2" json:"serviceMethod" path:"serviceMethod"`
+	RequestData   string `thrift:"requestData,3" form:"requestData" json:"requestData"`
+	ServiceId     string `thrift:"serviceId,4" form:"serviceId" json:"serviceId"`
 }
 
 func NewGatewayRequest() *GatewayRequest {
@@ -466,6 +466,7 @@ func (p *GatewayResponse) String() string {
 	return fmt.Sprintf("GatewayResponse(%+v)", *p)
 }
 
+// Assuming service name is unique
 type ApiGateway interface {
 	ProcessGetRequest(ctx context.Context, request *GatewayRequest) (r *GatewayResponse, err error)
 

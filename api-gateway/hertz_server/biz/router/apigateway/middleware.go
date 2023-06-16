@@ -11,7 +11,7 @@ func rootMw() []app.HandlerFunc {
 	return nil
 }
 
-func _hertzgatewayMw() []app.HandlerFunc {
+func __7bservicename_7dMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -22,6 +22,11 @@ func _processgetrequestMw() []app.HandlerFunc {
 }
 
 func _processpostrequestMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _servicenameMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

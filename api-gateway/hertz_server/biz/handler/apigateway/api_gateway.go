@@ -4,45 +4,19 @@ package apigateway
 
 import (
 	"context"
-	"fmt"
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
-	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
+	"fmt"
+
+	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 )
 
-// ProcessGetRequest .
-// @router hertzgateway/get [GET]
-func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req apigateway.GatewayRequest
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	// serviceFromRequest := c.Param("service")
-	// methodFromRequest := c.Param("method")
-
-	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile("AssetManagement", "queryAsset")
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	fmt.Println("IDL file path:", idl)
-
-	resp := new(apigateway.GatewayResponse)
-
-	c.JSON(consts.StatusOK, resp)
-}
-
 // ProcessPostRequest .
-// @router hertzgateway/post [POST]
+// @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req apigateway.GatewayRequest
@@ -52,7 +26,61 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(apigateway.GatewayResponse)
+	fmt.Println("Reached Here POST")
+
+	serviceName := c.Param("serviceName")
+	serviceMethod := c.Param("serviceMethod")
+
+	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
+
+	// Checking if service and method are valid
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Printf("IDL path '%s'\n", idl)
+
+	fmt.Println("Received response from backend service")
+
+	// Return resp
+	resp := apigateway.GatewayResponse{}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ProcessGetRequest .
+// @router /{:serviceName}/{:serviceMethod} [GET]
+func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req apigateway.GatewayRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	fmt.Println("Reached Here GET")
+
+	serviceName := c.Param("serviceName")
+	serviceMethod := c.Param("serviceMethod")
+
+	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, serviceMethod)
+
+	// Checking if service and method are valid
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Printf("IDL path '%s'\n", idl)
+
+	fmt.Println("Received response from backend service")
+
+	// Return resp
+	resp := apigateway.GatewayResponse{}
 
 	c.JSON(consts.StatusOK, resp)
 }
