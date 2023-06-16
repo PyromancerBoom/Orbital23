@@ -18,7 +18,7 @@ var IdlMap = []IdlMapping{
 }
 
 func getIdlFile(service, method string) (string, error) {
-	for key, value := range IdlMap {
+	for _, value := range IdlMap {
 		if value.Service == service && value.Method == method {
 			return value.IDL, nil
 		}
