@@ -3,7 +3,7 @@
 package main
 
 import (
-	handler "api-gateway/hert_server/biz/handler"
+	handler "api-gateway/hertz_server/biz/handler"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

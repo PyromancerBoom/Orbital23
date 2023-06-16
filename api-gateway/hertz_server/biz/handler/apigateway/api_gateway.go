@@ -4,8 +4,10 @@ package apigateway
 
 import (
 	"context"
+	"fmt"
 
-	apigateway "api-gateway/hert_server/biz/model/apigateway"
+	apigateway "api-gateway/hertz_server/biz/model/apigateway"
+	"api-gateway/hertz_server/idl_maps"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -22,7 +24,17 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// service := c.Param("service")
+	// serviceFromRequest := c.Param("service")
+	// methodFromRequest := c.Param("method")
+
+	// Checking if service and method are valid
+	idl, err := getIdlFile("AssetManagement", "queryAsset")
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Println("IDL file path:", idl)
 
 	resp := new(apigateway.GatewayResponse)
 

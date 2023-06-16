@@ -1,4 +1,4 @@
-package apigateway
+package idlMap
 
 import "fmt"
 

@@ -1,4 +1,4 @@
-module api-gateway/hert_server
+module api-gateway/hertz_server
 
 go 1.20
 

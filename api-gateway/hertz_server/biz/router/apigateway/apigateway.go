@@ -3,7 +3,7 @@
 package apigateway
 
 import (
-	apigateway "api-gateway/hert_server/biz/handler/apigateway"
+	apigateway "api-gateway/hertz_server/biz/handler/apigateway"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
