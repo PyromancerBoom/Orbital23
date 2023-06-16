@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
-	"api-gateway/hertz_server/idl_maps"
+	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -28,7 +28,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	// methodFromRequest := c.Param("method")
 
 	// Checking if service and method are valid
-	idl, err := getIdlFile("AssetManagement", "queryAsset")
+	idl, err := idlmap.GetIdlFile("AssetManagement", "queryAsset")
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
