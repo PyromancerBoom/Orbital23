@@ -88,35 +88,46 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// // c.Param("service")
-	// // c.Param("method")
-	// serviceFromRequest := "AssetManagement"
-	// methodFromRequest := "queryAsset"
+	serviceName := "UserService"
+	serviceMethod := "insertUser"
 
-	// // Checking if service and method are valid
-	// idl, err := idlmap.GetIdlFile(serviceFromRequest, methodFromRequest)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
-	// //generic client
-	// p, err := generic.NewThriftFileProvider("../idl/asset_management.thrift")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	// Checking if service and method are valid
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// g, err := generic.JSONThriftGeneric(p)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	// Create the generic client
+	p, err := generic.NewThriftFileProvider(idl)
+	if err != nil {
+		panic(err)
+	}
 
-	// cli, err := genericClient.NewClient("asset", g, client.WithHostPorts("127.0.0.1:8888"))
-	// if err != nil {
-	// 	panic(err)
-	// }
+	g, err := generic.JSONThriftGeneric(p)
+	if err != nil {
+		panic(err)
+	}
 
-	resp := new(apigateway.GatewayResponse)
+	cli, err := genericclient.NewClient(serviceName, g, client.WithHostPorts("127.0.0.1:8888"))
+	if err != nil {
+		panic(err)
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Convert the request parameters to a JSON string
+	reqJSON, err := json.Marshal(req)
+	if err != nil {
+		panic(err)
+	}
+
+	// Make the generic GET request
+	respJSON, err := cli.GenericCall(ctx, serviceMethod, string(reqJSON))
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Received response from backend service")
+	c.JSON(consts.StatusOK, respJSON)
 }
