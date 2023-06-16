@@ -5,12 +5,13 @@ package apigateway
 import (
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 	"context"
+	"encoding/json"
 	"fmt"
 
 	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 
 	"github.com/cloudwego/kitex/client"
-	genericClient "github.com/cloudwego/kitex/client/genericclient"
+	"github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/generic"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -30,17 +31,19 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	// c.Param("service")
 	// c.Param("method")
-	serviceFromRequest := "AssetManagement"
-	methodFromRequest := "insetAsset"
+	serviceName := "UserService"
+	serviceMethod := "insertUser"
+
+	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
 	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile(serviceFromRequest, methodFromRequest)
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Generic client
+	// Create the generic client
 	p, err := generic.NewThriftFileProvider(idl)
 	if err != nil {
 		panic(err)
@@ -51,20 +54,27 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
-	cli, err := genericClient.NewClient("asset", g, client.WithHostPorts("127.0.0.1:8888"))
+	cli, err := genericclient.NewClient(serviceName, g, client.WithHostPorts("127.0.0.1:8888"))
 	if err != nil {
 		panic(err)
 	}
 
-	resp, err := cli.GenericCall(context.Background(), methodFromRequest, req.RequestData)
+	// Convert the request body to JSON string
+	reqJSON, err := json.Marshal(req)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
+		panic(err)
 	}
 
-	fmt.Println("Generic Post request Made")
+	// Make the generic POST request
+	respJSON, err := cli.GenericCall(ctx, serviceMethod, string(reqJSON))
+	if err != nil {
+		panic(err)
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	fmt.Println("Received response from backend service")
+
+	// Send the response back to the client
+	c.JSON(consts.StatusOK, respJSON)
 }
 
 // ProcessGetRequest .
