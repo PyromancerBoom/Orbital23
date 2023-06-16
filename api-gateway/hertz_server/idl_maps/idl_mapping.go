@@ -1,6 +1,10 @@
 package idlMap
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+)
 
 // Represents the relationship between services, method, and IDLs
 type IdlMapping struct {
@@ -9,12 +13,29 @@ type IdlMapping struct {
 	IDL     string
 }
 
-//
-var IdlMap = []IdlMapping{
-	{Service: "AssetManagement", Method: "queryAsset", IDL: "../idl/asset_management.thrift"},
-	{Service: "AssetManagement", Method: "insert", IDL: "../idl/asset_management.thrift"},
-	// Can add more mappings similarly using service registry
-	// {Service: "Service Name", Method: "Method Name", IDL: "../idl/filename.thrift"}
+var IdlMap []IdlMapping
+
+func init() {
+	if err := loadMappings(); err != nil {
+		fmt.Printf("Failed to init idl mappings: %v\n", err)
+	}
+}
+
+func loadMappings() error {
+	jsonPath := "idl_mapping.json"
+
+	// Reading file
+	idlData, err := ioutil.ReadFile(jsonPath)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshal JSON data
+	if err := json.Unmarshal(idlData, &IdlMap); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getIdlFile(service, method string) (string, error) {
