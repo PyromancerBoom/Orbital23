@@ -13,6 +13,6 @@ struct GatewayResponse {
 }
 
 service ApiGateway {
-    GatewayResponse processGetRequest(1: GatewayRequest REQ) (api.post = "hertzgateway/get");
-    GatewayResponse processPostRequest(1: GatewayRequest REQ) (api.post = "hertzgateway/post");
+    GatewayResponse processGetRequest(1: GatewayRequest request) (api.get = "hertzgateway/get");
+    GatewayResponse processPostRequest(1: GatewayRequest request) (api.post = "hertzgateway/post");
 }

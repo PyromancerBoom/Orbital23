@@ -3,7 +3,7 @@
 package apigateway
 
 import (
-	apigateway "api-gateway/hertz_server/biz/handler/apigateway"
+	apigateway "api-gateway/hert_server/biz/handler/apigateway"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -19,7 +19,7 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_hertzgateway := root.Group("/hertzgateway", _hertzgatewayMw()...)
-		_hertzgateway.POST("/get", append(_processgetrequestMw(), apigateway.ProcessGetRequest)...)
+		_hertzgateway.GET("/get", append(_processgetrequestMw(), apigateway.ProcessGetRequest)...)
 		_hertzgateway.POST("/post", append(_processpostrequestMw(), apigateway.ProcessPostRequest)...)
 	}
 }

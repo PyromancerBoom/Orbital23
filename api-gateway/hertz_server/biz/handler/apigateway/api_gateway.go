@@ -5,13 +5,14 @@ package apigateway
 import (
 	"context"
 
-	apigateway "api-gateway/hertz_server/biz/model/apigateway"
+	apigateway "api-gateway/hert_server/biz/model/apigateway"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // ProcessGetRequest .
-// @router hertzgateway/get [POST]
+// @router hertzgateway/get [GET]
 func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req apigateway.GatewayRequest
@@ -20,6 +21,8 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+
+	// service := c.Param("service")
 
 	resp := new(apigateway.GatewayResponse)
 

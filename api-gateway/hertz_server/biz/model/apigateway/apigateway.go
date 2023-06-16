@@ -467,9 +467,9 @@ func (p *GatewayResponse) String() string {
 }
 
 type ApiGateway interface {
-	ProcessGetRequest(ctx context.Context, rEQ *GatewayRequest) (r *GatewayResponse, err error)
+	ProcessGetRequest(ctx context.Context, request *GatewayRequest) (r *GatewayResponse, err error)
 
-	ProcessPostRequest(ctx context.Context, rEQ *GatewayRequest) (r *GatewayResponse, err error)
+	ProcessPostRequest(ctx context.Context, request *GatewayRequest) (r *GatewayResponse, err error)
 }
 
 type ApiGatewayClient struct {
@@ -498,18 +498,18 @@ func (p *ApiGatewayClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *ApiGatewayClient) ProcessGetRequest(ctx context.Context, rEQ *GatewayRequest) (r *GatewayResponse, err error) {
+func (p *ApiGatewayClient) ProcessGetRequest(ctx context.Context, request *GatewayRequest) (r *GatewayResponse, err error) {
 	var _args ApiGatewayProcessGetRequestArgs
-	_args.REQ = rEQ
+	_args.Request = request
 	var _result ApiGatewayProcessGetRequestResult
 	if err = p.Client_().Call(ctx, "processGetRequest", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *ApiGatewayClient) ProcessPostRequest(ctx context.Context, rEQ *GatewayRequest) (r *GatewayResponse, err error) {
+func (p *ApiGatewayClient) ProcessPostRequest(ctx context.Context, request *GatewayRequest) (r *GatewayResponse, err error) {
 	var _args ApiGatewayProcessPostRequestArgs
-	_args.REQ = rEQ
+	_args.Request = request
 	var _result ApiGatewayProcessPostRequestResult
 	if err = p.Client_().Call(ctx, "processPostRequest", &_args, &_result); err != nil {
 		return
@@ -579,7 +579,7 @@ func (p *apiGatewayProcessorProcessGetRequest) Process(ctx context.Context, seqI
 	var err2 error
 	result := ApiGatewayProcessGetRequestResult{}
 	var retval *GatewayResponse
-	if retval, err2 = p.handler.ProcessGetRequest(ctx, args.REQ); err2 != nil {
+	if retval, err2 = p.handler.ProcessGetRequest(ctx, args.Request); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing processGetRequest: "+err2.Error())
 		oprot.WriteMessageBegin("processGetRequest", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
@@ -627,7 +627,7 @@ func (p *apiGatewayProcessorProcessPostRequest) Process(ctx context.Context, seq
 	var err2 error
 	result := ApiGatewayProcessPostRequestResult{}
 	var retval *GatewayResponse
-	if retval, err2 = p.handler.ProcessPostRequest(ctx, args.REQ); err2 != nil {
+	if retval, err2 = p.handler.ProcessPostRequest(ctx, args.Request); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing processPostRequest: "+err2.Error())
 		oprot.WriteMessageBegin("processPostRequest", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
@@ -656,28 +656,28 @@ func (p *apiGatewayProcessorProcessPostRequest) Process(ctx context.Context, seq
 }
 
 type ApiGatewayProcessGetRequestArgs struct {
-	REQ *GatewayRequest `thrift:"REQ,1"`
+	Request *GatewayRequest `thrift:"request,1"`
 }
 
 func NewApiGatewayProcessGetRequestArgs() *ApiGatewayProcessGetRequestArgs {
 	return &ApiGatewayProcessGetRequestArgs{}
 }
 
-var ApiGatewayProcessGetRequestArgs_REQ_DEFAULT *GatewayRequest
+var ApiGatewayProcessGetRequestArgs_Request_DEFAULT *GatewayRequest
 
-func (p *ApiGatewayProcessGetRequestArgs) GetREQ() (v *GatewayRequest) {
-	if !p.IsSetREQ() {
-		return ApiGatewayProcessGetRequestArgs_REQ_DEFAULT
+func (p *ApiGatewayProcessGetRequestArgs) GetRequest() (v *GatewayRequest) {
+	if !p.IsSetRequest() {
+		return ApiGatewayProcessGetRequestArgs_Request_DEFAULT
 	}
-	return p.REQ
+	return p.Request
 }
 
 var fieldIDToName_ApiGatewayProcessGetRequestArgs = map[int16]string{
-	1: "REQ",
+	1: "request",
 }
 
-func (p *ApiGatewayProcessGetRequestArgs) IsSetREQ() bool {
-	return p.REQ != nil
+func (p *ApiGatewayProcessGetRequestArgs) IsSetRequest() bool {
+	return p.Request != nil
 }
 
 func (p *ApiGatewayProcessGetRequestArgs) Read(iprot thrift.TProtocol) (err error) {
@@ -740,8 +740,8 @@ ReadStructEndError:
 }
 
 func (p *ApiGatewayProcessGetRequestArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.REQ = NewGatewayRequest()
-	if err := p.REQ.Read(iprot); err != nil {
+	p.Request = NewGatewayRequest()
+	if err := p.Request.Read(iprot); err != nil {
 		return err
 	}
 	return nil
@@ -777,10 +777,10 @@ WriteStructEndError:
 }
 
 func (p *ApiGatewayProcessGetRequestArgs) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("REQ", thrift.STRUCT, 1); err != nil {
+	if err = oprot.WriteFieldBegin("request", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := p.REQ.Write(oprot); err != nil {
+	if err := p.Request.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -948,28 +948,28 @@ func (p *ApiGatewayProcessGetRequestResult) String() string {
 }
 
 type ApiGatewayProcessPostRequestArgs struct {
-	REQ *GatewayRequest `thrift:"REQ,1"`
+	Request *GatewayRequest `thrift:"request,1"`
 }
 
 func NewApiGatewayProcessPostRequestArgs() *ApiGatewayProcessPostRequestArgs {
 	return &ApiGatewayProcessPostRequestArgs{}
 }
 
-var ApiGatewayProcessPostRequestArgs_REQ_DEFAULT *GatewayRequest
+var ApiGatewayProcessPostRequestArgs_Request_DEFAULT *GatewayRequest
 
-func (p *ApiGatewayProcessPostRequestArgs) GetREQ() (v *GatewayRequest) {
-	if !p.IsSetREQ() {
-		return ApiGatewayProcessPostRequestArgs_REQ_DEFAULT
+func (p *ApiGatewayProcessPostRequestArgs) GetRequest() (v *GatewayRequest) {
+	if !p.IsSetRequest() {
+		return ApiGatewayProcessPostRequestArgs_Request_DEFAULT
 	}
-	return p.REQ
+	return p.Request
 }
 
 var fieldIDToName_ApiGatewayProcessPostRequestArgs = map[int16]string{
-	1: "REQ",
+	1: "request",
 }
 
-func (p *ApiGatewayProcessPostRequestArgs) IsSetREQ() bool {
-	return p.REQ != nil
+func (p *ApiGatewayProcessPostRequestArgs) IsSetRequest() bool {
+	return p.Request != nil
 }
 
 func (p *ApiGatewayProcessPostRequestArgs) Read(iprot thrift.TProtocol) (err error) {
@@ -1032,8 +1032,8 @@ ReadStructEndError:
 }
 
 func (p *ApiGatewayProcessPostRequestArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.REQ = NewGatewayRequest()
-	if err := p.REQ.Read(iprot); err != nil {
+	p.Request = NewGatewayRequest()
+	if err := p.Request.Read(iprot); err != nil {
 		return err
 	}
 	return nil
@@ -1069,10 +1069,10 @@ WriteStructEndError:
 }
 
 func (p *ApiGatewayProcessPostRequestArgs) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("REQ", thrift.STRUCT, 1); err != nil {
+	if err = oprot.WriteFieldBegin("request", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := p.REQ.Write(oprot); err != nil {
+	if err := p.Request.Write(oprot); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
