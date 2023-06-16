@@ -4,15 +4,11 @@ package apigateway
 
 import (
 	"context"
-	"encoding/json"
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/client/genericclient"
-	"github.com/cloudwego/kitex/pkg/generic"
 
 	"fmt"
 
@@ -30,10 +26,10 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	fmt.Println("Reached Here")
+	fmt.Println("Reached Here POST")
 
-	serviceName := 
-	serviceMethod := "insertUser"
+	serviceName := c.Param("serviceName")
+	serviceMethod := c.Param("serviceMethod")
 
 	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
@@ -47,7 +43,11 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	fmt.Printf("IDL path '%s'\n", idl)
 
 	fmt.Println("Received response from backend service")
-	c.JSON(consts.StatusOK, respJSON)
+
+	// Return resp
+	resp := apigateway.GatewayResponse{}
+
+	c.JSON(consts.StatusOK, resp)
 }
 
 // ProcessGetRequest .
@@ -61,10 +61,10 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	fmt.Println("Reached Here")
+	fmt.Println("Reached Here GET")
 
-	serviceName := "UserService"
-	serviceMethod := "insertUser"
+	serviceName := c.Param("serviceName")
+	serviceMethod := c.Param("serviceMethod")
 
 	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
@@ -77,7 +77,10 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("IDL path '%s'\n", idl)
 
-
 	fmt.Println("Received response from backend service")
-	c.JSON(consts.StatusOK, respJSON)
+
+	// Return resp
+	resp := apigateway.GatewayResponse{}
+
+	c.JSON(consts.StatusOK, resp)
 }
