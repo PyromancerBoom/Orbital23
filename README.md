@@ -11,4 +11,5 @@
 * Finaliase Implementation of Service Discovery
 * Try out a simplr Random Load Balancer
 * Perform benchmarking on single Hertz server
-* look into cluster designs
+* build .config for service registry and information with all kitex instances.
+* Look into cluster designs
