@@ -1,5 +1,7 @@
 package apigateway
 
+import "fmt"
+
 // Represents the relationship between services, method, and IDLs
 type IdlMapping struct {
 	Service string
@@ -8,7 +10,7 @@ type IdlMapping struct {
 }
 
 //
-var IdlMapping = []IdlMapping{
+var IdlMap = []IdlMapping{
 	{Service: "AssetManagement", Method: "queryAsset", IDL: "../idl/asset_management.thrift"},
 	{Service: "AssetManagement", Method: "insert", IDL: "../idl/asset_management.thrift"},
 	// Can add more mappings similarly using service registry
@@ -16,9 +18,11 @@ var IdlMapping = []IdlMapping{
 }
 
 func getIdlFile(service, method string) (string, error) {
-	for key, value := range IdlMapping {
-		if key.service == service && key.Method == method {
-			return value, nil
+	for key, value := range IdlMap {
+		if value.Service == service && value.Method == method {
+			return value.IDL, nil
 		}
 	}
+
+	return "", fmt.Errorf("IDL not found")
 }
