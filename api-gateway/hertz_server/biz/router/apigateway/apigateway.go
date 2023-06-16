@@ -18,8 +18,8 @@ func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
 	{
-		_hertzgateway := root.Group("/hertzgateway", _hertzgatewayMw()...)
-		_hertzgateway.GET("/get", append(_processgetrequestMw(), apigateway.ProcessGetRequest)...)
-		_hertzgateway.POST("/post", append(_processpostrequestMw(), apigateway.ProcessPostRequest)...)
+		__7bservicename_7d := root.Group("/{serviceName}", __7bservicename_7dMw()...)
+		__7bservicename_7d.GET("/{serviceMethod}", append(_processgetrequestMw(), apigateway.ProcessGetRequest)...)
+		__7bservicename_7d.POST("/{serviceMethod}", append(_processpostrequestMw(), apigateway.ProcessPostRequest)...)
 	}
 }

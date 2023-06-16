@@ -3,19 +3,23 @@
 package apigateway
 
 import (
+	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 	"context"
 	"fmt"
 
-	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 	idlmap "api-gateway/hertz_server/biz/model/idlmap"
+
+	"github.com/cloudwego/kitex/client"
+	genericClient "github.com/cloudwego/kitex/client/genericclient"
+	"github.com/cloudwego/kitex/pkg/generic"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
-// ProcessGetRequest .
-// @router hertzgateway/get [GET]
-func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
+// ProcessPostRequest .
+// @router /{serviceName}/{serviceMethod} [POST]
+func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req apigateway.GatewayRequest
 	err = c.BindAndValidate(&req)
@@ -27,7 +31,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	// c.Param("service")
 	// c.Param("method")
 	serviceFromRequest := "AssetManagement"
-	methodFromRequest := "queryAsset"
+	methodFromRequest := "insetAsset"
 
 	// Checking if service and method are valid
 	idl, err := idlmap.GetIdlFile(serviceFromRequest, methodFromRequest)
@@ -36,16 +40,36 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	fmt.Println("IDL file path:", idl)
+	// Generic client
+	p, err := generic.NewThriftFileProvider(idl)
+	if err != nil {
+		panic(err)
+	}
 
-	resp := new(apigateway.GatewayResponse)
+	g, err := generic.JSONThriftGeneric(p)
+	if err != nil {
+		panic(err)
+	}
+
+	cli, err := genericClient.NewClient("asset", g, client.WithHostPorts("127.0.0.1:8888"))
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := cli.GenericCall(context.Background(), methodFromRequest, req.RequestData)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Println("Generic Post request Made")
 
 	c.JSON(consts.StatusOK, resp)
 }
 
-// ProcessPostRequest .
-// @router hertzgateway/post [POST]
-func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
+// ProcessGetRequest .
+// @router /{serviceName}/{serviceMethod} [GET]
+func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req apigateway.GatewayRequest
 	err = c.BindAndValidate(&req)
@@ -53,6 +77,34 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+
+	// // c.Param("service")
+	// // c.Param("method")
+	// serviceFromRequest := "AssetManagement"
+	// methodFromRequest := "queryAsset"
+
+	// // Checking if service and method are valid
+	// idl, err := idlmap.GetIdlFile(serviceFromRequest, methodFromRequest)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	// //generic client
+	// p, err := generic.NewThriftFileProvider("../idl/asset_management.thrift")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// g, err := generic.JSONThriftGeneric(p)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// cli, err := genericClient.NewClient("asset", g, client.WithHostPorts("127.0.0.1:8888"))
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	resp := new(apigateway.GatewayResponse)
 

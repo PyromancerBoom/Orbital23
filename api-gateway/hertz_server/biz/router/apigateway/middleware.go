@@ -11,7 +11,7 @@ func rootMw() []app.HandlerFunc {
 	return nil
 }
 
-func _hertzgatewayMw() []app.HandlerFunc {
+func __7bservicename_7dMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
