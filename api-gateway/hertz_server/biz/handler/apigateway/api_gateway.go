@@ -31,6 +31,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	fmt.Println(" ")
 	fmt.Println("Reached Here POST")
 
 	serviceName := c.Param("serviceName")
@@ -77,7 +78,87 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		panic(err)
 	}
 
-	fmt.Println("Received response from backend service")
+	// Convert responseJson to []byte
+	responseBytes, ok := responseJson.([]byte)
+	if !ok {
+		panic("Failed to convert responseJson to []byte")
+	}
+
+	// Unmarshal responseBytes
+	var response apigateway.GatewayResponse
+	err = json.Unmarshal(responseBytes, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the final response object
+	finalResponse := apigateway.GatewayResponse{
+		StatusCode:   response.StatusCode,
+		ResponseData: string(responseBytes),
+	}
+
+	fmt.Println("Received response from backend service for POST")
+
+	c.JSON(consts.StatusOK, finalResponse)
+}
+
+// ProcessGetRequest .
+// @router /{:serviceName}/{:serviceMethod} [GET]
+func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req apigateway.GatewayRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	fmt.Println(" ")
+	fmt.Println("Reached Here GET")
+
+	serviceName := c.Param("serviceName")
+	serviceMethod := c.Param("serviceMethod")
+
+	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, serviceMethod)
+
+	// Checking if service and method are valid
+	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	fmt.Printf("IDL path '%s'\n", idl)
+
+	// Generic client init
+	provider, err := generic.NewThriftFileProvider(idl)
+	if err != nil {
+		panic(err)
+	}
+
+	thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	if err != nil {
+		panic(err)
+	}
+
+	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
+		client.WithHostPorts("127.0.0.1:8888"))
+	if err != nil {
+		panic(err)
+	}
+
+	// Make Json string from request
+	jsonBytes, err := json.Marshal(req)
+	if err != nil {
+		panic(err)
+	}
+
+	jsonString := string(jsonBytes)
+
+	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
+	if err != nil {
+		panic(err)
+	}
 
 	// Convert responseJson to []byte
 	responseBytes, ok := responseJson.([]byte)
@@ -98,40 +179,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		ResponseData: string(responseBytes),
 	}
 
+	fmt.Println("Received response from backend service for GET")
+
 	c.JSON(consts.StatusOK, finalResponse)
-}
-
-// ProcessGetRequest .
-// @router /{:serviceName}/{:serviceMethod} [GET]
-func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req apigateway.GatewayRequest
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
-		return
-	}
-
-	fmt.Println("Reached Here GET")
-
-	serviceName := c.Param("serviceName")
-	serviceMethod := c.Param("serviceMethod")
-
-	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, serviceMethod)
-
-	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	fmt.Printf("IDL path '%s'\n", idl)
-
-	fmt.Println("Received response from backend service")
-
-	// Return resp
-	resp := apigateway.GatewayResponse{}
-
-	c.JSON(consts.StatusOK, resp)
 }
