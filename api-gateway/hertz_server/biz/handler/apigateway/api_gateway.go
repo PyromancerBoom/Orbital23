@@ -7,8 +7,13 @@ import (
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 
+	"encoding/json"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	client "github.com/cloudwego/kitex/client"
+	genericClient "github.com/cloudwego/kitex/client/genericclient"
+	"github.com/cloudwego/kitex/pkg/generic"
 
 	"fmt"
 
@@ -42,12 +47,58 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("IDL path '%s'\n", idl)
 
+	// Generic client init
+	provider, err := generic.NewThriftFileProvider(idl)
+	if err != nil {
+		panic(err)
+	}
+
+	thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	if err != nil {
+		panic(err)
+	}
+
+	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
+		client.WithHostPorts("127.0.0.1:8888"))
+	if err != nil {
+		panic(err)
+	}
+
+	// Make Json string from request
+	jsonBytes, err := json.Marshal(req)
+	if err != nil {
+		panic(err)
+	}
+
+	jsonString := string(jsonBytes)
+
+	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println("Received response from backend service")
 
-	// Return resp
-	resp := apigateway.GatewayResponse{}
+	// Convert responseJson to []byte
+	responseBytes, ok := responseJson.([]byte)
+	if !ok {
+		panic("Failed to convert responseJson to []byte")
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Unmarshal responseBytes
+	var response apigateway.GatewayResponse
+	err = json.Unmarshal(responseBytes, &response)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create the final response object
+	finalResponse := apigateway.GatewayResponse{
+		StatusCode:   response.StatusCode,
+		ResponseData: string(responseBytes),
+	}
+
+	c.JSON(consts.StatusOK, finalResponse)
 }
 
 // ProcessGetRequest .
