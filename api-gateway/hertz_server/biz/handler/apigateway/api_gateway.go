@@ -71,6 +71,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	jsonString := string(jsonBytes)
 
+	// Make generic Call
 	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -80,23 +81,28 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	responseBytes, err := json.Marshal(responseJson)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
-
+		return // Added return statement here
 	}
 
 	// Unmarshal responseBytes
-	var response apigateway.GatewayResponse
+	var response struct {
+		StatusCode   int32           `json:"statusCode"`
+		ResponseData json.RawMessage `json:"responseData"`
+	}
+
 	err = json.Unmarshal(responseBytes, &response)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
+		return // Added return statement here
 	}
 
 	// Create the final response object
 	finalResponse := apigateway.GatewayResponse{
 		StatusCode:   response.StatusCode,
-		ResponseData: string(responseBytes),
+		ResponseData: string(response.ResponseData),
 	}
 
-	fmt.Println("Received response from backend service for POST")
+	fmt.Println("Reached END for POST")
 
 	c.JSON(consts.StatusOK, finalResponse)
 }
