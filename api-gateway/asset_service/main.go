@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	asset_management "api-gateway/kitex_server/kitex_gen/asset_management/assetmanagement"
+	asset_management "api-gateway/asset_service/kitex_gen/asset_management/assetmanagement"
 	"os"
 
 	server "github.com/cloudwego/kitex/server"

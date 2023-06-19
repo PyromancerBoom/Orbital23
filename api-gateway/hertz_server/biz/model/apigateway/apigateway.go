@@ -11,8 +11,8 @@ import (
 type GatewayRequest struct {
 	ServiceName   string `thrift:"serviceName,1" json:"serviceName" path:"serviceName"`
 	ServiceMethod string `thrift:"serviceMethod,2" json:"serviceMethod" path:"serviceMethod"`
-	RequestData   string `thrift:"requestData,3" form:"requestData" json:"requestData"`
-	ServiceId     string `thrift:"serviceId,4" json:"serviceId" path:"serviceId"`
+	// 3: string requestData (api.form = "requestData");
+	ServiceId string `thrift:"serviceId,4" json:"serviceId" path:"serviceId"`
 }
 
 func NewGatewayRequest() *GatewayRequest {
@@ -27,10 +27,6 @@ func (p *GatewayRequest) GetServiceMethod() (v string) {
 	return p.ServiceMethod
 }
 
-func (p *GatewayRequest) GetRequestData() (v string) {
-	return p.RequestData
-}
-
 func (p *GatewayRequest) GetServiceId() (v string) {
 	return p.ServiceId
 }
@@ -38,7 +34,6 @@ func (p *GatewayRequest) GetServiceId() (v string) {
 var fieldIDToName_GatewayRequest = map[int16]string{
 	1: "serviceName",
 	2: "serviceMethod",
-	3: "requestData",
 	4: "serviceId",
 }
 
@@ -74,16 +69,6 @@ func (p *GatewayRequest) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -149,15 +134,6 @@ func (p *GatewayRequest) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GatewayRequest) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.RequestData = v
-	}
-	return nil
-}
-
 func (p *GatewayRequest) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
@@ -179,10 +155,6 @@ func (p *GatewayRequest) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 		if err = p.writeField4(oprot); err != nil {
@@ -240,23 +212,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *GatewayRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("requestData", thrift.STRING, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.RequestData); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *GatewayRequest) writeField4(oprot thrift.TProtocol) (err error) {

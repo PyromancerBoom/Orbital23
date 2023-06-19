@@ -3,7 +3,7 @@ namespace Go ApiGateway
 struct GatewayRequest {
     1: string serviceName (api.path = "serviceName");
     2: string serviceMethod (api.path = "serviceMethod");
-    3: string requestData (api.form = "*");
+    // 3: string requestData (api.form = "requestData");
     4: string serviceId (api.path = "serviceId");
 }
 

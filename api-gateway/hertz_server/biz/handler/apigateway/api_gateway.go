@@ -38,9 +38,13 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
+	reqBody, err := c.Body()
+	if err != nil {
+		fmt.Println(err)
+	}
 	// Print request data
-	fmt.Println("Request Data:")
-	fmt.Println(c.Param("requestData"))
+	fmt.Println("Request data:")
+	fmt.Println(string(reqBody))
 
 	// Checking if service and method are valid
 	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
@@ -76,12 +80,44 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	jsonString := string(jsonBytes)
 
 	// Make generic Call and get back response
-	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
+	response, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	c.JSON(consts.StatusOK, responseJson)
+	// finalResponse, ok := response.(string) // Type assertion to convert response to string
+	// if !ok {
+	// 	c.String(consts.StatusInternalServerError, "Failed to convert response to string")
+	// 	return
+	// }
+
+	c.String(consts.StatusOK, response.(string)) // Return finalResponse as a string
+
+	// resp, err := json.Marshal(response)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
+
+	// finalresponse, _ := strconv.Unquote(string(resp))
+
+	// unquotedResp, _ := strconv.Unquote(finalresponse)
+
+	// c.JSON(consts.StatusOK, unquotedResp)
+
+	// if respStr, ok := responseJsonStr.(string); ok {
+	// 	responseJson, _ := strconv.Unquote(respStr)
+	// 	fmt.Println("response str: ")
+	// 	fmt.Println(respStr)
+	// 	c.JSON(consts.StatusOK, responseJson)
+	// } else {
+	// 	fmt.Println("Not captured string")
+	// }
+
+	// // Convert response to JSON
+	// responseJson := responseJsonStr.(string)
+
+	// resp, second := strconv.Unquote(response.(string))
+	// fmt.Println(resp)
 }
 
 // ProcessGetRequest .

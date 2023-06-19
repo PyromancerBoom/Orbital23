@@ -1,4 +1,4 @@
-module api-gateway/kitex_server
+module api-gateway/asset_service
 
 go 1.20
 
