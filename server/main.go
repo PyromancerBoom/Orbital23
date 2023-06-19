@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -12,6 +13,7 @@ import (
 	"github.com/cloudwego/kitex/server/genericserver"
 	consulApi "github.com/hashicorp/consul/api"
 	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/tidwall/gjson"
 )
 
 const (
@@ -21,6 +23,8 @@ const (
 	healthCheckInterval = "7s"
 	consulAddr          = "127.0.0.1:8500"
 )
+
+var numbCalls = 0
 
 func main() {
 	// Parse IDL with Local Files
@@ -52,7 +56,7 @@ func main() {
 	//Weight param is later used for Load Balancing. Weight param must be > 0.
 	svr := genericserver.NewServer(new(GenericServiceImpl), g, serverHostPortOpt, server.WithRegistry(registry), server.WithRegistryInfo(&r.Info{
 		ServiceName: serviceName,
-		Weight:      1,
+		Weight:      2,
 	}))
 
 	svr.Run()
@@ -62,11 +66,27 @@ func main() {
 type GenericServiceImpl struct {
 }
 
+type EchoResp struct {
+	Msg string
+}
+
 func (g *GenericServiceImpl) GenericCall(ctx context.Context, method string, request interface{}) (response interface{}, err error) {
 	// use jsoniter or other json parse sdk to assert request
 	m := request.(string)
 	fmt.Printf("Recv: %v\n", m)
-	return "{\"Msg\": \"World!!\"}", nil
+	numbCalls = numbCalls + 1
+	fmt.Println(numbCalls)
+
+	s := gjson.Get(m, "Msg")
+
+	temp := &EchoResp{
+		Msg: s.String() + " back! :)",
+	}
+
+	jsn, _ := json.Marshal(temp)
+
+	//return "{\"Msg\": \"World!!\"}", nil
+	return string(jsn), nil
 }
 
 // Recursively call TCP resolver until an address is found. Possible infinite loop.
