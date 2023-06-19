@@ -71,40 +71,13 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	jsonString := string(jsonBytes)
 
-	// Make generic Call
+	// Make generic Call and get back response
 	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// Convert responseJson to []byte
-	responseBytes, err := json.Marshal(responseJson)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return // Added return statement here
-	}
-
-	// Unmarshal responseBytes
-	var response struct {
-		StatusCode   int32           `json:"statusCode"`
-		ResponseData json.RawMessage `json:"responseData"`
-	}
-
-	err = json.Unmarshal(responseBytes, &response)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return // Added return statement here
-	}
-
-	// Create the final response object
-	finalResponse := apigateway.GatewayResponse{
-		StatusCode:   response.StatusCode,
-		ResponseData: string(response.ResponseData),
-	}
-
-	fmt.Println("Reached END for POST")
-
-	c.JSON(consts.StatusOK, finalResponse)
+	c.JSON(consts.StatusOK, responseJson)
 }
 
 // ProcessGetRequest .
@@ -135,61 +108,61 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("IDL path '%s'\n", idl)
 
-	// Generic client init
-	provider, err := generic.NewThriftFileProvider(idl)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+	// // Generic client init
+	// provider, err := generic.NewThriftFileProvider(idl)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
 
-	}
+	// }
 
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+	// thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
 
-	}
+	// }
 
-	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithHostPorts("127.0.0.1:8888"))
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+	// genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
+	// 	client.WithHostPorts("127.0.0.1:8888"))
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
 
-	}
+	// }
 
-	// Make Json string from request
-	jsonBytes, err := json.Marshal(req)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+	// // Make Json string from request
+	// jsonBytes, err := json.Marshal(req)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
 
-	}
+	// }
 
-	jsonString := string(jsonBytes)
+	// jsonString := string(jsonBytes)
 
-	responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
+	// responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
 
-	}
+	// }
 
-	// Convert responseJson to []byte
-	responseBytes, err := json.Marshal(responseJson)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+	// // Convert responseJson to []byte
+	// responseBytes, err := json.Marshal(responseJson)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
 
-	// Unmarshal responseBytes
-	var response apigateway.GatewayResponse
-	err = json.Unmarshal(responseBytes, &response)
-	if err != nil {
-		panic(err)
-	}
+	// // Unmarshal responseBytes
+	// var response apigateway.GatewayResponse
+	// err = json.Unmarshal(responseBytes, &response)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	// Create the final response object
-	finalResponse := apigateway.GatewayResponse{
-		StatusCode:   response.StatusCode,
-		ResponseData: string(responseBytes),
-	}
+	// // Create the final response object
+	// finalResponse := apigateway.GatewayResponse{
+	// 	StatusCode:   response.StatusCode,
+	// 	ResponseData: string(responseBytes),
+	// }
 
-	fmt.Println("Received response from backend service for GET")
+	// fmt.Println("Received response from backend service for GET")
 
-	c.JSON(consts.StatusOK, finalResponse)
+	// c.JSON(consts.StatusOK, finalResponse)
 }

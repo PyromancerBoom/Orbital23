@@ -284,8 +284,8 @@ func (p *GatewayRequest) String() string {
 }
 
 type GatewayResponse struct {
-	StatusCode   int32  `thrift:"statusCode,1" form:"statusCode" json:"statusCode" query:"statusCode"`
-	ResponseData string `thrift:"responseData,2" form:"responseData" json:"responseData" query:"responseData"`
+	StatusCode   int32             `thrift:"statusCode,1" form:"statusCode" json:"statusCode" query:"statusCode"`
+	ResponseData map[string]string `thrift:"responseData,2" form:"responseData" json:"responseData" query:"responseData"`
 }
 
 func NewGatewayResponse() *GatewayResponse {
@@ -296,7 +296,7 @@ func (p *GatewayResponse) GetStatusCode() (v int32) {
 	return p.StatusCode
 }
 
-func (p *GatewayResponse) GetResponseData() (v string) {
+func (p *GatewayResponse) GetResponseData() (v map[string]string) {
 	return p.ResponseData
 }
 
@@ -335,7 +335,7 @@ func (p *GatewayResponse) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.MAP {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -384,10 +384,30 @@ func (p *GatewayResponse) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *GatewayResponse) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
 		return err
-	} else {
-		p.ResponseData = v
+	}
+	p.ResponseData = make(map[string]string, size)
+	for i := 0; i < size; i++ {
+		var _key string
+		if v, err := iprot.ReadString(); err != nil {
+			return err
+		} else {
+			_key = v
+		}
+
+		var _val string
+		if v, err := iprot.ReadString(); err != nil {
+			return err
+		} else {
+			_val = v
+		}
+
+		p.ResponseData[_key] = _val
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -443,10 +463,23 @@ WriteFieldEndError:
 }
 
 func (p *GatewayResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("responseData", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("responseData", thrift.MAP, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ResponseData); err != nil {
+	if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.ResponseData)); err != nil {
+		return err
+	}
+	for k, v := range p.ResponseData {
+
+		if err := oprot.WriteString(k); err != nil {
+			return err
+		}
+
+		if err := oprot.WriteString(v); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteMapEnd(); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

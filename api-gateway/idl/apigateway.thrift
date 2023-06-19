@@ -9,7 +9,7 @@ struct GatewayRequest {
 
 struct GatewayResponse {
     1: i32 statusCode;
-    2: string responseData;
+    2: map<string, string> responseData;
 }
 
 // Assuming service name is unique
