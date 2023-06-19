@@ -38,6 +38,10 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
+	// Print request data
+	fmt.Println("Request Data:")
+	fmt.Println(c.Param("requestData"))
+
 	// Checking if service and method are valid
 	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
 	if err != nil {
@@ -108,61 +112,46 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	fmt.Printf("IDL path '%s'\n", idl)
 
-	// // Generic client init
-	// provider, err := generic.NewThriftFileProvider(idl)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// Generic client init
+	provider, err := generic.NewThriftFileProvider(idl)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// }
+	thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
+	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
+		client.WithHostPorts("127.0.0.1:8888"))
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// }
+	// Make JSON string from request
+	requestJSON, err := json.Marshal(req)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-	// 	client.WithHostPorts("127.0.0.1:8888"))
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// Make generic call and get back response as map[string]interface{}
+	responseData, err := genClient.GenericCall(ctx, serviceMethod, string(requestJSON))
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// }
+	// Convert response data to JSON string
+	responseJSON, err := json.Marshal(responseData)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// // Make Json string from request
-	// jsonBytes, err := json.Marshal(req)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-
-	// }
-
-	// jsonString := string(jsonBytes)
-
-	// responseJson, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-
-	// }
-
-	// // Convert responseJson to []byte
-	// responseBytes, err := json.Marshal(responseJson)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
-
-	// // Unmarshal responseBytes
-	// var response apigateway.GatewayResponse
-	// err = json.Unmarshal(responseBytes, &response)
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// // Create the final response object
-	// finalResponse := apigateway.GatewayResponse{
-	// 	StatusCode:   response.StatusCode,
-	// 	ResponseData: string(responseBytes),
-	// }
-
-	// fmt.Println("Received response from backend service for GET")
-
-	// c.JSON(consts.StatusOK, finalResponse)
+	c.String(consts.StatusOK, string(responseJSON))
 }

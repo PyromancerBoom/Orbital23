@@ -12,7 +12,7 @@ type GatewayRequest struct {
 	ServiceName   string `thrift:"serviceName,1" json:"serviceName" path:"serviceName"`
 	ServiceMethod string `thrift:"serviceMethod,2" json:"serviceMethod" path:"serviceMethod"`
 	RequestData   string `thrift:"requestData,3" form:"requestData" json:"requestData"`
-	ServiceId     string `thrift:"serviceId,4" form:"serviceId" json:"serviceId"`
+	ServiceId     string `thrift:"serviceId,4" json:"serviceId" path:"serviceId"`
 }
 
 func NewGatewayRequest() *GatewayRequest {

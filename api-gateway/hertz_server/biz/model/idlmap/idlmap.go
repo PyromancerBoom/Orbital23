@@ -32,5 +32,5 @@ func GetIdlFile(service, method string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("404 : IDL not found")
+	return "", fmt.Errorf("404 : IDL not found\n")
 }
