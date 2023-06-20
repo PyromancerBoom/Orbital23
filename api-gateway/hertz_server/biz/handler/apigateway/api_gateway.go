@@ -85,39 +85,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// finalResponse, ok := response.(string) // Type assertion to convert response to string
-	// if !ok {
-	// 	c.String(consts.StatusInternalServerError, "Failed to convert response to string")
-	// 	return
-	// }
-
-	c.String(consts.StatusOK, response.(string)) // Return finalResponse as a string
-
-	// resp, err := json.Marshal(response)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
-
-	// finalresponse, _ := strconv.Unquote(string(resp))
-
-	// unquotedResp, _ := strconv.Unquote(finalresponse)
-
-	// c.JSON(consts.StatusOK, unquotedResp)
-
-	// if respStr, ok := responseJsonStr.(string); ok {
-	// 	responseJson, _ := strconv.Unquote(respStr)
-	// 	fmt.Println("response str: ")
-	// 	fmt.Println(respStr)
-	// 	c.JSON(consts.StatusOK, responseJson)
-	// } else {
-	// 	fmt.Println("Not captured string")
-	// }
-
-	// // Convert response to JSON
-	// responseJson := responseJsonStr.(string)
-
-	// resp, second := strconv.Unquote(response.(string))
-	// fmt.Println(resp)
+	c.String(consts.StatusOK, response.(string))
 }
 
 // ProcessGetRequest .
@@ -143,7 +111,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
-
+		return
 	}
 
 	fmt.Printf("IDL path '%s'\n", idl)
@@ -175,19 +143,14 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Make generic call and get back response as map[string]interface{}
-	responseData, err := genClient.GenericCall(ctx, serviceMethod, string(requestJSON))
+	requestJSONStr := string(requestJSON)
+
+	// Make generic call and get back response
+	responseData, err := genClient.GenericCall(ctx, serviceMethod, requestJSONStr)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// Convert response data to JSON string
-	responseJSON, err := json.Marshal(responseData)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.String(consts.StatusOK, string(responseJSON))
+	c.String(consts.StatusOK, responseData.(string))
 }
