@@ -19,6 +19,11 @@ import (
 	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 )
 
+// ------------------------------------- NOTE -------------------------------------
+// POST Request working
+// GET requests have some issue (ProcessGetRequest Method)
+// --------------------------------------------------------------------------
+
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
@@ -101,7 +106,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	c.String(consts.StatusOK, response.(string))
 }
 
-// ProcessGetRequest .
+// ProcessGetRequest handles the GET request.
 // @router /{:serviceName}/{:serviceMethod} [GET]
 func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	serviceName := c.Param("serviceName")
@@ -114,7 +119,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// provider initialisation
+	// Provider initialization
 	provider, err := generic.NewThriftFileProvider(idl)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\n Provider Init error \n")
@@ -127,17 +132,32 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// fetch hostport from registry later
+	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithHostPorts("127.0.0.1:8888"))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic client initialisation error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic client initialization error \n")
+		return
 	}
 
-	// Make generic Call and get back response
-	response, err := genClient.GenericCall(ctx, serviceMethod, "")
+	// Get the 'id' query parameter from the request URL
+	id := c.Query("id")
+
+	// Create a query request object
+	queryRequest := map[string]interface{}{
+		"ID": id,
+	}
+	requestBody, err := json.Marshal(queryRequest)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error()+"\n JSON Marshalling error \n")
+		return
+	}
+
+	// Make the generic call and get the response
+	response, err := genClient.GenericCall(ctx, serviceMethod, string(requestBody))
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic call error \n")
+		return
 	}
 
 	c.String(consts.StatusOK, response.(string))
