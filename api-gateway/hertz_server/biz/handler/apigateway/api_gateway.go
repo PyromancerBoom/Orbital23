@@ -41,7 +41,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// fmt.Println("Reached Here POST")
 
 	serviceName := c.Param("serviceName")
-	serviceMethod := c.Param("serviceMethod")
+	path := c.Param("path")
 
 	// fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
 
@@ -62,7 +62,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// fmt.Println(string(reqBody))
 
 	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	value, err := idlmap.GetIdlFile(serviceName, path)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
@@ -70,15 +70,15 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// fmt.Printf("IDL path '%s'\n", idl)
 
 	// provider initialisation
-	provider, err := generic.NewThriftFileProvider(idl)
+	provider, err := generic.NewThriftFileProvider(value.IDL)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Provider Init error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
 		return
 	}
 
 	thriftGeneric, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n JSONThriftGeneric error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nJSONThriftGeneric error \n")
 		return
 	}
 
@@ -86,21 +86,21 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithHostPorts("127.0.0.1:8888"))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic client initialisation error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
 	}
 
 	// Make Json string from request
 	jsonBytes, err := json.Marshal(req)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Json Marshalling error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
 
 	jsonString := string(jsonBytes)
 
 	// Make generic Call and get back response
-	response, err := genClient.GenericCall(ctx, serviceMethod, jsonString)
+	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic call error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric call error \n")
 	}
 
 	c.String(consts.StatusOK, response.(string))
@@ -110,25 +110,25 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 // @router /{:serviceName}/{:serviceMethod} [GET]
 func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	serviceName := c.Param("serviceName")
-	serviceMethod := c.Param("serviceMethod")
+	path := c.Param("path")
 
 	// Checking if service and method are valid
-	idl, err := idlmap.GetIdlFile(serviceName, serviceMethod)
+	value, err := idlmap.GetIdlFile(serviceName, path)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
 	// Provider initialization
-	provider, err := generic.NewThriftFileProvider(idl)
+	provider, err := generic.NewThriftFileProvider(value.IDL)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Provider Init error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
 		return
 	}
 
 	thriftGeneric, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n JSONThriftGeneric error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nJSONThriftGeneric error \n")
 		return
 	}
 
@@ -136,7 +136,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithHostPorts("127.0.0.1:8888"))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic client initialization error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialization error \n")
 		return
 	}
 
@@ -149,14 +149,14 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	requestBody, err := json.Marshal(queryRequest)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n JSON Marshalling error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nJSON Marshalling error \n")
 		return
 	}
 
 	// Make the generic call and get the response
-	response, err := genClient.GenericCall(ctx, serviceMethod, string(requestBody))
+	response, err := genClient.GenericCall(ctx, value.Method, string(requestBody))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\n Generic call error \n")
+		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric call error \n")
 		return
 	}
 

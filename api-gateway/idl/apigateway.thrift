@@ -2,9 +2,9 @@ namespace Go ApiGateway
 
 struct GatewayRequest {
     1: string serviceName (api.path = "serviceName");
-    2: string serviceMethod (api.path = "serviceMethod");
-    // 3: string requestData (api.form = "requestData");
-    4: string serviceId (api.path = "serviceId");
+    // 2: string serviceMethod (api.path = "serviceMethod");
+    2: string serviceId (api.path = "serviceId");
+    3: string path (api.path = "path");
 }
 
 struct GatewayResponse {
@@ -14,6 +14,6 @@ struct GatewayResponse {
 
 // Assuming service name is unique
 service ApiGateway {
-    GatewayResponse processGetRequest(1: GatewayRequest request) (api.get = '/:serviceName/:serviceMethod');
-    GatewayResponse processPostRequest(1: GatewayRequest request) (api.post = '/:serviceName/:serviceMethod');
+    GatewayResponse processGetRequest(1: GatewayRequest request) (api.get = '/:serviceName/:path');
+    GatewayResponse processPostRequest(1: GatewayRequest request) (api.post = '/:serviceName/:path');
 }

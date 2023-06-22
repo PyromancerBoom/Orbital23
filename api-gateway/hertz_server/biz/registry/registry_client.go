@@ -57,3 +57,21 @@ func (s *Service) registerService() {
 		log.Fatal(err)
 	}
 }
+
+func (s *Service) healthCheckLoop() {
+	ticker := time.NewTicker(time.Second * 3)
+	for {
+		err := s.consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
+		if err != nil {
+			log.Fatal(err)
+		}
+		<-ticker.C
+	}
+}
+
+func main() {
+	s := NewService()
+
+	s.registerService()
+	s.healthCheckLoop()
+}
