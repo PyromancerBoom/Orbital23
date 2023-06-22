@@ -4,6 +4,7 @@ package main
 
 import (
 	handler "api-gateway/hertz_server/biz/handler"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -12,4 +13,6 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 
 	// your code ...
+	r.POST("/register", handler.Register)
+	r.GET("/show", handler.DisplayAll)
 }
