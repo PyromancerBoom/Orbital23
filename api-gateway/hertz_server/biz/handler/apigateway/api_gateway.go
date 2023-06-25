@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 
@@ -53,8 +52,6 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
-
-	fmt.Printf("IDL content '%s'\n", value.IDL)
 
 	// provider initialisation
 	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
