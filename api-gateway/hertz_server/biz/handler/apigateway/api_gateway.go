@@ -63,7 +63,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// fmt.Println(string(reqBody))
 
 	// Checking if service and method are valid
-	value, err := idlmap.GetIdlFile(serviceName, path)
+	value, err := idlmap.GetService(serviceName, path)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
@@ -71,7 +71,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// fmt.Printf("IDL path '%s'\n", idl)
 
 	// provider initialisation
-	provider, err := generic.NewThriftFileProvider(value.IDL)
+	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
 		return
@@ -128,7 +128,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, path)
 
 	// Checking if service and method are valid
-	value, err := idlmap.GetIdlFile(serviceName, path)
+	value, err := idlmap.GetService(serviceName, path)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
@@ -136,7 +136,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	fmt.Printf("IDL path '%s'\n", value.IDL)
 
 	// provider initialisation
-	provider, err := generic.NewThriftFileProvider(value.IDL)
+	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
 		return
@@ -157,20 +157,8 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	queryParams := c.QueryArgs()
 
-	// Print queryParams variable as it is
-	fmt.Println("QueryParams variable:")
-	fmt.Println(queryParams)
-
-	// Create the response structure with the expected values
-	responseFormat := apigateway.GatewayResponse{
-		ID:     "4",
-		Name:   "Google",
-		Market: "US",
-		Msg:    "",
-	}
-
 	// Make Json string from request
-	jsonBytes, err := json.Marshal(responseFormat)
+	jsonBytes, err := json.Marshal(queryParams)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}

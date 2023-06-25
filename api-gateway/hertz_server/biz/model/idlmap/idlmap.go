@@ -1,32 +1,66 @@
 package idlmap
 
-import "fmt"
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+
+	yaml "gopkg.in/yaml.v3"
+)
 
 // Represents the relationship between services, method, and IDLs
 type IdlMapping struct {
+	Service string `yaml:"Service"`
+	Path    string `yaml:"Path"`
+	Method  string `yaml:"Method"`
+	IDL     string `yaml:"Idl"`
+}
+
+var IdlHashMap map[string]IdlMapping
+
+func init() {
+	// Load IDL mappings from the YAML file
+	loadIdlMappings()
+}
+
+func loadIdlMappings() {
+	// Read the YAML file
+	yamlFile, err := ioutil.ReadFile("biz/model/idlmap/idlmapping.yaml")
+	if err != nil {
+		log.Fatalf("Failed to read YAML file: %v", err)
+	}
+
+	// Unmarshal YAML into a slice of IdlMapping
+	var idlMappings []IdlMapping
+	err = yaml.Unmarshal(yamlFile, &idlMappings)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal YAML: %v", err)
+	}
+
+	// Create the IDL hashmap
+	IdlHashMap = make(map[string]IdlMapping)
+	for _, mapping := range idlMappings {
+		IdlHashMap[mapping.Service+"_"+mapping.Path] = mapping
+	}
+}
+
+type GatewayService struct {
 	Service string
-	Method  string
 	Path    string
+	Method  string
 	IDL     string
 }
 
-// TODO: Change to hashmap, its currently an array
-var IdlHashMap = []IdlMapping{
-	{Service: "AssetManagement", Path: "queryAsset", Method: "queryAsset", IDL: "../idl/asset_management.thrift"},
-	{Service: "AssetManagement", Path: "insertAsset", Method: "insertAsset", IDL: "../idl/asset_management.thrift"},
-	{Service: "UserService", Path: "queryUser", Method: "queryUser", IDL: "../idl/user_service.thrift"},
-	//{Service: "UserService", Method: "insertUser", IDL: "../../../../idl/user_service.thrift"},
-	{Service: "UserService", Path: "insertUser", Method: "insertUser", IDL: "../idl/user_service.thrift"},
-	{Service: "UserService", Path: "insertUserNew", Method: "insertUser", IDL: "../idl/user_service.thrift"},
-	// Can add more mappings similarly using service registry
-}
-
-func GetIdlFile(service, path string) (IdlMapping, error) {
-	for _, value := range IdlHashMap {
-		if value.Service == service && value.Path == path {
-			return value, nil
-		}
+func GetService(service, path string) (GatewayService, error) {
+	mapping, ok := IdlHashMap[service+"_"+path]
+	if !ok {
+		return GatewayService{}, fmt.Errorf("404: Service not found")
 	}
 
-	return IdlMapping{}, fmt.Errorf("404 : IDL not found\n")
+	return GatewayService{
+		Service: mapping.Service,
+		Path:    mapping.Path,
+		Method:  mapping.Method,
+		IDL:     mapping.IDL,
+	}, nil
 }
