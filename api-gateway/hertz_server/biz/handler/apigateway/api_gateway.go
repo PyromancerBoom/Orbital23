@@ -38,13 +38,13 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// fmt.Println(" ")
-	// fmt.Println("Reached Here POST")
+	fmt.Println(" ")
+	fmt.Println("Reached Here POST")
 
 	serviceName := c.Param("serviceName")
 	path := c.Param("path")
 
-	// fmt.Printf("Received generic POST request for service '%s' method '%s'\n", serviceName, serviceMethod)
+	fmt.Printf("Received generic POST request for service '%s' path '%s'\n", serviceName, path)
 
 	reqBody, err := c.Body()
 	if err != nil {
@@ -58,9 +58,9 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// // Print request data
-	// fmt.Println("Request data:")
-	// fmt.Println(string(reqBody))
+	// Print request data
+	fmt.Println("Request data:")
+	fmt.Println(string(reqBody))
 
 	// Checking if service and method are valid
 	value, err := idlmap.GetService(serviceName, path)
@@ -68,7 +68,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// fmt.Printf("IDL path '%s'\n", idl)
+	fmt.Printf("IDL content '%s'\n", value.IDL)
 
 	// provider initialisation
 	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
@@ -91,12 +91,20 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Make Json string from request
-	jsonBytes, err := json.Marshal(req)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
-	}
+	// jsonBytes, err := json.Marshal(reqBody)
+	// if err != nil {
+	// 	c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
+	// }
 
-	jsonString := string(jsonBytes)
+	// Print request data
+	fmt.Println("Request data:")
+	fmt.Println(string(reqBody))
+
+	jsonString := string(reqBody)
+
+	// Print query parameters
+	fmt.Println("Json string in POST")
+	fmt.Println(jsonString)
 
 	// Make generic Call and get back response
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
@@ -158,7 +166,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	queryParams := c.QueryArgs()
 
 	// Extract query parameters
-	params := make(map[string]string)
+	params := make(map[string]interface{})
 	queryParams.VisitAll(func(key, value []byte) {
 		params[string(key)] = string(value)
 	})
@@ -173,6 +181,10 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
 	jsonString := string(jsonBytes)
+
+	// Print query parameters
+	fmt.Println("Json string")
+	fmt.Println(jsonString)
 
 	// Make generic Call and get back response
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"context"
 	asset_management "api-gateway/asset_service/kitex_gen/asset_management"
+	"context"
+	"fmt"
 )
 
 // AssetManagementImpl implements the last service interface defined in the IDL.
@@ -21,12 +22,17 @@ func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_managem
 	// TODO: Your code here...
 	// TODO: Your code here...
 
+	fmt.Println("\nReached START Query Asset")
+
 	ast, exist := AssetData[req.ID]
 	if !exist {
 		return &asset_management.QueryAssetResponse{
 			Exist: false,
 		}, nil
 	}
+
+	fmt.Println("Asset data:")
+	fmt.Println(AssetData)
 
 	resp = &asset_management.QueryAssetResponse{
 		Exist:  true,
@@ -35,6 +41,8 @@ func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_managem
 		Market: ast.Market,
 	}
 
+	fmt.Println("\nReached end Query Asset")
+
 	return resp, nil
 }
 
@@ -42,6 +50,7 @@ func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_managem
 func (s *AssetManagementImpl) InsertAsset(ctx context.Context, req *asset_management.InsertAssetRequest) (resp *asset_management.InsertAssetResponse, err error) {
 	// TODO: Your code here...
 	// TODO: Your code here...
+	fmt.Println("\nReached Start InsertAsset")
 	_, exist := AssetData[req.ID]
 	if exist {
 		return &asset_management.InsertAssetResponse{
@@ -55,6 +64,11 @@ func (s *AssetManagementImpl) InsertAsset(ctx context.Context, req *asset_manage
 		Name:   req.Name,
 		Market: req.Market,
 	}
+
+	fmt.Println("Asset data:")
+	fmt.Println(AssetData)
+
+	fmt.Println("\nReached END InsertAsset")
 
 	return &asset_management.InsertAssetResponse{
 		Ok: true,
