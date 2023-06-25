@@ -164,17 +164,14 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	})
 
 	// Print query parameters
-	fmt.Println("\nqueryParams:")
-	for key, value := range params {
-		fmt.Printf("Key: %s, Value: %s\n", key, value)
-	}
+	fmt.Println("Params")
+	fmt.Println(params)
 
 	// Make Json string from request
-	jsonBytes, err := json.Marshal(queryParams)
+	jsonBytes, err := json.Marshal(params)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
-
 	jsonString := string(jsonBytes)
 
 	// Make generic Call and get back response
