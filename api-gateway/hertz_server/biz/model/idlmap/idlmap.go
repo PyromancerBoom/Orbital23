@@ -10,9 +10,10 @@ type IdlMapping struct {
 	IDL     string
 }
 
+// TODO: Change to hashmap, its currently an array
 var IdlHashMap = []IdlMapping{
-	// {Service: "AssetManagement", Method: "queryAsset", IDL: "../idl/asset_management.thrift"},
-	// {Service: "AssetManagement", Method: "insertAsset", IDL: "../idl/asset_management.thrift"},
+	{Service: "AssetManagement", Path: "queryAsset", Method: "queryAsset", IDL: "../idl/asset_management.thrift"},
+	{Service: "AssetManagement", Path: "insertAsset", Method: "insertAsset", IDL: "../idl/asset_management.thrift"},
 	{Service: "UserService", Path: "queryUser", Method: "queryUser", IDL: "../idl/user_service.thrift"},
 	//{Service: "UserService", Method: "insertUser", IDL: "../../../../idl/user_service.thrift"},
 	{Service: "UserService", Path: "insertUser", Method: "insertUser", IDL: "../idl/user_service.thrift"},
