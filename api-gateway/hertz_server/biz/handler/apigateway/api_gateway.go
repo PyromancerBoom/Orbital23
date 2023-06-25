@@ -157,8 +157,20 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	queryParams := c.QueryArgs()
 
+	// Extract query parameters
+	params := make(map[string]string)
+	queryParams.VisitAll(func(key, value []byte) {
+		params[string(key)] = string(value)
+	})
+
+	// Print query parameters
+	fmt.Println("\nqueryParams:")
+	for key, value := range params {
+		fmt.Printf("Key: %s, Value: %s\n", key, value)
+	}
+
 	// Make Json string from request
-	jsonBytes, err := json.Marshal(queryParams)
+	jsonBytes, err := json.Marshal(params)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
@@ -173,58 +185,3 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 
 	c.String(consts.StatusOK, response.(string))
 }
-
-// func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
-// 	serviceName := c.Param("serviceName")
-// 	path := c.Param("path")
-
-// 	// Checking if service and method are valid
-// 	value, err := idlmap.GetIdlFile(serviceName, path)
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error())
-// 		return
-// 	}
-
-// 	// Provider initialization
-// 	provider, err := generic.NewThriftFileProvider(value.IDL)
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
-// 		return
-// 	}
-
-// 	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error()+"\nJSONThriftGeneric error \n")
-// 		return
-// 	}
-
-// 	// Fetch hostport from registry later
-// 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-// 		client.WithHostPorts("127.0.0.1:8888"))
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialization error \n")
-// 		return
-// 	}
-
-// 	// Get the 'id' query parameter from the request URL
-// 	id := c.Query("id")
-
-// 	// Create a query request object
-// 	queryRequest := map[string]interface{}{
-// 		"ID": id,
-// 	}
-// 	requestBody, err := json.Marshal(queryRequest)
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error()+"\nJSON Marshalling error \n")
-// 		return
-// 	}
-
-// 	// Make the generic call and get the response
-// 	response, err := genClient.GenericCall(ctx, value.Method, string(requestBody))
-// 	if err != nil {
-// 		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric call error \n")
-// 		return
-// 	}
-
-// 	c.String(consts.StatusOK, response.(string))
-// }
