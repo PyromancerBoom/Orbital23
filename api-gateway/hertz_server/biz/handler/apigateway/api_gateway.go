@@ -170,7 +170,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Make Json string from request
-	jsonBytes, err := json.Marshal(params)
+	jsonBytes, err := json.Marshal(queryParams)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
