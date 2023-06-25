@@ -1,5 +1,8 @@
 package idlmap
 
+// Usign this makeshift registry to develop the gateway code for now.
+// But similar logic would go in the main service registry which uses consul
+
 import (
 	"fmt"
 	"io/ioutil"

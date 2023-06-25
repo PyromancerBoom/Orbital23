@@ -20,11 +20,6 @@ import (
 	idlmap "api-gateway/hertz_server/biz/model/idlmap"
 )
 
-// ------------------------------------- NOTE -------------------------------------
-// POST Request working
-// GET requests have some issue (ProcessGetRequest Method)
-// --------------------------------------------------------------------------
-
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
@@ -38,13 +33,8 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	fmt.Println(" ")
-	fmt.Println("Reached Here POST")
-
 	serviceName := c.Param("serviceName")
 	path := c.Param("path")
-
-	fmt.Printf("Received generic POST request for service '%s' path '%s'\n", serviceName, path)
 
 	reqBody, err := c.Body()
 	if err != nil {
@@ -57,10 +47,6 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, "Request body is empty")
 		return
 	}
-
-	// Print request data
-	fmt.Println("Request data:")
-	fmt.Println(string(reqBody))
 
 	// Checking if service and method are valid
 	value, err := idlmap.GetService(serviceName, path)
@@ -90,21 +76,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
 	}
 
-	// Make Json string from request
-	// jsonBytes, err := json.Marshal(reqBody)
-	// if err != nil {
-	// 	c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
-	// }
-
-	// Print request data
-	fmt.Println("Request data:")
-	fmt.Println(string(reqBody))
-
 	jsonString := string(reqBody)
-
-	// Print query parameters
-	fmt.Println("Json string in POST")
-	fmt.Println(jsonString)
 
 	// Make generic Call and get back response
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
@@ -127,21 +99,14 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	fmt.Println(" ")
-	fmt.Println("Reached Here GET")
-
 	serviceName := c.Param("serviceName")
 	path := c.Param("path")
-
-	fmt.Printf("Received generic GET request for service '%s' method '%s'\n", serviceName, path)
 
 	// Checking if service and method are valid
 	value, err := idlmap.GetService(serviceName, path)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
-
-	fmt.Printf("IDL path '%s'\n", value.IDL)
 
 	// provider initialisation
 	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
@@ -171,20 +136,12 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		params[string(key)] = string(value)
 	})
 
-	// Print query parameters
-	fmt.Println("Params")
-	fmt.Println(params)
-
 	// Make Json string from request
 	jsonBytes, err := json.Marshal(params)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
 	}
 	jsonString := string(jsonBytes)
-
-	// Print query parameters
-	fmt.Println("Json string")
-	fmt.Println(jsonString)
 
 	// Make generic Call and get back response
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
