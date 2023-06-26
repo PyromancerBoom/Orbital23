@@ -14,5 +14,6 @@ func customizedRegister(r *server.Hertz) {
 
 	// your code ...
 	r.POST("/register", handler.Register)
+	// r.POST("/connect", handler.connect)
 	r.GET("/show", handler.DisplayAll)
 }
