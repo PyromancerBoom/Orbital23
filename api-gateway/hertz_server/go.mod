@@ -8,6 +8,7 @@ require (
 	github.com/apache/thrift v0.13.0
 	github.com/cloudwego/hertz v0.6.4
 	github.com/cloudwego/kitex v0.5.2
+	github.com/google/uuid v1.1.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
