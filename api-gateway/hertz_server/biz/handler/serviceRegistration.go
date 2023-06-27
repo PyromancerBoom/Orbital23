@@ -10,79 +10,65 @@ import (
 	"github.com/google/uuid"
 )
 
-var servicesMap = make(map[string]interface{})
-
-type registerRequest struct {
-	ServiceOwner      string                       `json:"serviceOwner"`
-	ApiKey            string                       `json:"apiKey"`
-	RegisteredServers []RegisteredServerWithAPIKey `json:"registeredServers"`
+type Service struct {
+	ServiceOwner      string   `json:"serviceOwner"`
+	APIKey            string   `json:"apiKey"`
+	RegisteredServers []Server `json:"registeredServers"`
 }
 
-type RegisteredServerWithAPIKey struct {
-	RegisteredServer
-	ServiceID string `json:"serviceId"`
+type Server struct {
+	ServiceName         string     `json:"serviceName"`
+	ServiceDescription  string     `json:"serviceDescription"`
+	ServerAddress       string     `json:"serverAddress"`
+	LastPingedAt        string     `json:"lastPingedAt"`
+	ServiceVersion      string     `json:"serviceVersion"`
+	HealthCheckEndpoint string     `json:"healthCheckEndpoint"`
+	Endpoints           []Endpoint `json:"endpoints"`
 }
 
-type RegisteredServer struct {
-	ServerAddress string               `json:"serverAddress"`
-	LastPingedAt  string               `json:"lastPingedAt"`
-	Service       string               `json:"service"`
-	Endpoints     []RegisteredEndpoint `json:"endpoints"`
-}
-
-type RegisteredEndpoint struct {
+type Endpoint struct {
 	Path   string `json:"path"`
 	Method string `json:"method"`
-	Idl    string `json:"idl"`
+	IDL    string `json:"idl"`
 }
 
-func Register(ctx context.Context, c *app.RequestContext) {
-	// Parse the request payload
-	var req registerRequest
+var servicesMap map[string]Service
 
-	// Read the request body
+func Register(ctx context.Context, c *app.RequestContext) {
+	var req Service
 	reqBody, err := c.Body()
 	if err != nil {
 		c.String(consts.StatusBadRequest, "Request body is missing")
 		return
 	}
-
 	buf := bytes.NewBuffer(reqBody)
 
+	// Decode the JSON request
 	err = json.NewDecoder(buf).Decode(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, "Failed to parse request body")
 		return
 	}
 
-	// Generate a unique API Key
+	// Generate API Key
 	apiKey := uuid.New().String()
+	req.APIKey = apiKey
 
-	servicesMap[req.ApiKey] = apiKey
-
-	// Create a map to store the registered servers
-	registeredServers := make(map[string]interface{})
-
-	for _, registeredServer := range req.RegisteredServers {
-		// Generate a unique Service ID using UUID
-		serviceID := uuid.New().String()
-
-		registeredServerWithAPIKey := RegisteredServerWithAPIKey{
-			RegisteredServer: registeredServer.RegisteredServer,
-			ServiceID:        serviceID,
-		}
-		registeredServers[serviceID] = registeredServerWithAPIKey
+	// Store the service information
+	if servicesMap == nil {
+		servicesMap = make(map[string]Service)
 	}
 
-	response := make(map[string]interface{})
-	response["Status"] = "Registered successfully"
-	response["apiKey"] = apiKey
-	response["Message"] = "You're good to go!"
+	servicesMap[apiKey] = req
 
-	c.JSON(consts.StatusOK, response)
+	// Make a map for a response variable
+	res := make(map[string]string)
+	res["apiKey"] = apiKey
+	res["Message"] = "Registered successfully. You're good to go!"
+
+	c.JSON(consts.StatusOK, res)
 }
 
-// displayAll returns the hashmap with all the stored details.
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, servicesMap)
 }
