@@ -20,6 +20,7 @@ type Server struct {
 	ServiceName         string     `json:"serviceName"`
 	ServiceDescription  string     `json:"serviceDescription"`
 	ServerAddress       string     `json:"serverAddress"`
+	ServiceStatus       string     `json:"serviceStatus"`
 	LastPingedAt        string     `json:"lastPingedAt"`
 	ServiceVersion      string     `json:"serviceVersion"`
 	HealthCheckEndpoint string     `json:"healthCheckEndpoint"`
@@ -65,6 +66,11 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	}
 
 	servicesMap[apiKey] = req
+
+	// set ServiceStatus to inactive
+	for i := range servicesMap[apiKey].RegisteredServers {
+		servicesMap[apiKey].RegisteredServers[i].ServiceStatus = "inactive"
+	}
 
 	res := make(map[string]string)
 	res["apiKey"] = apiKey
