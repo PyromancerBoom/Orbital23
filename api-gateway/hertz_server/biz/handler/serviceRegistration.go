@@ -10,16 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
-var servicesMap = make(map[string]map[string]interface{})
+var servicesMap = make(map[string]interface{})
 
 type registerRequest struct {
 	ServiceOwner      string                       `json:"serviceOwner"`
+	ApiKey            string                       `json:"apiKey"`
 	RegisteredServers []RegisteredServerWithAPIKey `json:"registeredServers"`
 }
 
 type RegisteredServerWithAPIKey struct {
 	RegisteredServer
-	ApiKey    string `json:"apiKey"`
 	ServiceID string `json:"serviceId"`
 }
 
@@ -58,27 +58,28 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	// Generate a unique API Key
 	apiKey := uuid.New().String()
 
+	servicesMap[req.ApiKey] = apiKey
+
 	// Create a map to store the registered servers
 	registeredServers := make(map[string]interface{})
 
-	// Iterate over RegisteredServers and add them to the registeredServers map
 	for _, registeredServer := range req.RegisteredServers {
 		// Generate a unique Service ID using UUID
 		serviceID := uuid.New().String()
 
 		registeredServerWithAPIKey := RegisteredServerWithAPIKey{
 			RegisteredServer: registeredServer.RegisteredServer,
-			ApiKey:           apiKey,
 			ServiceID:        serviceID,
 		}
 		registeredServers[serviceID] = registeredServerWithAPIKey
 	}
 
-	servicesMap[req.ServiceOwner] = registeredServers
+	response := make(map[string]interface{})
+	response["Status"] = "Registered successfully"
+	response["apiKey"] = apiKey
+	response["Message"] = "You're good to go!"
 
-	c.JSON(consts.StatusOK, map[string]interface{}{
-		"apiKey": apiKey,
-	})
+	c.JSON(consts.StatusOK, response)
 }
 
 // displayAll returns the hashmap with all the stored details.
