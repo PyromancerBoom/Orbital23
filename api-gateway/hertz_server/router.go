@@ -5,6 +5,8 @@ package main
 import (
 	handler "api-gateway/hertz_server/biz/handler"
 
+	servicehandler "api-gateway/hertz_server/biz/handler/servicehandler"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -13,7 +15,11 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 
 	// your code ...
-	r.POST("/register", handler.Register)
-	// r.POST("/connect", handler.connect)
-	r.GET("/show", handler.DisplayAll)
+	r.POST("/register", servicehandler.Register)
+	r.PUT("/update", servicehandler.Update)
+	// r.POST("/connect", servicehandler.connect) <- Uncomment the endpoint when done
+
+	// ---------------------------------------
+	// Remove this endpoint before production
+	r.GET("/show", servicehandler.DisplayAll)
 }

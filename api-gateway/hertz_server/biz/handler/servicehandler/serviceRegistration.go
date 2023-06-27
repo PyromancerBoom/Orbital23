@@ -1,4 +1,4 @@
-package handler
+package servicehandler
 
 import (
 	"bytes"
@@ -68,7 +68,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 	res := make(map[string]string)
 	res["apiKey"] = apiKey
-	res["Message"] = "Registered successfully. You're good to go!"
+	res["Message"] = "Registered successfully. You're good to \"GO\" :D"
 
 	c.JSON(consts.StatusOK, res)
 }
