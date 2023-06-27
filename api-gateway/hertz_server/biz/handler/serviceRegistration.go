@@ -50,7 +50,12 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Generate API Key
+	// Check if the ownerId is already registered
+	if isAlreadyRegistered(req.ServiceOwner) {
+		c.String(consts.StatusBadRequest, "Already registered")
+		return
+	}
+
 	apiKey := uuid.New().String()
 	req.APIKey = apiKey
 
@@ -61,7 +66,6 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 	servicesMap[apiKey] = req
 
-	// Make a map for a response variable
 	res := make(map[string]string)
 	res["apiKey"] = apiKey
 	res["Message"] = "Registered successfully. You're good to go!"
@@ -71,4 +75,13 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, servicesMap)
+}
+
+func isAlreadyRegistered(ownerId string) bool {
+	for _, service := range servicesMap {
+		if service.ServiceOwner == ownerId {
+			return true
+		}
+	}
+	return false
 }
