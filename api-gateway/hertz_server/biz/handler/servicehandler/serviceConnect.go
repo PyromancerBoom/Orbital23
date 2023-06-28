@@ -33,7 +33,7 @@ type Request struct {
 const (
 	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
 	ttl            = 10 * time.Second //declare unhealthy after
-	ttd            = 12 * ttl         //remove from registry afer
+	ttd            = 6 * ttl          //remove from registry afer
 )
 
 func Connect(ctx context.Context, c *app.RequestContext) {
@@ -59,7 +59,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 	res["message"] = "Server Connection Request Accepted."
 	res["serverID"] = uuid.New().String()
 
-	err2 := registerServer(req.ServerAddress, req.ServerPort, res["server-id"], req.ServiceName, req.APIKey)
+	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.APIKey)
 	if err2 != nil {
 		c.String(consts.StatusInternalServerError, "Unable to register server.")
 		return
@@ -73,7 +73,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTER_API_KEY) && (serviceName == "UserService" || serviceName == "asset.Management")
+	return (apiKey == MASTER_API_KEY) && (serviceName == "UserService" || serviceName == "AssetManagement")
 }
 
 func validateAddress(address string, port string) error {

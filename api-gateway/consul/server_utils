@@ -1,0 +1,26 @@
+package server_utils
+
+import (
+	"encoding/json"
+)
+
+type ConnectRequest struct {
+	APIKEY      string `json:"api-key"`
+	ServiceName string `json:"serviceName"`
+	Address     string `json:"serverAddress"`
+	Port        string `json:"serverPort"`
+}
+
+// gateway address example : "localhost:4200"
+func connectServer(gatewayAddress string, apikey string, servicceName string, address string, port string) {
+	url := gatewayAddress + "/connect"
+
+	req := &ConnectRequest{APIKEY: apikey, ServiceName: serviceName, Address: address, Port: port}
+
+	b, err := json.Marshal
+
+}
+
+func updateHealth(gatewayAddress string, apkey string, serverID string) {
+
+}

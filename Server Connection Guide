@@ -4,7 +4,7 @@ Once your service is registered under our system, you will receive an api-key wh
 
 ## Requirements to connect to our system:
 
-1. Service Owner must ensure his servers are able to perform all the methods he indicated in his interface definition during service registry. We shall forward the requests, it is his/her duty to ensure his servers are capable of performing the defined functions.
+1. Service Owner must ensure his servers are able to perform all the methods he indicated in his interface definition during segtrvice registry. We shall forward the requests, it is his/her duty to ensure his servers are capable of performing the defined functions.
 
 2. Service Owner must ensure that everytime a new server is booted up, it registers itself via the :/connect endpoint
 

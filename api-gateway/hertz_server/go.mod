@@ -10,6 +10,7 @@ require (
 	github.com/cloudwego/kitex v0.5.2
 	github.com/google/uuid v1.1.2
 	github.com/hashicorp/consul/api v1.22.0
+	github.com/kitex-contrib/registry-consul v0.0.0-20230406075225-7d341f036654
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -40,7 +41,6 @@ require (
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
-	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
