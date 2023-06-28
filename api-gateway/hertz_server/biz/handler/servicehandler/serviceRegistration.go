@@ -11,32 +11,33 @@ import (
 )
 
 type Service struct {
-	ServiceOwner      string   `json:"serviceOwner"`
-	APIKey            string   `json:"apiKey"`
-	RegisteredServers []Server `json:"registeredServers"`
+	Name    string      `json:"name"`
+	ID      string      `json:"id"`
+	Tags    []string    `json:"tags"`
+	Address string      `json:"address"`
+	Port    int         `json:"port"`
+	Meta    ServiceMeta `json:"meta"`
+	Check   HealthCheck `json:"check"`
 }
 
-type Server struct {
-	ServiceName         string     `json:"serviceName"`
-	ServiceDescription  string     `json:"serviceDescription"`
-	ServerAddress       string     `json:"serverAddress"`
-	ServiceStatus       string     `json:"serviceStatus"`
-	LastPingedAt        string     `json:"lastPingedAt"`
-	ServiceVersion      string     `json:"serviceVersion"`
-	HealthCheckEndpoint string     `json:"healthCheckEndpoint"`
-	Endpoints           []Endpoint `json:"endpoints"`
+type ServiceMeta struct {
+	APIKey             string `json:"apiKey"`
+	ServiceDescription string `json:"serviceDescription"`
+	ServiceVersion     string `json:"serviceVersion"`
+	IDL                string `json:"idl"`
 }
 
-type Endpoint struct {
-	Path   string `json:"path"`
-	Method string `json:"method"`
-	IDL    string `json:"idl"`
+type HealthCheck struct {
+	HTTP     string `json:"HTTP"`
+	Interval string `json:"Interval"`
 }
 
 var servicesMap map[string]Service
 
 func Register(ctx context.Context, c *app.RequestContext) {
-	var req Service
+	var req []struct {
+		Service Service `json:"Service"`
+	}
 	reqBody, err := c.Body()
 	if err != nil {
 		c.String(consts.StatusBadRequest, "Request body is missing")
@@ -51,29 +52,26 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Check if the ownerId is already registered
-	if isAlreadyRegistered(req.ServiceOwner) {
-		c.String(consts.StatusBadRequest, "Already registered")
-		return
-	}
+	for _, item := range req {
+		service := item.Service
 
-	apiKey := uuid.New().String()
-	req.APIKey = apiKey
+		if isAlreadyRegistered(service.ID) {
+			c.String(consts.StatusBadRequest, "Already registered")
+			return
+		}
 
-	// Store the service information
-	if servicesMap == nil {
-		servicesMap = make(map[string]Service)
-	}
+		apiKey := uuid.New().String()
+		service.Meta.APIKey = apiKey
 
-	servicesMap[apiKey] = req
+		// stor the service information
+		if servicesMap == nil {
+			servicesMap = make(map[string]Service)
+		}
 
-	// set ServiceStatus to inactive
-	for i := range servicesMap[apiKey].RegisteredServers {
-		servicesMap[apiKey].RegisteredServers[i].ServiceStatus = "inactive"
+		servicesMap[apiKey] = service
 	}
 
 	res := make(map[string]string)
-	res["apiKey"] = apiKey
 	res["Message"] = "Registered successfully. You're good to \"GO\" :D"
 
 	c.JSON(consts.StatusOK, res)
@@ -85,7 +83,7 @@ func DisplayAll(ctx context.Context, c *app.RequestContext) {
 
 func isAlreadyRegistered(ownerId string) bool {
 	for _, service := range servicesMap {
-		if service.ServiceOwner == ownerId {
+		if service.ID == ownerId {
 			return true
 		}
 	}
