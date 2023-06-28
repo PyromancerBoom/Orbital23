@@ -17,7 +17,8 @@ func customizedRegister(r *server.Hertz) {
 	// your code ...
 	r.POST("/register", servicehandler.Register)
 	r.PUT("/update", servicehandler.Update)
-	// r.POST("/connect", servicehandler.connect) <- Uncomment the endpoint when done
+	r.POST("/connect", servicehandler.Connect)
+	r.POST("/health", servicehandler.HealthCheck)
 
 	// ---------------------------------------
 	// Remove this endpoint before production
