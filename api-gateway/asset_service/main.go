@@ -1,23 +1,43 @@
 package main
 
 import (
-	"bufio"
+	asset_management "api-gateway/asset_service/kitex_gen/asset_management/assetmanagement"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
-	asset_management "api-gateway/asset_service/kitex_gen/asset_management/assetmanagement"
-	"os"
+	"strconv"
+	"time"
 
 	server "github.com/cloudwego/kitex/server"
 )
 
+const (
+	apikey  = "36e991d3-646d-414a-ac66-0c0e8a310ced"
+	gateway = "http://127.0.0.1:4200"
+)
+
+var addr = getAddr()
+
+func init() {
+	id, err := connectServer(gateway, apikey, "AssetManagement", addr.IP.String(), strconv.Itoa(addr.Port))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	go healthCheckLoop(gateway, apikey, id)
+}
+
+func healthCheckLoop(gateway string, api string, id string) {
+	ticker := time.NewTicker(5 * time.Second)
+	for {
+		updateHealth(gateway, api, id)
+		<-ticker.C
+	}
+}
+
 func main() {
 
-	port := "127.0.0.1:" + getPort()
-	addr, _ := net.ResolveTCPAddr("tcp", port)
 	svr := asset_management.NewServer(new(AssetManagementImpl), server.WithServiceAddr(addr))
-
 	err := svr.Run()
 
 	if err != nil {
@@ -25,24 +45,28 @@ func main() {
 	}
 }
 
-// returns the port retrieved from cmd, if input is "", then from port.config file. If that fails, returns "8080" /default port.
-func getPort() string {
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("Please enter port: ")
+func getAddr() *net.TCPAddr {
 
-	scanner.Scan()
-	input := scanner.Text()
+	port, _ := GetFreePort()
 
-	//read the .config file if no port is mentioned
-	if len(input) == 0 {
-		fmt.Println("Reading port.config for port")
-		data, err := ioutil.ReadFile("port.config")
-		if err != nil {
-			fmt.Println("File reading error. Using port 8080", err)
-			return "8080" //default port
-		}
-		return string(data)
+	a := "127.0.0.1:" + strconv.Itoa(port)
+
+	addr, err := net.ResolveTCPAddr("tcp", a)
+	if err != nil {
+		fmt.Println("Error occured." + err.Error() + "Retrying")
+		return getAddr()
 	}
+	return addr
+}
 
-	return string(input)
+func GetFreePort() (port int, err error) {
+	var a *net.TCPAddr
+	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
+		var l *net.TCPListener
+		if l, err = net.ListenTCP("tcp", a); err == nil {
+			defer l.Close()
+			return l.Addr().(*net.TCPAddr).Port, nil
+		}
+	}
+	return
 }

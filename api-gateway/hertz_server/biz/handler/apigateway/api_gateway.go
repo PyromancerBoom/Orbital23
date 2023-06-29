@@ -11,6 +11,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	consul "github.com/kitex-contrib/registry-consul"
 
 	client "github.com/cloudwego/kitex/client"
 	genericClient "github.com/cloudwego/kitex/client/genericclient"
@@ -66,9 +67,15 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	//get registry to enable resolving serverIDs
+	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	if err != nil {
+		panic(err)
+	}
+
 	// fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithHostPorts("127.0.0.1:8888"))
+		client.WithResolver(registry))
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
 	}
@@ -118,9 +125,15 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	//get registry to enable resolving serverIDs
+	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	if err != nil {
+		panic(err)
+	}
+
 	// fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithHostPorts("127.0.0.1:8888"))
+		client.WithResolver(registry))
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
 	}
