@@ -155,6 +155,8 @@ Currently, we have the following functional services :
 - (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
 - (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
 
+The expected data for the above endpoints is provided below in Step 4.
+
 Once initialised they are automatically connected to consul, for example :
 
 ![consul](consulservicesconnection.png)
@@ -162,6 +164,8 @@ Once initialised they are automatically connected to consul, for example :
 **Step 4:**
 
 Send a POST or GET requests to the "/{serviceName}/{path}" endpoint, for example:
+
+#### Asset Management
 
 ```
 curl -X POST -H "Content-Type: application/json"
@@ -176,7 +180,24 @@ curl -X POST -H "Content-Type: application/json"
 Now try quering the info,
 
 ```
-curl -X GET http://localhost:4200/AssetManagement/queryAsset?ID=2
+curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
 ```
 
-- The "ID" should be capital as it's case sensitive.
+#### User service
+
+```
+curl -X POST -H "Content-Type: application/json"
+-d '{
+  "id": "3",
+  "name": "Doe",
+  "email": "johndoe@example.com",
+  "age": 24
+}'
+"http://localhost:4200/UserService/newUser"
+```
+
+Now try quering the info,
+
+```
+curl -X GET http://localhost:4200/UserService/getUser?id=2
+```
