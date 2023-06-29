@@ -49,7 +49,7 @@ Despite the spike in between the server showed great recovery.
 - Total time : 5 mins
 - Ramp up time: 1 min
 
-Again, after the spike, the showed great recovery.
+Again, after the spike, the gateway showed great recovery.
 
 ### Registration :
 
