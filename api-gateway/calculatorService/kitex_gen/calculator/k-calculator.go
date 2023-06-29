@@ -224,7 +224,7 @@ func (p *CalculationResponse) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
@@ -275,7 +275,7 @@ ReadStructEndError:
 func (p *CalculationResponse) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
@@ -315,8 +315,8 @@ func (p *CalculationResponse) BLength() int {
 
 func (p *CalculationResponse) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "result", thrift.I32, 1)
-	offset += bthrift.Binary.WriteI32(buf[offset:], p.Result_)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "Result", thrift.STRING, 1)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Result_)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -324,8 +324,8 @@ func (p *CalculationResponse) fastWriteField1(buf []byte, binaryWriter bthrift.B
 
 func (p *CalculationResponse) field1Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("result", thrift.I32, 1)
-	l += bthrift.Binary.I32Length(p.Result_)
+	l += bthrift.Binary.FieldBeginLength("Result", thrift.STRING, 1)
+	l += bthrift.Binary.StringLengthNocopy(p.Result_)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

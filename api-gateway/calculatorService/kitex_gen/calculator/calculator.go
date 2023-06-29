@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type CalculationRequest struct {
@@ -232,7 +233,7 @@ func (p *CalculationRequest) Field2DeepEqual(src int32) bool {
 }
 
 type CalculationResponse struct {
-	Result_ int32 `thrift:"result,1" frugal:"1,default,i32" json:"result"`
+	Result_ string `thrift:"Result,1" frugal:"1,default,string" json:"Result"`
 }
 
 func NewCalculationResponse() *CalculationResponse {
@@ -243,15 +244,15 @@ func (p *CalculationResponse) InitDefault() {
 	*p = CalculationResponse{}
 }
 
-func (p *CalculationResponse) GetResult_() (v int32) {
+func (p *CalculationResponse) GetResult_() (v string) {
 	return p.Result_
 }
-func (p *CalculationResponse) SetResult_(val int32) {
+func (p *CalculationResponse) SetResult_(val string) {
 	p.Result_ = val
 }
 
 var fieldIDToName_CalculationResponse = map[int16]string{
-	1: "result",
+	1: "Result",
 }
 
 func (p *CalculationResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -274,7 +275,7 @@ func (p *CalculationResponse) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -314,7 +315,7 @@ ReadStructEndError:
 }
 
 func (p *CalculationResponse) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		p.Result_ = v
@@ -352,10 +353,10 @@ WriteStructEndError:
 }
 
 func (p *CalculationResponse) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("result", thrift.I32, 1); err != nil {
+	if err = oprot.WriteFieldBegin("Result", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Result_); err != nil {
+	if err := oprot.WriteString(p.Result_); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -387,9 +388,9 @@ func (p *CalculationResponse) DeepEqual(ano *CalculationResponse) bool {
 	return true
 }
 
-func (p *CalculationResponse) Field1DeepEqual(src int32) bool {
+func (p *CalculationResponse) Field1DeepEqual(src string) bool {
 
-	if p.Result_ != src {
+	if strings.Compare(p.Result_, src) != 0 {
 		return false
 	}
 	return true
