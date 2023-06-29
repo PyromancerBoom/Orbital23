@@ -8,7 +8,7 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 #### Behind the scenes :
 
-For now, the registration functionality is NOT integrated with the service registry. However, services can be registered at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
+For now, the registration functionality is NOT integrated with the service registry. However, service information for registration can be sent at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
 
 ```
 [
@@ -31,6 +31,10 @@ For now, the registration functionality is NOT integrated with the service regis
   }
 ]
 ```
+
+The `"idl":"idlcontent"` field is required as require the IDL content to make the RPC calls from the gateway to the service.
+
+Later, we will connect the registration with our registry and IDL mappings.
 
 Moreover, to see all registered service we can hit the endpoint `:/show`. (This will be removed later and was made just for testing purposes)
 
@@ -105,6 +109,10 @@ Currently, we have the following functional services :
 - (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
 - (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
 - (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
+
+Once initialised they are automatically connected to consul, for example :
+
+![consul](consulservicesconnection.png)
 
 **Step 4:**
 
