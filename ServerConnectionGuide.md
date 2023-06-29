@@ -2,19 +2,21 @@
 
 Once your service is registered under our system, you will receive an api-key which you can use to register your servers in our system. There is currently no limit to the number of servers you can enlist to our system. However, our system only supports RPC servers as the gateway merely acts as a proxy between HTTP network requests to RPC calls through thrift binary encoding.
 
+Note: Since service registration is not supported right now in the MVP, only AssetManagement and UserService services can be registered into the system. However, after the implementation of service registration through the `:/register` endpoint, servers of any registered services may be connected.
+
 ## Requirements to connect to our system:
 
-1. Service Owner must ensure his servers are able to perform all the methods he indicated in his interface definition during segtrvice registry. We shall forward the requests, it is his/her duty to ensure his servers are capable of performing the defined functions.
+1. Service Owner must ensure his servers are able to perform all the methods he indicated in his interface definition during the service registration in the `"/register` endpoint. We shall only forward the requests, it is his/her duty to ensure his/her servers are capable of performing the defined functions.
 
-2. Service Owner must ensure that everytime a new server is booted up, it registers itself via the :/connect endpoint
+2. Service Owner must ensure that every time a new server is booted up, it registers itself via the `:/connect` endpoint
 
-3. Service Owner must ensure that his servers declare themselves healthy to our system so we may forward requests to his/her RPC server(s) by making requests to :/health endpoint. Our system will no longer consider the server healthy if it does not declare itself healthy (at least) every 10 seconds. Server will be delisted after 1 minute of last health check.
+3. Service Owner must ensure that his servers declare themselves healthy to our system so we may forward requests to his/her RPC server(s) by making requests to `:/health` endpoint. Our system will no longer consider the server healthy if it does not declare itself healthy (at least) every 10 seconds. Server will be delisted after 1 minute of the last health check.
 
 ## Guide To Connect your server:
 
 ### Step 1:
 
-Register your server in our system via :/register endpoint. You will have to provide a Service Name, which you will need to add servers to our system. After registering your service, you will get an API Key. That key will let you register servers to our system.
+Register your server in our system via `:/register` endpoint. You will have to provide a Service Name, which you will need to add servers to our system. After registering your service, you will get an API Key. That key will let you register servers to our system.
 
 ### Step 2:
 
