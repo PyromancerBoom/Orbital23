@@ -4,9 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 )
+
+type GatewayClient struct {
+	API_KEY        string
+	Service_Name   string
+	GatewayAddress string
+}
+
+func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
+	return &GatewayClient{apikey, serviceName, gatewayAddress}
+}
 
 type ConnectRequest struct {
 	APIKEY      string `json:"api-key"`
@@ -17,10 +29,10 @@ type ConnectRequest struct {
 
 // gateway address example : "http://localhost:4200"
 // connectsServer to system and gets the server ID back.
-func connectServer(gatewayAddress string, apikey string, serviceName string, address string, port string) (string, error) {
-	url := gatewayAddress + "/connect"
+func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
+	url := client.GatewayAddress + "/connect"
 
-	req := &ConnectRequest{APIKEY: apikey, ServiceName: serviceName, Address: address, Port: port}
+	req := &ConnectRequest{APIKEY: client.API_KEY, ServiceName: client.Service_Name, Address: serverAddress, Port: serverPort}
 
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -34,8 +46,8 @@ func connectServer(gatewayAddress string, apikey string, serviceName string, add
 
 	r.Header.Add("Content-Type", "application/json")
 
-	client := &http.Client{}
-	res, err := client.Do(r)
+	httpCli := &http.Client{}
+	res, err := httpCli.Do(r)
 	if err != nil {
 		return "", err
 	}
@@ -47,15 +59,15 @@ func connectServer(gatewayAddress string, apikey string, serviceName string, add
 		return "", err
 	}
 
-	c := make(map[string]json.RawMessage)
+	j := make(map[string]json.RawMessage)
 
 	// unmarschal JSON
-	e := json.Unmarshal(body, &c)
+	e := json.Unmarshal(body, &j)
 	if e != nil {
 		return "", err
 	}
 
-	return strings.Trim(string(c["serverID"]), "\""), nil
+	return strings.Trim(string(j["serverID"]), "\""), nil
 }
 
 type UpdateHealthRequest struct {
@@ -63,11 +75,12 @@ type UpdateHealthRequest struct {
 	ServerID string `json:"serverID"`
 }
 
-func updateHealth(gatewayAddress string, apikey string, serverID string) error {
+// declares that server is healthy
+func (client *GatewayClient) updateHealth(serverID string) error {
 
-	url := gatewayAddress + "/health"
+	url := client.GatewayAddress + "/health"
 
-	req := &UpdateHealthRequest{APIKEY: apikey, ServerID: serverID}
+	req := &UpdateHealthRequest{APIKEY: client.API_KEY, ServerID: serverID}
 
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -81,8 +94,8 @@ func updateHealth(gatewayAddress string, apikey string, serverID string) error {
 
 	r.Header.Add("Content-Type", "application/json")
 
-	client := &http.Client{}
-	res, err := client.Do(r)
+	httpCli := &http.Client{}
+	res, err := httpCli.Do(r)
 	if err != nil {
 		return err
 	}
@@ -99,4 +112,21 @@ func updateHealth(gatewayAddress string, apikey string, serverID string) error {
 	}
 
 	return nil
+}
+
+// keeps declaring server is healthy continuously
+func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
+	go client.helper(client.GatewayAddress, client.API_KEY, id, timeBetweenLoops)
+}
+
+func (client *GatewayClient) helper(gateway string, api string, id string, timeBetweenLoops int) error {
+	ticker := time.NewTicker(time.Duration(timeBetweenLoops) * time.Second)
+	for {
+		err := client.updateHealth(id)
+		if err != nil {
+			log.Fatal(err.Error())
+			return err
+		}
+		<-ticker.C
+	}
 }

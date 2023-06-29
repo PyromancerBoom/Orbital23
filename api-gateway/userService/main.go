@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"strconv"
-	"time"
 
 	"github.com/cloudwego/kitex/server"
 )
@@ -19,20 +18,18 @@ const (
 var addr = getAddr()
 
 func init() {
-	id, err := connectServer(gateway, apikey, "UserService", addr.IP.String(), strconv.Itoa(addr.Port))
+
+	//make a client
+	gatewayClient := NewGatewayClient(apikey, "UserService", gateway)
+
+	//register the server to the system
+	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	go healthCheckLoop(gateway, apikey, id)
-}
-
-func healthCheckLoop(gateway string, api string, id string) {
-	ticker := time.NewTicker(5 * time.Second)
-	for {
-		updateHealth(gateway, api, id)
-		<-ticker.C
-	}
+	//enter a health loop
+	gatewayClient.updateHealthLoop(id, 5)
 }
 
 func main() {
