@@ -1,5 +1,5 @@
 - Service: AssetManagement
-  Path: queryAsset
+  Path: getAsset
   Method: queryAsset
   Idl: >
     namespace Go asset.management
@@ -31,7 +31,7 @@
       InsertAssetResponse insertAsset(1: InsertAssetRequest req);
     }
 - Service: AssetManagement
-  Path: insertAsset
+  Path: newAsset
   Method: insertAsset
   Idl: >
     namespace Go asset.management
@@ -63,7 +63,7 @@
       InsertAssetResponse insertAsset(1: InsertAssetRequest req);
     }
 - Service: UserService
-  Path: queryUser
+  Path: getUser
   Method: queryUser
   Idl: >
     namespace go UserService
