@@ -14,7 +14,7 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 3. Service Registration: Although the registration functionality is not yet integrated with the service registry, service information can be sent to the `:/register` endpoint in JSON format. The JSON payload includes service details such as the service name, address, port, and additional metadata like service description, version, and IDL content.
 
-4. Automated connection: Services can automate their connection at the `:/connect` endpoint of the API Gateway using an API Key.
+4. Automated Server Connection: Services can automate the registration of their servers to our system by making an HTTP POST request at the `:/connect` endpoint of the API Gateway using an API key. This enables services to scale up or down dynamically according to their needs.
 
 5. Health Declaration: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. If a server fails to declare its health for 1 minute, it is delisted from the system and needs to reconnect.
 
