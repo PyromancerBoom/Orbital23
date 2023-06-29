@@ -36,6 +36,32 @@ Moreover, to see all registered service we can hit the endpoint `:/show`. (This 
 
 ## Performance
 
+## Connecting services to the gateway:
+
+Ensure that your servers can perform all the methods indicated in your interface definition during service registry.
+
+- Register your servers via the `:/connect` endpoint each time a new server is booted up. Use the `server_utils.go` file for the methods which can be used in the service to connect to the gateway. Examples are present in the `main.go` of the services.
+- Declare your servers as healthy to our system by making requests to the `:/health` endpoint at least every 10 seconds.
+
+To connect your server to our system, follow these steps:
+
+1. Register your service and receive an API Key.
+2. On server bootup, send a request to `:/connect` with the API Key, service details, server address, and port.
+3. Get a serverID upon successful connection.
+4. Declare your server's health by regularly sending requests to `:/health` with the API Key and serverID.
+   Remember:
+
+Note:
+
+- New servers should register themselves via :/connect.
+- Servers must declare themselves healthy every 10 seconds.
+- Servers are delisted if they don't declare health for 1 minute.
+- If delisted, reconnect..
+
+Load balancing currently uses round-robin, but will be upgraded to weighted round-robin.
+
+For the detailed guide on service connection, check out [Server Connection Guide](file://ServerConnectionGuide.md)
+
 ## How to use? [^3]
 
 **Step 1:**
