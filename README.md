@@ -32,23 +32,22 @@ The red line indicates rate.
 - Users : 25
 - Total time : 5 mins
 - Ramp up time: 1 min
-  Despite the spike in between the server showed great recovery.
 
 ![performance1](perf-50users-mvp.png)
 2 instances of User Service and 3 instances of Asset Management Service
+Despite the spike in between the server showed great recovery.
 
 - Users : 50
 - Total time : 5 mins
 - Ramp up time: 1 min
-  Despite the spike in between the server showed great recovery.
 
 ![performance1](perf-30users.png)
 3 instances of User Service and 3 instances of Asset Management Service
+Again, after the spike, the showed great recovery.
 
 - Users : 30
 - Total time : 5 mins
 - Ramp up time: 1 min
-  Again, after the spike, the showed great recovery.
 
 #### Registration :
 
