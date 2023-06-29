@@ -4,9 +4,29 @@ This is a repository for the ByteDance and Tiktok Orbital 2023.
 
 This is the MVP project for our API Gateway based on one Hertz server and multiple RPC servers.
 
-The API Gateway, which is a Hertz server, listens to requests at port 4200 on multiple exposed endpoints "/{serviceName}/{serviceMethod}" [POST] and "/{serviceName}/{serviceMethod}" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using the internal RPC client built inside the Hertz server). The user service is at port 8888 while the Asset Management service can be initialised on any port from user input from console.
+The API Gateway, which is a Hertz server, listens to requests at port 4200 on multiple exposed endpoints "/{serviceName}/{path}" [POST] and "/{serviceName}/{serviceMethod}" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using the internal RPC client built inside the Hertz server). The user service is at port 8888 while the Asset Management service can be initialised on any port from user input from console.
 
-#### Behind the scenes :
+#### Components and features of MVP:
+
+1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers.
+
+2. RPC Server Integration: The API Gateway forwards incoming API requests to the Kitex server using the internal RPC client within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services.
+
+3. Service Registration: Although the registration functionality is not yet integrated with the service registry, service information can be sent to the `:/register` endpoint in JSON format. The JSON payload includes service details such as the service name, address, port, and additional metadata like service description, version, and IDL content.
+
+4. Automated connection: Services can automate their connection at the `:/connect` endpoint of the API Gateway using an API Key.
+
+5. Health Declaration: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. If a server fails to declare its health for 1 minute, it is delisted from the system and needs to reconnect.
+
+6. Load Balancing: The MVP version implements round-robin load balancing, distributing the requests equally among the connected RPC servers. This helps achieve better scalability and performance by effectively utilizing the available server resources. Future updates will include weighted round-robin load balancing for improved efficiency.
+
+## Performance
+
+On Load testing, we were able to have the following benchmarks:
+
+![performance1](perf-50users-mvp.png)
+
+#### Registration :
 
 For now, the registration functionality is NOT integrated with the service registry. However, service information for registration can be sent at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
 
@@ -37,8 +57,6 @@ The `"idl":"idlcontent"` field is required as require the IDL content to make th
 Later, we will connect the registration with our registry and IDL mappings.
 
 Moreover, to see all registered service we can hit the endpoint `:/show`. (This will be removed later and was made just for testing purposes)
-
-## Performance
 
 ## Connecting services to the gateway:
 
