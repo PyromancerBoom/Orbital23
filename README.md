@@ -20,6 +20,8 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 6. Load Balancing: The MVP version implements round-robin load balancing, distributing the requests equally among the connected RPC servers. This helps achieve better scalability and performance by effectively utilizing the available server resources. Future updates will include weighted round-robin load balancing for improved efficiency.
 
+7. Service Registry: Consul by Hashicorp is used as the service registry. It is completely masked from the RPC servers and servers can only register themselves through the `:/connect` endpoint, using the gateway as a proxy. This was done to prevent malicious attacks on the service registry. The consul service registry provides a beautiful graphical view of all the connected servers to help admins track, manage and troubleshoot connections.
+
 ## Performance
 
 On Load testing with Postman, we were able to have the following benchmarks:
