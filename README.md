@@ -51,7 +51,7 @@ Despite the spike in between the server showed great recovery.
 
 Again, after the spike, the showed great recovery.
 
-#### Registration :
+### Registration :
 
 For now, the registration functionality is NOT integrated with the service registry. However, service information for registration can be sent at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
 
