@@ -8,7 +8,7 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 #### Behind the scenes :
 
-For now, the registration functionality is NOT integrated with the service registry. However, services can be registered at the `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
+For now, the registration functionality is NOT integrated with the service registry. However, services can be registered at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
 
 ```
 [
