@@ -4,7 +4,7 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
 
 This is the MVP project for our API Gateway based on one Hertz server and multiple RPC servers.
 
-The API Gateway, which is a Hertz server, listens to requests at port 4200 on multiple exposed endpoints "/{serviceName}/{path}" [POST] and "/{serviceName}/{serviceMethod}" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using the internal RPC client built inside the Hertz server).
+The API Gateway, which is a Hertz server, listens to requests at port 4200 on multiple exposed endpoints "/{serviceName}/{path}" [POST] and "/{serviceName}/{serviceMethod}" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using RPC generic call).
 
 ### Components and features of MVP:
 
