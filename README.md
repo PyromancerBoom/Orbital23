@@ -22,13 +22,21 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 ## Performance
 
-On Load testing, we were able to have the following benchmarks:
+On Load testing with 3 instances of User Service and 3 instances of Asset Management Service, we were able to have the following benchmarks:
+
+![performance1](perf-25users-mvp.png)
+
+- Users : 25
+- Total time : 5 mins
+- Ramp up time: 1 min
+  Despite the spike in between the server showed great recovery.
 
 ![performance1](perf-50users-mvp.png)
 
 - Users : 50
 - Total time : 5 mins
 - Ramp up time: 1 min
+  Despite the spike in between the server showed great recovery.
 
 #### Registration :
 
