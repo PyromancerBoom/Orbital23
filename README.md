@@ -24,7 +24,7 @@ The API Gateway, which is a Hertz server, listens to requests at port 4200 on mu
 
 On Load testing with Postman, we were able to have the following benchmarks:
 The lower the blue line is, the better.
-The red line indicates rate.
+The red line indicates error rate.
 
 ![performance1](perf-25users-mvp.png)
 2 instances of User Service and 3 instances of Asset Management Service
