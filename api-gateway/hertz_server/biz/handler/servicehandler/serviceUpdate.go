@@ -4,10 +4,12 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
+// To be updated (Unintentional pun) later when registration feature is finalised
 func Update(ctx context.Context, c *app.RequestContext) {
-	// // we get the key from header
+	// we get the key from header
 	// apiKey := string(c.GetHeader("apikey"))
 
 	// // now we get the body
@@ -24,19 +26,10 @@ func Update(ctx context.Context, c *app.RequestContext) {
 	// 	return
 	// }
 
-	// // for updation, we make a temp map and assign it to the registered one
-	// var updatedServiceTemp Service
-	// err = json.Unmarshal(reqBody, &updatedServiceTemp)
-	// if err != nil {
-	// 	c.String(consts.StatusBadRequest, "Failed to parse request body")
-	// 	return
-	// }
-
-	// service.ServiceOwner = updatedServiceTemp.ServiceOwner
-	// service.RegisteredServers = updatedServiceTemp.RegisteredServers
+	// // update service
 
 	// servicesMap[apiKey] = service
 
-	// // Sending back a string respone if everything goes well
-	// c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
+	// // // Sending back a string respone if everything goes well
+	c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
 }

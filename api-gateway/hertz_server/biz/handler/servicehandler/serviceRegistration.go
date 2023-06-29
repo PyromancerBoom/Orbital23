@@ -32,6 +32,7 @@ type HealthCheckForService struct {
 	Interval string `json:"Interval"`
 }
 
+// To be stored in DB later and cached in the gateway
 var servicesMap map[string]Service
 
 func Register(ctx context.Context, c *app.RequestContext) {
