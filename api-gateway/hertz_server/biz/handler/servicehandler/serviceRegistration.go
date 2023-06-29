@@ -11,13 +11,13 @@ import (
 )
 
 type Service struct {
-	Name    string      `json:"name"`
-	ID      string      `json:"id"`
-	Tags    []string    `json:"tags"`
-	Address string      `json:"address"`
-	Port    int         `json:"port"`
-	Meta    ServiceMeta `json:"meta"`
-	Check   HealthCheck `json:"check"`
+	Name    string                `json:"name"`
+	ID      string                `json:"id"`
+	Tags    []string              `json:"tags"`
+	Address string                `json:"address"`
+	Port    int                   `json:"port"`
+	Meta    ServiceMeta           `json:"meta"`
+	Check   HealthCheckForService `json:"check"`
 }
 
 type ServiceMeta struct {
@@ -27,7 +27,7 @@ type ServiceMeta struct {
 	IDL                string `json:"idl"`
 }
 
-type HealthCheck struct {
+type HealthCheckForService struct {
 	HTTP     string `json:"HTTP"`
 	Interval string `json:"Interval"`
 }
