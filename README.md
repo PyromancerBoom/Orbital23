@@ -60,7 +60,7 @@ Note:
 
 Load balancing currently uses round-robin, but will be upgraded to weighted round-robin.
 
-For the detailed guide on service connection, check out [Server Connection Guide](file://ServerConnectionGuide.md)
+For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
 
 ## How to use? [^3]
 
