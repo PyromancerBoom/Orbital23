@@ -26,6 +26,10 @@ On Load testing, we were able to have the following benchmarks:
 
 ![performance1](perf-50users-mvp.png)
 
+- Users : 50
+- Total time : 5 mins
+- Ramp up time: 1 min
+
 #### Registration :
 
 For now, the registration functionality is NOT integrated with the service registry. However, service information for registration can be sent at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
