@@ -43,7 +43,7 @@ The red line indicates rate.
   Despite the spike in between the server showed great recovery.
 
 ![performance1](perf-30users.png)
-2 instances of User Service and 3 instances of Asset Management Service
+3 instances of User Service and 3 instances of Asset Management Service
 
 - Users : 30
 - Total time : 5 mins
