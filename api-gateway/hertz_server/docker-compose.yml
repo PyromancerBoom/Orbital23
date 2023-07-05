@@ -1,9 +1,11 @@
 version: '3'
 services:
   app:
-    container_name: gatewayContainer  # Added container name
+    image: api-gateway
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 8080:8080
+      - "8080"
+    deploy:
+      replicas: 5
