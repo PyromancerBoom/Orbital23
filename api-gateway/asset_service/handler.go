@@ -22,23 +22,29 @@ func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_managem
 	// TODO: Your code here...
 	// TODO: Your code here...
 
-	fmt.Println("\nReached START Query Asset")
+	// fmt.Println("\nReached START Query Asset")
 
-	ast, exist := AssetData[req.ID]
-	if !exist {
-		return &asset_management.QueryAssetResponse{
-			Exist: false,
-		}, nil
-	}
+	// ast, exist := AssetData[req.ID]
+	// if !exist {
+	// 	return &asset_management.QueryAssetResponse{
+	// 		Exist: false,
+	// 	}, nil
+	// }
 
-	fmt.Println("Asset data:")
-	fmt.Println(AssetData)
+	// fmt.Println("Asset data:")
+	// fmt.Println(AssetData)
 
+	// resp = &asset_management.QueryAssetResponse{
+	// 	Exist:  true,
+	// 	ID:     ast.ID,
+	// 	Name:   ast.Name,
+	// 	Market: ast.Market,
+	// }
 	resp = &asset_management.QueryAssetResponse{
 		Exist:  true,
-		ID:     ast.ID,
-		Name:   ast.Name,
-		Market: ast.Market,
+		ID:     "2",
+		Name:   "CompanyName",
+		Market: "MarketHere",
 	}
 
 	fmt.Println("\nReached end Query Asset")
