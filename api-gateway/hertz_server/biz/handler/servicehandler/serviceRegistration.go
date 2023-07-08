@@ -10,26 +10,28 @@ import (
 	"github.com/google/uuid"
 )
 
+type RegisteredServer struct {
+	ServerUrl string `json:"ServerUrl"`
+	Port      int    `json:"Port"`
+}
+
 type Service struct {
-	Name    string                `json:"name"`
-	ID      string                `json:"id"`
-	Tags    []string              `json:"tags"`
-	Address string                `json:"address"`
-	Port    int                   `json:"port"`
-	Meta    ServiceMeta           `json:"meta"`
-	Check   HealthCheckForService `json:"check"`
+	ServiceId          string             `json:"ServiceId"`
+	ServiceName        string             `json:"ServiceName"`
+	ExposedMethod      string             `json:"ExposedMethod"`
+	Path               string             `json:"Path"`
+	IdlContent         string             `json:"IdlContent"`
+	Version            string             `json:"version"`
+	ServiceDescription string             `json:"ServiceDescription"`
+	ServerCount        int                `json:"ServerCount"`
+	RegisteredServers  []RegisteredServer `json:"RegisteredServers"`
 }
 
-type ServiceMeta struct {
-	APIKey             string `json:"apiKey"`
-	ServiceDescription string `json:"serviceDescription"`
-	ServiceVersion     string `json:"serviceVersion"`
-	IDL                string `json:"idl"`
-}
-
-type HealthCheckForService struct {
-	HTTP     string `json:"HTTP"`
-	Interval string `json:"Interval"`
+type Config struct {
+	ApiKey    string    `json:"ApiKey"`
+	OwnerName string    `json:"OwnerName"`
+	OwnerId   string    `json:"OwnerId"`
+	Services  []Service `json:"Services"`
 }
 
 // To be stored in DB later and cached in the gateway
