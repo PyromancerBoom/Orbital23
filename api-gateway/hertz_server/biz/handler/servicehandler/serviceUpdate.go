@@ -26,10 +26,8 @@ func Update(ctx context.Context, c *app.RequestContext) {
 	// 	return
 	// }
 
-	// // update service
+	// ------------- LOGIC FOR SERVICE UPDATE -----------------
 
-	// servicesMap[apiKey] = service
-
-	// // // Sending back a string respone if everything goes well
+	// Sending back a string respone if everything goes well
 	c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
 }

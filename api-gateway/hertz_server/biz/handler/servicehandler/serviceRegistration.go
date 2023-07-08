@@ -35,12 +35,17 @@ type Config struct {
 }
 
 // To be stored in DB later and cached in the gateway
-var servicesMap map[string]Service
+var registrationData map[string]Config
+
+// Make a Set of OwnerIds
+var ownerIds map[string]bool
 
 func Register(ctx context.Context, c *app.RequestContext) {
 	var req []struct {
 		Service Service `json:"Service"`
 	}
+
+	// Getting the request Body
 	reqBody, err := c.Body()
 	if err != nil {
 		c.String(consts.StatusBadRequest, "Request body is missing")
@@ -55,40 +60,37 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	for _, item := range req {
-		service := item.Service
+	// Add logic for registration here
 
-		if isAlreadyRegistered(service.ID) {
-			c.String(consts.StatusBadRequest, "Already registered")
-			return
-		}
-
-		apiKey := uuid.New().String()
-		service.Meta.APIKey = apiKey
-
-		// stor the service information
-		if servicesMap == nil {
-			servicesMap = make(map[string]Service)
-		}
-
-		servicesMap[apiKey] = service
+	// Check if owner ID already exists
+	if isAlreadyRegistered(reqBody.OwnerId) {
+		c.String(consts.StatusBadRequest, "Owner ID already exists")
+		return
 	}
 
+	// Generate a UUID Api key for that owner
+	apiKey := uuid.New().String()
+	registrationData[reqBody.OwnerId].ApiKey = apiKey
+
+	// If not, add the owner Id to set and Hashmap
+	ownerIds[reqBody.OwnerId] = true
+
+	// Add the owner ID as the key and the entire request body as the value
+	registrationData[reqBody.OwnerId] = reqBody
+
 	res := make(map[string]string)
-	res["Message"] = "Registered successfully. You're good to \"GO\" :D"
+	res["Message"] = "Registered successfully. You're good to GO :D"
+	res["Api Key"] = apiKey
 
 	c.JSON(consts.StatusOK, res)
 }
 
-func DisplayAll(ctx context.Context, c *app.RequestContext) {
-	c.JSON(consts.StatusOK, servicesMap)
+// Function to check if owner ID already exists using the ownderId set
+func isAlreadyRegistered(ownerId string) bool {
+	_, ok := ownerIds[ownerId]
+	return ok
 }
 
-func isAlreadyRegistered(ownerId string) bool {
-	for _, service := range servicesMap {
-		if service.ID == ownerId {
-			return true
-		}
-	}
-	return false
+func DisplayAll(ctx context.Context, c *app.RequestContext) {
+	c.JSON(consts.StatusOK, registrationData)
 }

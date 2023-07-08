@@ -24,7 +24,7 @@ import (
 )
 
 type Request struct {
-	APIKey        string `json:"api-key"`
+	ApiKey        string `json:"api-key"`
 	ServiceName   string `json:"serviceName"`
 	ServerAddress string `json:"serverAddress"`
 	ServerPort    string `json:"serverPort"`
@@ -44,7 +44,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	if !authoriseConnect(req.APIKey, req.ServiceName) {
+	if !authoriseConnect(req.ApiKey, req.ServiceName) {
 		c.String(consts.StatusUnauthorized, "Unauthorized.")
 		return
 	}
@@ -59,7 +59,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 	res["message"] = "Server Connection Request Accepted."
 	res["serverID"] = uuid.New().String()
 
-	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.APIKey)
+	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
 	if err2 != nil {
 		c.String(consts.StatusInternalServerError, "Unable to register server.")
 		return
