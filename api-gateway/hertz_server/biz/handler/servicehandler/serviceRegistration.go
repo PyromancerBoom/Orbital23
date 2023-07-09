@@ -99,7 +99,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 				servicesMap = make(map[string]ClientData)
 			}
 
-			servicesMap[apiKey] = clientData
+			servicesMap[clientData.OwnerId] = clientData
 		}
 	}
 

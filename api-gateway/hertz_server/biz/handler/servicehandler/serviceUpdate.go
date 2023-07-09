@@ -4,30 +4,41 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
-// To be updated (Unintentional pun) later when registration feature is finalised
 func Update(ctx context.Context, c *app.RequestContext) {
-	// we get the key from header
+	// // Get the API key from the header
 	// apiKey := string(c.GetHeader("apikey"))
+	// // Check if the API key exists
+	// clientData, ok := servicesMap[apiKey]
+	// if !ok {
+	// 	c.String(consts.StatusBadRequest, "Invalid API key")
+	// 	return
+	// }
 
-	// // now we get the body
+	// // Get the request body
 	// reqBody, err := c.Body()
 	// if err != nil {
 	// 	c.String(consts.StatusBadRequest, "Request body error")
 	// 	return
 	// }
 
-	// // and now we check if api key exists
-	// service, ok := servicesMap[apiKey]
-	// if !ok {
-	// 	c.String(consts.StatusBadRequest, "Invalid API key")
+	// // Decode the JSON request
+	// var updatedData ClientData
+	// err = json.Unmarshal(reqBody, &updatedData)
+	// if err != nil {
+	// 	c.String(consts.StatusBadRequest, "Failed to parse request body")
 	// 	return
 	// }
 
-	// ------------- LOGIC FOR SERVICE UPDATE -----------------
+	// // Update the client data with the new values
+	// clientData.OwnerName = updatedData.OwnerName
+	// clientData.OwnerId = updatedData.OwnerId
+	// clientData.Services = updatedData.Services
 
-	// Sending back a string respone if everything goes well
-	c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
+	// // Update the services map
+	// servicesMap[apiKey] = clientData
+
+	// // Sending back a string response if everything goes well
+	// c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
 }
