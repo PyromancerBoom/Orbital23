@@ -38,7 +38,7 @@ type RegisteredServer struct {
 var servicesMap map[string]ClientData
 
 // Make a Set of OwnerIds
-var ownerIds map[string]bool
+var ownerIdSet map[string]bool
 
 func Register(ctx context.Context, c *app.RequestContext) {
 	var req []map[string]interface{}
@@ -57,6 +57,8 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, "Failed to parse request body")
 		return
 	}
+
+	apiKey := uuid.New().String()
 
 	// Iterate over the request items
 	for _, item := range req {
@@ -83,7 +85,13 @@ func Register(ctx context.Context, c *app.RequestContext) {
 				return
 			}
 
-			apiKey := uuid.New().String()
+			// if not, then add owner ID to the set ownerIdSet
+			// assignment to entry in nil map
+			if ownerIdSet == nil {
+				ownerIdSet = make(map[string]bool)
+			}
+			ownerIdSet[clientData.OwnerId] = true
+
 			clientData.ApiKey = apiKey
 
 			// Store the client data information
@@ -95,15 +103,16 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 
-	// res := make(map[string]string)
-	// res["Message"] = "Registered successfully. You're good to GO :D"
+	res := make(map[string]string)
+	res["Message"] = "Registered successfully. You're good to GO :D"
+	res["api-key"] = apiKey
 
-	c.JSON(consts.StatusOK, req)
+	c.JSON(consts.StatusOK, res)
 }
 
 // Function to check if owner ID already exists using the ownerIds map
 func isAlreadyRegistered(ownerId string) bool {
-	_, ok := ownerIds[ownerId]
+	_, ok := ownerIdSet[ownerId]
 	return ok
 }
 
