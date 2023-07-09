@@ -10,9 +10,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type RegisteredServer struct {
-	ServerUrl string `json:"ServerUrl"`
-	Port      int    `json:"Port"`
+type ClientData struct {
+	ApiKey    string    `json:"ApiKey"`
+	OwnerName string    `json:"OwnerName"`
+	OwnerId   string    `json:"OwnerId"`
+	Services  []Service `json:"Services"`
 }
 
 type Service struct {
@@ -27,23 +29,19 @@ type Service struct {
 	RegisteredServers  []RegisteredServer `json:"RegisteredServers"`
 }
 
-type Config struct {
-	ApiKey    string    `json:"ApiKey"`
-	OwnerName string    `json:"OwnerName"`
-	OwnerId   string    `json:"OwnerId"`
-	Services  []Service `json:"Services"`
+type RegisteredServer struct {
+	ServerUrl string `json:"ServerUrl"`
+	Port      int    `json:"Port"`
 }
 
 // To be stored in DB later and cached in the gateway
-var registrationData map[string]Config
+var servicesMap map[string]ClientData
 
 // Make a Set of OwnerIds
 var ownerIds map[string]bool
 
 func Register(ctx context.Context, c *app.RequestContext) {
-	var req []struct {
-		Service Service `json:"Service"`
-	}
+	var req []map[string]interface{}
 
 	// Getting the request Body
 	reqBody, err := c.Body()
@@ -60,37 +58,55 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Add logic for registration here
+	// Iterate over the request items
+	for _, item := range req {
+		// Check if "ClientData" key exists in the item
+		if clientDataRaw, ok := item["ClientData"]; ok {
+			// Convert the value to bytes for decoding
+			clientDataBytes, err := json.Marshal(clientDataRaw)
+			if err != nil {
+				c.String(consts.StatusBadRequest, "Failed to parse ClientData")
+				return
+			}
 
-	// Check if owner ID already exists
-	if isAlreadyRegistered(reqBody.OwnerId) {
-		c.String(consts.StatusBadRequest, "Owner ID already exists")
-		return
+			// Decode the ClientData JSON
+			var clientData ClientData
+			err = json.Unmarshal(clientDataBytes, &clientData)
+			if err != nil {
+				c.String(consts.StatusBadRequest, "Failed to parse ClientData")
+				return
+			}
+
+			// Check if owner ID already exists
+			if isAlreadyRegistered(clientData.OwnerId) {
+				c.String(consts.StatusBadRequest, "Owner ID already exists")
+				return
+			}
+
+			apiKey := uuid.New().String()
+			clientData.ApiKey = apiKey
+
+			// Store the client data information
+			if servicesMap == nil {
+				servicesMap = make(map[string]ClientData)
+			}
+
+			servicesMap[apiKey] = clientData
+		}
 	}
 
-	// Generate a UUID Api key for that owner
-	apiKey := uuid.New().String()
-	registrationData[reqBody.OwnerId].ApiKey = apiKey
+	// res := make(map[string]string)
+	// res["Message"] = "Registered successfully. You're good to GO :D"
 
-	// If not, add the owner Id to set and Hashmap
-	ownerIds[reqBody.OwnerId] = true
-
-	// Add the owner ID as the key and the entire request body as the value
-	registrationData[reqBody.OwnerId] = reqBody
-
-	res := make(map[string]string)
-	res["Message"] = "Registered successfully. You're good to GO :D"
-	res["Api Key"] = apiKey
-
-	c.JSON(consts.StatusOK, res)
+	c.JSON(consts.StatusOK, req)
 }
 
-// Function to check if owner ID already exists using the ownderId set
+// Function to check if owner ID already exists using the ownerIds map
 func isAlreadyRegistered(ownerId string) bool {
 	_, ok := ownerIds[ownerId]
 	return ok
 }
 
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
-	c.JSON(consts.StatusOK, registrationData)
+	c.JSON(consts.StatusOK, servicesMap)
 }
