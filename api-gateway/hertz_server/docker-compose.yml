@@ -1,0 +1,11 @@
+version: '3'
+services:
+  app:
+    image: api-gateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080"
+    deploy:
+      replicas: 5
