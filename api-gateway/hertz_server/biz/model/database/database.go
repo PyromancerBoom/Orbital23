@@ -1,6 +1,6 @@
 package database
 
-// Package for DB Management
+// Package for managing database operations for easier management of code
 
 import (
 	"context"
@@ -11,21 +11,21 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// MongoDBConfig contains the configuration for connecting to MongoDB
+// contains the configuration for connecting to MongoDB
 type MongoDBConfig struct {
-	URI      string
-	Database string
+	URI      string // URI is the connection string for MongoDB
+	Database string // Database is the name of the MongoDB database
 }
 
-// MongoDBClient holds the MongoDB client and database connection
+// holds the MongoDB client and database connection
 type MongoDBClient struct {
-	Client     *mongo.Client
+	Client     *mongo.Client // Mongo client
 	Database   *mongo.Database
 	Collection string
 }
 
-// ConnectMongoDB establishes a connection to MongoDB using the provided configuration
-func ConnectMongoDB(config MongoDBConfig) (*MongoDBClient, error) {
+// establishes a connection to MongoDB using the provided configuration.
+func ConnectToDB(config MongoDBConfig) (*MongoDBClient, error) {
 	clientOptions := options.Client().ApplyURI(config.URI)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
@@ -41,15 +41,15 @@ func ConnectMongoDB(config MongoDBConfig) (*MongoDBClient, error) {
 	}, nil
 }
 
-// Close closes the MongoDB client connection
-func (m *MongoDBClient) Close() {
+// closes the mongodb client connection
+func (m *MongoDBClient) CloseClientConn() {
 	err := m.Client.Disconnect(context.Background())
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-// StoreData stores the provided data in the specified collection
+// stores the provided data in the specified collection.
 func (m *MongoDBClient) StoreData(collectionName string, data interface{}) error {
 	collection := m.Database.Collection(collectionName)
 
@@ -62,7 +62,7 @@ func (m *MongoDBClient) StoreData(collectionName string, data interface{}) error
 	return nil
 }
 
-// GetAllData retrieves all documents from the specified collection
+// retrieves all documents from the specified collection.
 func (m *MongoDBClient) GetAllData(collectionName string, result interface{}) error {
 	collection := m.Database.Collection(collectionName)
 
