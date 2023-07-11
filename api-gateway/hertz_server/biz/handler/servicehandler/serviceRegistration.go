@@ -8,37 +8,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/google/uuid"
+
+	db_mongo "api-gateway/hertz_server/biz/model/db_mongo"
 )
-
-type ClientData struct {
-	ApiKey    string    `json:"ApiKey"`
-	OwnerName string    `json:"OwnerName"`
-	OwnerId   string    `json:"OwnerId"`
-	Services  []Service `json:"Services"`
-}
-
-type Service struct {
-	ServiceId          string             `json:"ServiceId"`
-	ServiceName        string             `json:"ServiceName"`
-	ExposedMethod      string             `json:"ExposedMethod"`
-	Path               string             `json:"Path"`
-	IdlContent         string             `json:"IdlContent"`
-	Version            string             `json:"version"`
-	ServiceDescription string             `json:"ServiceDescription"`
-	ServerCount        int                `json:"ServerCount"`
-	RegisteredServers  []RegisteredServer `json:"RegisteredServers"`
-}
-
-type RegisteredServer struct {
-	ServerUrl string `json:"ServerUrl"`
-	Port      int    `json:"Port"`
-}
-
-// To be stored in DB later and cached in the gateway
-var servicesMap map[string]ClientData
-
-// Make a Set of OwnerIds
-var ownerIdSet map[string]bool
 
 func Register(ctx context.Context, c *app.RequestContext) {
 	var req []map[string]interface{}
@@ -72,7 +44,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 			}
 
 			// Decode the ClientData JSON
-			var clientData ClientData
+			var clientData db_mongo.ClientData
 			err = json.Unmarshal(clientDataBytes, &clientData)
 			if err != nil {
 				c.String(consts.StatusBadRequest, "Failed to parse ClientData")
@@ -85,21 +57,10 @@ func Register(ctx context.Context, c *app.RequestContext) {
 				return
 			}
 
-			// if not, then add owner ID to the set ownerIdSet
-			// assignment to entry in nil map
-			if ownerIdSet == nil {
-				ownerIdSet = make(map[string]bool)
-			}
-			ownerIdSet[clientData.OwnerId] = true
-
 			clientData.ApiKey = apiKey
 
-			// Store the client data information
-			if servicesMap == nil {
-				servicesMap = make(map[string]ClientData)
-			}
-
-			servicesMap[clientData.OwnerId] = clientData
+			// Store the client data information in MongoDB
+			db_mongo.StoreClientData(&clientData)
 		}
 	}
 
@@ -112,10 +73,19 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 // Function to check if owner ID already exists using the ownerIds map
 func isAlreadyRegistered(ownerId string) bool {
-	_, ok := ownerIdSet[ownerId]
-	return ok
+	clientData, err := db_mongo.GetClientDataByOwnerID(ownerId)
+	if err != nil {
+		return false
+	}
+	return clientData != nil
 }
 
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
-	c.JSON(consts.StatusOK, servicesMap)
+	clientDataList, err := db_mongo.GetAllClientData()
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "Failed to fetch client data")
+		return
+	}
+
+	c.JSON(consts.StatusOK, clientDataList)
 }

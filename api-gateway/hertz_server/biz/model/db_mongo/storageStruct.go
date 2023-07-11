@@ -1,4 +1,4 @@
-package database
+package db_mongo
 
 // Structure for storage is defined here
 

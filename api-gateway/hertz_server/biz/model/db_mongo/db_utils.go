@@ -1,4 +1,4 @@
-package database
+package db_mongo
 
 // Contains all utility functions for operations with MongoDB
 // Works with storageStruct.go
