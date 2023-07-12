@@ -15,21 +15,16 @@ import (
 // stores the client data in the database
 // Returns nothing
 func (db *Database) StoreClientData(clientData *ClientData) error {
-	// Marshal the client data into JSON bytes
-	clientDataBytes, err := json.Marshal(clientData)
-	if err != nil {
-		return fmt.Errorf("failed to marshal client data: %v", err)
-	}
-
-	// Unmarshal the client data JSON bytes into a BSON map
-	var clientDataMap bson.M
-	err = bson.UnmarshalExtJSON(clientDataBytes, true, &clientDataMap)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal client data: %v", err)
+	// Convert clientData to bson.M
+	clientDataMap := bson.M{
+		"ApiKey":    clientData.ApiKey,
+		"OwnerName": clientData.OwnerName,
+		"OwnerId":   clientData.OwnerId,
+		"Services":  clientData.Services,
 	}
 
 	// Insert the client data into the database collection
-	_, err = db.collection.InsertOne(context.Background(), clientDataMap)
+	_, err := db.collection.InsertOne(context.Background(), clientDataMap)
 	if err != nil {
 		return fmt.Errorf("failed to store client data: %v", err)
 	}

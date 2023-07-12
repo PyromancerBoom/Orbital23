@@ -5,12 +5,11 @@ import (
 	"context"
 	"encoding/json"
 
+	"api-gateway/hertz_server/biz/model/repository"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/bson"
-
-	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
 func Register(ctx context.Context, c *app.RequestContext) {
@@ -40,15 +39,12 @@ func Register(ctx context.Context, c *app.RequestContext) {
 			c.String(consts.StatusBadRequest, "Owner ID already exists")
 			return
 		}
-		dataMap := bson.M{
-			"ownerId": ownerId,
-			"apiKey":  apiKey,
+		clientData := &repository.ClientData{
+			OwnerId: ownerId,
+			ApiKey:  apiKey,
 		}
-		err = repository.StoreClientData(dataMap)
-		if err != nil {
-			c.String(consts.StatusInternalServerError, "Failed to register client data")
-			return
-		}
+
+		err = repository.StoreClientData(clientData)
 	}
 
 	res := make(map[string]string)

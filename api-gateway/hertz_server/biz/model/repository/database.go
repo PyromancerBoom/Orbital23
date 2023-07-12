@@ -18,6 +18,7 @@ type Database struct {
 
 // establishes a connection to the MongoDB server
 func ConnectDB(uri, dbName, collectionName string) (*Database, error) {
+	fmt.Println("Reached Connection")
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
