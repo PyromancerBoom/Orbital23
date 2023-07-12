@@ -8,8 +8,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 
-	db_mongo "api-gateway/hertz_server/biz/model/db_mongo"
+	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
 func Register(ctx context.Context, c *app.RequestContext) {
@@ -32,35 +33,21 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 	apiKey := uuid.New().String()
 
-	// Iterate over the request items
-	for _, item := range req {
-		// Check if "ClientData" key exists in the item
-		if clientDataRaw, ok := item["ClientData"]; ok {
-			// Convert the value to bytes for decoding
-			clientDataBytes, err := json.Marshal(clientDataRaw)
-			if err != nil {
-				c.String(consts.StatusBadRequest, "Failed to parse ClientData")
-				return
-			}
-
-			// Decode the ClientData JSON
-			var clientData db_mongo.ClientData
-			err = json.Unmarshal(clientDataBytes, &clientData)
-			if err != nil {
-				c.String(consts.StatusBadRequest, "Failed to parse ClientData")
-				return
-			}
-
-			// Check if owner ID already exists
-			if isAlreadyRegistered(clientData.OwnerId) {
-				c.String(consts.StatusBadRequest, "Owner ID already exists")
-				return
-			}
-
-			clientData.ApiKey = apiKey
-
-			// Store the client data information in MongoDB
-			db_mongo.StoreClientData(&clientData)
+	// Register information in Mongo DB along with the apiKey
+	for _, data := range req {
+		ownerId := data["ownerId"].(string)
+		if isAlreadyRegistered(ownerId) {
+			c.String(consts.StatusBadRequest, "Owner ID already exists")
+			return
+		}
+		dataMap := bson.M{
+			"ownerId": ownerId,
+			"apiKey":  apiKey,
+		}
+		err = repository.StoreClientData(dataMap)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, "Failed to register client data")
+			return
 		}
 	}
 
@@ -73,7 +60,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 // Function to check if owner ID already exists using the ownerIds map
 func isAlreadyRegistered(ownerId string) bool {
-	clientData, err := db_mongo.GetClientDataByOwnerID(ownerId)
+	clientData, err := repository.GetClientDataByOwnerID(ownerId)
 	if err != nil {
 		return false
 	}
@@ -81,7 +68,7 @@ func isAlreadyRegistered(ownerId string) bool {
 }
 
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
-	clientDataList, err := db_mongo.GetAllClientData()
+	clientDataList, err := repository.GetAllClientData()
 	if err != nil {
 		c.String(consts.StatusInternalServerError, "Failed to fetch client data")
 		return
