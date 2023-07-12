@@ -15,12 +15,14 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 
 	// your code ...
-	r.POST("/register", servicehandler.Register)
+	// r.POST("/register", servicehandler.Register)
 	r.PUT("/update", servicehandler.Update)
 	r.POST("/connect", servicehandler.Connect)
 	r.POST("/health", servicehandler.HealthCheck)
 
 	// ---------------------------------------
 	// Remove this endpoint before production
-	r.GET("/show", servicehandler.DisplayAll)
+	// r.GET("/show", servicehandler.DisplayAll)
+
+	r.GET("/testmongo", handler.InsertDataInMongo)
 }
