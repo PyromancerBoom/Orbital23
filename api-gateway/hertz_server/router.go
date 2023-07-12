@@ -15,7 +15,7 @@ func customizedRegister(r *server.Hertz) {
 	r.GET("/ping", handler.Ping)
 
 	// your code ...
-	// r.POST("/register", servicehandler.Register)
+	r.POST("/register", servicehandler.Register)
 	r.PUT("/update", servicehandler.Update)
 	r.POST("/connect", servicehandler.Connect)
 	r.POST("/health", servicehandler.HealthCheck)

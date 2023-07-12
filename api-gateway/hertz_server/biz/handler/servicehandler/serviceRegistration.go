@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Handler for /register
+// Handler for "/register"
 // Registers info sent through a post request
 // Generates API key for admin
 func Register(ctx context.Context, c *app.RequestContext) {
@@ -30,6 +30,12 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	err = json.NewDecoder(buf).Decode(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, "Failed to parse request body")
+		return
+	}
+
+	// Check if ownerId exists
+	if ownerIdExists(req[0]["OwnerId"].(string)) {
+		c.String(consts.StatusBadRequest, "Owner ID already exists")
 		return
 	}
 
@@ -54,17 +60,4 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	response["api-key"] = apiKey
 
 	c.JSON(consts.StatusOK, response)
-}
-
-// Utility Function to check if ownerID is already registered in the database
-// @Params:
-// - ownerId: string - The owner ID to check
-// @Returns:
-// - bool: true if already registered, false otherwise
-func isAlreadyRegistered(ownerId string) bool {
-	_, err := repository.GetAdminInfoByID(ownerId)
-	if err != nil {
-		return false
-	}
-	return true
 }
