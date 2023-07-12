@@ -4,9 +4,15 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+
+	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
 func main() {
+	if err := repository.ConnectToMongoDB(); err != nil {
+		panic(err)
+	}
+
 	h := server.Default(server.WithHostPorts("0.0.0.0:4200")) // 127.0.0.1:8080
 
 	register(h)
