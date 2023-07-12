@@ -25,21 +25,21 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 	return nil
 }
 
-/*
-Updates admin data based on the owner ID
-@Params
-ownerID: string
-isValid: bool
-@Returns
-nil or,
-err: error
-*/
-func StoreAdminInfo(adminConfig AdminConfig) error {
-	collection := Client.Database(db_name).Collection(collection_name)
+// Updates admin data based on the owner ID
+// Params:
+// - ownerID: string - The owner ID of the admin data to update
+// - isValid: bool - The updated value for the "isValid" field
+// Returns:
+// - error: An error if any occurred during the update operation
+func UpdateAdminInfo(ownerID string, isValid bool) error {
+	collection := Client.Database("testDB").Collection("adminCollection")
 
-	_, err := collection.InsertOne(context.Background(), adminConfig)
+	filter := bson.M{"OwnerId": ownerID}
+	update := bson.M{"$set": bson.M{"isValid": isValid}}
+
+	_, err := collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		return fmt.Errorf("failed to store admin info: %w", err)
+		return fmt.Errorf("failed to update admin info: %w", err)
 	}
 
 	return nil
@@ -65,8 +65,9 @@ func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 
 // Fetches all the registered client data documents
 // Returns a slice of RegisteredServer and an error if any
+// Todo : Remove method later
 func GetAllClientData() ([]RegisteredServer, error) {
-	collection := Client.Database("testDB").Collection("adminCollection")
+	collection := Client.Database(db_name).Collection(collection_name)
 
 	cur, err := collection.Find(context.Background(), bson.M{})
 	if err != nil {
