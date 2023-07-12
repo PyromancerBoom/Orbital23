@@ -12,6 +12,23 @@ import (
 	"github.com/google/uuid"
 )
 
+var db *repository.Database
+
+func Init() error {
+	var err error
+	db, err = repository.ConnectDB("http://localhost:32769/", "testDB", "testCollection")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Close() {
+	if db != nil {
+		db.Close()
+	}
+}
+
 func Register(ctx context.Context, c *app.RequestContext) {
 	var req []map[string]interface{}
 
@@ -44,7 +61,12 @@ func Register(ctx context.Context, c *app.RequestContext) {
 			ApiKey:  apiKey,
 		}
 
-		err = repository.StoreClientData(clientData)
+		// Use the db instance to call the StoreClientData method
+		err := db.StoreClientData(clientData)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, "Failed to store client data")
+			return
+		}
 	}
 
 	res := make(map[string]string)
@@ -56,7 +78,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 // Function to check if owner ID already exists using the ownerIds map
 func isAlreadyRegistered(ownerId string) bool {
-	clientData, err := repository.GetClientDataByOwnerID(ownerId)
+	clientData, err := db.GetClientDataByOwnerID(ownerId)
 	if err != nil {
 		return false
 	}
@@ -64,7 +86,7 @@ func isAlreadyRegistered(ownerId string) bool {
 }
 
 func DisplayAll(ctx context.Context, c *app.RequestContext) {
-	clientDataList, err := repository.GetAllClientData()
+	clientDataList, err := db.GetAllClientData()
 	if err != nil {
 		c.String(consts.StatusInternalServerError, "Failed to fetch client data")
 		return

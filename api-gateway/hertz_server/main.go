@@ -3,18 +3,16 @@
 package main
 
 import (
-	repository "api-gateway/hertz_server/biz/model/repository"
-
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 func main() {
 	// Connect to the MongoDB server on Docker
-	database, err := repository.ConnectDB("http://localhost:32768/", "testDB", "testCollection")
-	if err != nil {
-		return err
-	}
-	defer database.Close()
+	// database, err := repository.ConnectDB("http://localhost:32768/", "testDB", "testCollection")
+	// if err != nil {
+	// 	return err
+	// }
+	// defer database.Close()
 
 	h := server.Default(server.WithHostPorts("0.0.0.0:4200")) // 127.0.0.1:8080
 
