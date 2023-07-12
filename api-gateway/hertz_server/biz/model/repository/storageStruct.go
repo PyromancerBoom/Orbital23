@@ -2,7 +2,7 @@ package repository
 
 // Structure for storage is defined here
 
-type ClientData struct {
+type AdminConfig struct {
 	ApiKey    string    `json:"ApiKey"`
 	OwnerName string    `json:"OwnerName"`
 	OwnerId   string    `json:"OwnerId"`

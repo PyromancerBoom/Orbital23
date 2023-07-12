@@ -9,7 +9,9 @@ import (
 )
 
 var (
-	Client *mongo.Client
+	Client          *mongo.Client
+	db_name         string = "testDB"
+	collection_name string = "testCollection"
 )
 
 func ConnectToMongoDB() error {
