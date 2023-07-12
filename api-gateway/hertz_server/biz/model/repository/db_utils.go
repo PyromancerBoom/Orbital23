@@ -11,9 +11,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Stores the admin data in the database
-// Adds document to existing collection
-// Returns an error if any
+// Stores the admin data in the database, adds document to existing collection
+// @Params:
+// - adminConfig: AdminConfig - Data to be inserted
+// @Returns
+// - error: An error if any
 func StoreAdminInfo(adminConfig AdminConfig) error {
 	collection := Client.Database(db_name).Collection(collection_name)
 
@@ -26,18 +28,18 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 }
 
 // Updates admin data based on the owner ID
-// Params:
+// @Params:
 // - ownerID: string - The owner ID of the admin data to update
-// - isValid: bool - The updated value for the "isValid" field
-// Returns:
-// - error: An error if any occurred during the update operation
-func UpdateAdminInfo(ownerID string, isValid bool) error {
+// - adminConfig: AdminConfig - Data to be updated and overwritten
+// @Returns:
+// - error: An error if any
+func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error {
 	collection := Client.Database("testDB").Collection("adminCollection")
 
 	filter := bson.M{"OwnerId": ownerID}
-	update := bson.M{"$set": bson.M{"isValid": isValid}}
 
-	_, err := collection.UpdateOne(context.Background(), filter, update)
+	// update admin info
+	_, err := collection.UpdateOne(context.Background(), filter, bson.M{"$set": adminConfig})
 	if err != nil {
 		return fmt.Errorf("failed to update admin info: %w", err)
 	}
@@ -46,7 +48,12 @@ func UpdateAdminInfo(ownerID string, isValid bool) error {
 }
 
 // Fetches admin data based on the owner ID
-// Returns the admin data and an error if any
+// The validation based on API key happens outside this
+// @Params:
+// - ownerID: string - The owner ID of the admin data to fetch
+// @Returns:
+// - adminConfig: AdminConfig - The admin data
+// - error: An error if any
 func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 	collection := Client.Database(db_name).Collection(collection_name)
 
@@ -61,33 +68,4 @@ func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 	}
 
 	return adminConfig, nil
-}
-
-// Fetches all the registered client data documents
-// Returns a slice of RegisteredServer and an error if any
-// Todo : Remove method later
-func GetAllClientData() ([]RegisteredServer, error) {
-	collection := Client.Database(db_name).Collection(collection_name)
-
-	cur, err := collection.Find(context.Background(), bson.M{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch client data: %w", err)
-	}
-	defer cur.Close(context.Background())
-
-	var registeredServers []RegisteredServer
-	for cur.Next(context.Background()) {
-		var adminConfig AdminConfig
-		if err := cur.Decode(&adminConfig); err != nil {
-			return nil, fmt.Errorf("failed to decode client data: %w", err)
-		}
-
-		registeredServers = append(registeredServers, adminConfig.Services[0].RegisteredServers...)
-	}
-
-	if err := cur.Err(); err != nil {
-		return nil, fmt.Errorf("cursor error while fetching client data: %w", err)
-	}
-
-	return registeredServers, nil
 }
