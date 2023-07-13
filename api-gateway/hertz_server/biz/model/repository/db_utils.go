@@ -1,6 +1,30 @@
 package repository
 
-// Contains all utility functions for operations specific to MongoDB
+// Contains all utility functions for operations specific only to MongoDB
+// Includes methods for storing, updating, deleting, etc
+
+/*
+This package contains the following utility method:
+
+-- func StoreAdminInfo(adminConfig AdminConfig) error
+Stores the admin data in the database by adding a document to the existing collection.
+
+-- func DeleteAdminInfo(ownerID string, ownerName string) error
+Deletes the admin data document from the database based on the owner ID and owner name.
+UpdateAdminInfo
+
+-- func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error
+Updates the admin data in the database based on the owner ID by overwriting the existing data with the provided adminConfig data.
+GetAdminInfoByID
+
+-- func GetAdminInfoByID(ownerID string) (AdminConfig, error)
+Fetches the admin data from the database based on the owner ID and returns the corresponding AdminConfig data.
+GetApiKey
+
+-- func GetApiKey(ownerID string) (string, error)
+Fetches the API key from the database based on the owner ID and returns the API key as a string.
+
+*/
 
 import (
 	"context"
@@ -26,6 +50,27 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 	return nil
 }
 
+// Delete the admin data document in the database
+// No authentication implemented yet for this.
+// @Params:
+// - ownerID: string - The owner ID of the admin data to delete
+// - ownerName: string - Name of the owner
+// @Returns:
+// - error: An error if any
+func DeleteAdminInfo(ownerID string, ownerName string) error {
+	collection := Client.Database(db_name).Collection(collection_name)
+
+	filter := bson.M{"ownerid": ownerID, "ownername": ownerName}
+
+	// delete admin info
+	_, err := collection.DeleteOne(context.Background(), filter)
+	if err != nil {
+		return fmt.Errorf("failed to delete admin info: %w", err)
+	}
+
+	return nil
+}
+
 // Updates admin data based on the owner ID
 // @Params:
 // - ownerID: string - The owner ID of the admin data to update
@@ -33,7 +78,7 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 // @Returns:
 // - error: An error if any
 func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error {
-	collection := Client.Database("testDB").Collection("adminCollection")
+	collection := Client.Database(db_name).Collection(collection_name)
 
 	filter := bson.M{"ownerid": ownerID}
 
@@ -67,4 +112,26 @@ func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 	}
 
 	return adminConfig, nil
+}
+
+// Fetch API Key from the database
+// @Params:
+// - ownerID: string - The owner ID of the admin data to fetch
+// @Returns:
+// - string: The API key
+// - error: An error if any
+func GetApiKey(ownerID string) (string, error) {
+	collection := Client.Database(db_name).Collection(collection_name)
+
+	var adminConfig AdminConfig
+	filter := bson.M{"ownerid": ownerID}
+	err := collection.FindOne(context.Background(), filter).Decode(&adminConfig)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", fmt.Errorf("admin data not found")
+		}
+		return "", fmt.Errorf("failed to get admin info: %w", err)
+	}
+
+	return adminConfig.ApiKey, nil
 }

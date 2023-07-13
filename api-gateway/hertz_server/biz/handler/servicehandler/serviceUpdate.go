@@ -1,44 +1,79 @@
 package servicehandler
 
 import (
+	repository "api-gateway/hertz_server/biz/model/repository"
+	"bytes"
 	"context"
+	"encoding/json"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
+// Handler for "/update"
+// Updates info sent through a post request
 func Update(ctx context.Context, c *app.RequestContext) {
-	// // Get the API key from the header
-	// apiKey := string(c.GetHeader("apikey"))
-	// // Check if the API key exists
-	// clientData, ok := servicesMap[apiKey]
-	// if !ok {
-	// 	c.String(consts.StatusBadRequest, "Invalid API key")
-	// 	return
-	// }
+	var req []map[string]interface{}
+	// Fetch ownerId from params
+	ownerId := c.Query("ownerid")
+	// Fetch api key from header
+	apiKey := string(c.GetHeader("apikey"))
 
-	// // Get the request body
-	// reqBody, err := c.Body()
-	// if err != nil {
-	// 	c.String(consts.StatusBadRequest, "Request body error")
-	// 	return
-	// }
+	// Check if owner ID is valid
+	if !ownerIdExists(ownerId) {
+		c.String(consts.StatusBadRequest, "Invalid owner ID")
+		return
+	}
 
-	// // Decode the JSON request
-	// var updatedData ClientData
-	// err = json.Unmarshal(reqBody, &updatedData)
-	// if err != nil {
-	// 	c.String(consts.StatusBadRequest, "Failed to parse request body")
-	// 	return
-	// }
+	// Validate api key
+	if !apiKeyValid(apiKey, ownerId) {
+		c.String(consts.StatusBadRequest, "Invalid API key")
+		return
+	}
 
-	// // Update the client data with the new values
-	// clientData.OwnerName = updatedData.OwnerName
-	// clientData.OwnerId = updatedData.OwnerId
-	// clientData.Services = updatedData.Services
+	// Getting the request Body
+	reqBody, err := c.Body()
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Request body is missing"+err.Error())
+		return
+	}
+	buf := bytes.NewBuffer(reqBody)
 
-	// // Update the services map
-	// servicesMap[apiKey] = clientData
+	// Decode the JSON request
+	err = json.NewDecoder(buf).Decode(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Failed to parse request body"+err.Error())
+		return
+	}
 
-	// // Sending back a string response if everything goes well
-	// c.String(consts.StatusOK, "Service updated successfully. You're good to \"GO\" :D")
+	// Prepare the updated admin info
+	adminConfig := repository.AdminConfig{
+		ApiKey:    apiKey,
+		OwnerName: req[0]["OwnerName"].(string),
+		OwnerId:   req[0]["OwnerId"].(string),
+	}
+
+	// Unmarshal the Services field from the request into the Services field of adminConfig
+	servicesJSON, err := json.Marshal(req[0]["Services"])
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Failed to parse Services field")
+		return
+	}
+	err = json.Unmarshal(servicesJSON, &adminConfig.Services)
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Failed to parse Services field"+err.Error())
+		return
+	}
+
+	err = repository.UpdateAdminInfo(ownerId, adminConfig)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "Failed to update admin")
+		return
+	}
+
+	// Return the reponse
+	response := make(map[string]string)
+	response["Message"] = "Updated successfully. You're good to GO :D"
+
+	c.JSON(consts.StatusOK, response)
 }

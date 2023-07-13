@@ -17,3 +17,22 @@ func ownerIdExists(ownerId string) bool {
 
 	return true
 }
+
+// Method to check if api key is valid for some owner id
+// @Params:
+// - apiKey: string - The api key to check
+// - ownerId: string - The owner id to check
+// @Returns:
+// - bool: true if valid, false otherwise
+func apiKeyValid(apiKey string, ownerId string) bool {
+	adminConfig, err := repository.GetAdminInfoByID(ownerId)
+	if err != nil {
+		return false
+	}
+
+	if adminConfig.ApiKey == apiKey {
+		return true
+	}
+
+	return false
+}
