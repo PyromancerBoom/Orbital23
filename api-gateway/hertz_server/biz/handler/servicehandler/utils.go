@@ -11,5 +11,9 @@ import repository "api-gateway/hertz_server/biz/model/repository"
 // - bool: true if already registered, false otherwise
 func ownerIdExists(ownerId string) bool {
 	_, err := repository.GetAdminInfoByID(ownerId)
-	return err == nil
+	if err != nil {
+		return false
+	}
+
+	return true
 }

@@ -1,7 +1,6 @@
 package repository
 
-// Contains all utility functions for operations with MongoDB
-// Works with storageStruct.go
+// Contains all utility functions for operations specific to MongoDB
 
 import (
 	"context"
@@ -36,7 +35,7 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error {
 	collection := Client.Database("testDB").Collection("adminCollection")
 
-	filter := bson.M{"OwnerId": ownerID}
+	filter := bson.M{"ownerid": ownerID}
 
 	// update admin info
 	_, err := collection.UpdateOne(context.Background(), filter, bson.M{"$set": adminConfig})
@@ -58,7 +57,7 @@ func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 	collection := Client.Database(db_name).Collection(collection_name)
 
 	var adminConfig AdminConfig
-	filter := bson.M{"OwnerId": ownerID}
+	filter := bson.M{"ownerid": ownerID}
 	err := collection.FindOne(context.Background(), filter).Decode(&adminConfig)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {

@@ -1,6 +1,10 @@
 package repository
 
 // Structure for storage is defined here
+// While the format will be same, the fields would be in smallcase in MongoDB.
+// So for example, ApiKey in the dataabase would be stored as "apikey"
+// "OwnerName" would be stored as "ownername" by default
+// and so on
 
 type AdminConfig struct {
 	ApiKey    string    `json:"ApiKey"`
