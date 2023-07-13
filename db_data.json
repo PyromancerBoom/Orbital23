@@ -1,0 +1,92 @@
+// Import this json in the mongo container
+// Data is shared through this json file
+
+// Note: This is just a dummy file and does not contain any real data
+// It was made for testing this application
+[{
+  "_id": {
+    "$oid": "64afd4cba52e3ae2d2cbb8cc"
+  },
+  "apikey": "9dd3d06b-8127-497b-ae08-82cad5800a8f",
+  "ownername": "John Doe",
+  "ownerid": "123456",
+  "services": [
+    {
+      "serviceid": "1",
+      "servicename": "Service A",
+      "exposedmethod": "GET",
+      "path": "/service-a",
+      "idlcontent": "",
+      "version": "1.0",
+      "servicedescription": "Service A Description",
+      "servercount": 2,
+      "registeredservers": [
+        {
+          "serverurl": "http://localhost:8000",
+          "port": 8000
+        },
+        {
+          "serverurl": "http://localhost:8001",
+          "port": 8001
+        }
+      ]
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "64afd4e2a52e3ae2d2cbb8cd"
+  },
+  "apikey": "cb82627e-29d7-476a-9137-090081870824",
+  "ownername": "John Doe 2",
+  "ownerid": "789456",
+  "services": [
+    {
+      "serviceid": "1",
+      "servicename": "Service A",
+      "exposedmethod": "GET",
+      "path": "/service-a",
+      "idlcontent": "",
+      "version": "1.0",
+      "servicedescription": "Service A Description",
+      "servercount": 2,
+      "registeredservers": [
+        {
+          "serverurl": "http://localhost:8000",
+          "port": 8000
+        },
+        {
+          "serverurl": "http://localhost:8001",
+          "port": 8001
+        }
+      ]
+    },
+    {
+      "serviceid": "2",
+      "servicename": "Service A",
+      "exposedmethod": "GET",
+      "path": "/service-a",
+      "idlcontent": "",
+      "version": "1.0",
+      "servicedescription": "Service B Description",
+      "servercount": 2,
+      "registeredservers": [
+        {
+          "serverurl": "http://localhost:8000",
+          "port": 8000
+        },
+        {
+          "serverurl": "http://localhost:8001",
+          "port": 8001
+        }
+      ]
+    }
+  ]
+},{
+  "_id": {
+    "$oid": "64afd4e5a52e3ae2d2cbb8ce"
+  },
+  "apikey": "36664cbe-d867-4917-bead-29d587bef662",
+  "ownername": "John Doe",
+  "ownerid": "123123213",
+  "services": null
+}]
