@@ -19,10 +19,4 @@ func customizedRegister(r *server.Hertz) {
 	r.PUT("/update", servicehandler.Update)
 	r.POST("/connect", servicehandler.Connect)
 	r.POST("/health", servicehandler.HealthCheck)
-
-	// ---------------------------------------
-	// Remove this endpoint before production
-	// r.GET("/show", servicehandler.DisplayAll)
-
-	r.GET("/testmongo", handler.InsertDataInMongo)
 }
