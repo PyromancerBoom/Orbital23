@@ -28,8 +28,8 @@ import (
 
 var (
 	Client          *mongo.Client
-	db_name         string = "testDB"
-	collection_name string = "testCollection"
+	db_name         string = "api_gateway_db"
+	collection_name string = "admin_services"
 )
 
 // Establishes connection to MongoDB
