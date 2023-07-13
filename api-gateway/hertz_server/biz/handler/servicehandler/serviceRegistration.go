@@ -21,7 +21,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	// Getting the request Body
 	reqBody, err := c.Body()
 	if err != nil {
-		c.String(consts.StatusBadRequest, "Request body is missing")
+		c.String(consts.StatusBadRequest, "Request body is missing"+err.Error())
 		return
 	}
 	buf := bytes.NewBuffer(reqBody)
@@ -29,7 +29,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	// Decode the JSON request
 	err = json.NewDecoder(buf).Decode(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, "Failed to parse request body")
+		c.String(consts.StatusBadRequest, "Failed to parse request body"+err.Error())
 		return
 	}
 
@@ -56,7 +56,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	}
 	err = json.Unmarshal(servicesJSON, &adminConfig.Services)
 	if err != nil {
-		c.String(consts.StatusBadRequest, "Failed to parse Services field")
+		c.String(consts.StatusBadRequest, "Failed to parse Services field"+err.Error())
 		return
 	}
 
