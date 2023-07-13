@@ -46,7 +46,18 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		ApiKey:    apiKey,
 		OwnerName: req[0]["OwnerName"].(string),
 		OwnerId:   req[0]["OwnerId"].(string),
-		Services:  []repository.Service{},
+	}
+
+	// Unmarshal the Services field from the request into the Services field of adminConfig
+	servicesJSON, err := json.Marshal(req[0]["Services"])
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Failed to parse Services field")
+		return
+	}
+	err = json.Unmarshal(servicesJSON, &adminConfig.Services)
+	if err != nil {
+		c.String(consts.StatusBadRequest, "Failed to parse Services field")
+		return
 	}
 
 	err = repository.StoreAdminInfo(adminConfig)
