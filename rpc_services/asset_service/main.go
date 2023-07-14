@@ -51,10 +51,10 @@ func main() {
 	svr := asset_management.NewServer(new(AssetManagementImpl), server.WithServiceAddr(addr),
 		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 1000}),
 		server.WithReadWriteTimeout(100*time.Second))
-	err = svr.Run()
+	kitexerr := svr.Run()
 
-	if err != nil {
-		log.Println(err.Error())
+	if kitexerr != nil {
+		log.Println(kitexerr.Error())
 	}
 }
 

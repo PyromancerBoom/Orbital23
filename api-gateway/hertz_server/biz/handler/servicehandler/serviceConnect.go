@@ -61,7 +61,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 
 	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
 	if err2 != nil {
-		c.String(consts.StatusInternalServerError, "Unable to register server.")
+		c.String(consts.StatusInternalServerError, "Unable to connect server.")
 		return
 	}
 
