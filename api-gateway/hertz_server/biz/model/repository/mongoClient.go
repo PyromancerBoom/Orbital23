@@ -21,9 +21,11 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 )
 
 var (
@@ -41,10 +43,49 @@ func ConnectToMongoDB() error {
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	c, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
+		zap.L().Error("Failed to connect to MongoDB", zap.Error(err))
 		return fmt.Errorf("failed to connect to MongoDB: %w", err)
 	}
 
 	Client = c
 
 	return nil
+}
+
+// Perform MongoDB health check by pinging the server every 30 sec normally.
+// If health check fails, ping every 5 seconds until MongoDB server comes back online.
+func MongoHealthCheck() {
+	normalPingInterval := 10 * time.Second
+	failedPingInterval := 3 * time.Second
+	maxFailedPingDuration := 3 * time.Minute
+
+	ticker := time.NewTicker(normalPingInterval)
+	pingInterval := normalPingInterval
+	failedPingStart := time.Time{}
+
+	for {
+		select {
+		case <-ticker.C:
+			err := Client.Ping(context.Background(), nil)
+			if err != nil {
+				zap.L().Error("Failed to ping MongoDB server", zap.Error(err))
+				if pingInterval != failedPingInterval {
+					zap.L().Info("Switching to fast ping interval")
+					pingInterval = failedPingInterval
+					ticker.Reset(pingInterval)
+					failedPingStart = time.Now()
+				} else if time.Since(failedPingStart) > maxFailedPingDuration {
+					zap.L().Info("MongoDB server is still offline after 3 minutes, stopping health check")
+					ticker.Stop()
+					return
+				}
+			} else {
+				if pingInterval != normalPingInterval {
+					zap.L().Info("MongoDB server is back online, switching to normal ping interval")
+					pingInterval = normalPingInterval
+					ticker.Reset(pingInterval)
+				}
+			}
+		}
+	}
 }
