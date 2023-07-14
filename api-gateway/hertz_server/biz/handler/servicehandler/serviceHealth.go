@@ -58,6 +58,17 @@ func authoriseHealthCheckRight(apiKey string, serverID string) bool {
 	return true
 }
 
+// Original updateAsHealthy func
+// func updateAsHealthy(checkID string) error {
+// 	err2 := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
+// 	if err2 != nil {
+// 		println(err2.Error())
+// 		return err2
+// 	}
+
+// 	return nil
+// }
+
 func updateAsHealthy(checkID string) error {
 	for {
 		err := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
