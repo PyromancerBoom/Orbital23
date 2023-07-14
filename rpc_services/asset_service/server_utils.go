@@ -27,6 +27,20 @@ type ConnectRequest struct {
 	Port        string `json:"serverPort"`
 }
 
+func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {
+	for {
+		log.Println("Connecting to gateway...")
+		id, err := client.connectServer(serverAddress, serverPort)
+		if err == nil {
+			return id, nil
+		}
+
+		log.Println("Error connecting to gateway:", err.Error())
+		log.Println("Retrying connection in 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
+}
+
 // gateway address example : "http://localhost:4200"
 // connectsServer to system and gets the server ID back.
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {

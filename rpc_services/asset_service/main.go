@@ -1,10 +1,10 @@
 package main
 
 import (
-	asset_management "rpc_services/asset_service/kitex_gen/asset_management/assetmanagement"
 	"fmt"
 	"log"
 	"net"
+	asset_management "rpc_services/asset_service/kitex_gen/asset_management/assetmanagement"
 	"strconv"
 	"time"
 
@@ -14,32 +14,44 @@ import (
 
 const (
 	apikey  = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	gateway = "http://127.0.0.1:4200"
+	gateway = "http://0.0.0.0:4200"
 )
 
 var addr = getAddr()
 
-func init() {
+// func init() {
 
-	//make a client
-	gatewayClient := NewGatewayClient(apikey, "AssetManagement", gateway)
+// 	//make a client
+// 	gatewayClient := NewGatewayClient(apikey, "AssetManagement", gateway)
 
-	//register the server to the system
-	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+// 	//register the server to the system
+// 	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
+// 	if err != nil {
+// 		log.Fatal(err.Error())
+// 	}
 
-	//enter a health loop
-	gatewayClient.updateHealthLoop(id, 5)
-}
+// 	//enter a health loop
+// 	gatewayClient.updateHealthLoop(id, 5)
+// }
 
 func main() {
+	// Make a client
+	gatewayClient := NewGatewayClient(apikey, "AssetManagement", gateway)
+
+	// Connect to the gateway server with retry
+	id, err := connectServerWithRetry(gatewayClient, addr.IP.String(), strconv.Itoa(addr.Port))
+	if err != nil {
+		log.Println("Error connecting to gateway:", err.Error())
+		return
+	}
+
+	// Enter a health loop
+	gatewayClient.updateHealthLoop(id, 5)
 
 	svr := asset_management.NewServer(new(AssetManagementImpl), server.WithServiceAddr(addr),
 		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 1000}),
 		server.WithReadWriteTimeout(100*time.Second))
-	err := svr.Run()
+	err = svr.Run()
 
 	if err != nil {
 		log.Println(err.Error())

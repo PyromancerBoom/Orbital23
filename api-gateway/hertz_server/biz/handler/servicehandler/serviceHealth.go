@@ -3,6 +3,7 @@ package servicehandler
 import (
 	"context"
 	"log"
+	"time"
 
 	consul "github.com/hashicorp/consul/api"
 
@@ -58,11 +59,14 @@ func authoriseHealthCheckRight(apiKey string, serverID string) bool {
 }
 
 func updateAsHealthy(checkID string) error {
-	err2 := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
-	if err2 != nil {
-		println(err2.Error())
-		return err2
-	}
+	for {
+		err := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
+		if err == nil {
+			return nil // Health update successful
+		}
 
-	return nil
+		log.Println("Failed to update health:", err.Error())
+		log.Println("Retrying health update in 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
 }

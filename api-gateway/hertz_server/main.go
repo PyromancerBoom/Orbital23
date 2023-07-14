@@ -13,7 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	h := server.Default(server.WithHostPorts("0.0.0.0:4200")) // 127.0.0.1:8080
+	h := server.Default(server.WithHostPorts("0.0.0.0:4200"))
 
 	register(h)
 	h.Spin()
