@@ -19,12 +19,16 @@ Import "go.uber.org/zap" to use.
 
 import (
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
-
 func initLogger() {
-	logger, _ = zap.NewProduction()
+	config := zap.NewDevelopmentConfig()
+	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	logger, err := config.Build()
+	if err != nil {
+		panic(err)
+	}
 	defer logger.Sync()
 
 	// Replace the global logger with our own.
