@@ -13,7 +13,8 @@ Methods for loggging :
 
 Import "go.uber.org/zap" to use.
 
-Use by calling the methods on zap.L()
+ -----> Use by calling the methods on zap.L()
+ For example, zap.L().Info(...)
 */
 
 import (
