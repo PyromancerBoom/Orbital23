@@ -4,22 +4,18 @@ package servicehandler
 This package contains utility methods for the servicehandler package.
 
 - func ownerIdExists(ownerId string) bool
-  - Checks if the ownerID is already registered in the database.
-  - Params:
-    - ownerId: string - The owner ID to check.
-  - Returns:
-    - bool: true if the ownerID is already registered, false otherwise.
+  Checks if the ownerID is already registered in the database.
+
 
 - func apiKeyValid(apiKey string, ownerId string) bool
-  - Checks if the provided API key is valid for the given ownerID.
-  - Params:
-    - apiKey: string - The API key to check.
-    - ownerId: string - The owner ID to check.
-  - Returns:
-    - bool: true if the API key is valid for the ownerID, false otherwise.
+  Checks if the provided API key is valid for the given ownerID.
 */
 
-import repository "api-gateway/hertz_server/biz/model/repository"
+import (
+	repository "api-gateway/hertz_server/biz/model/repository"
+
+	"go.uber.org/zap"
+)
 
 // Utility Function to check if ownerID is already registered in the database
 // @Params:
@@ -29,6 +25,7 @@ import repository "api-gateway/hertz_server/biz/model/repository"
 func ownerIdExists(ownerId string) bool {
 	_, err := repository.GetAdminInfoByID(ownerId)
 	if err != nil {
+		zap.L().Error("Owner ID does not exist: ", zap.Error(err))
 		return false
 	}
 
@@ -44,6 +41,7 @@ func ownerIdExists(ownerId string) bool {
 func apiKeyValid(apiKey string, ownerId string) bool {
 	adminConfig, err := repository.GetAdminInfoByID(ownerId)
 	if err != nil {
+		zap.L().Error("Admin config not found: ", zap.Error(err))
 		return false
 	}
 

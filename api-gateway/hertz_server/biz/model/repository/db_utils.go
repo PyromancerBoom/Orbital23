@@ -30,7 +30,6 @@ import (
 	"context"
 	"fmt" // Using fmt for error printing. Change to hertz error code later
 
-	"github.com/hertz-contrib/logger/zap"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
@@ -46,7 +45,7 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 
 	_, err := collection.InsertOne(context.Background(), adminConfig)
 	if err != nil {
-		zap.L().Errorf("failed to store admin info: ", zap.Error(err))
+		zap.L().Error("failed to store admin info: ", zap.Error(err))
 		return fmt.Errorf("failed to store admin info: %w", err)
 	}
 
@@ -95,7 +94,7 @@ func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error {
 		return fmt.Errorf("failed to update admin info: %w", err)
 	}
 
-	zap.L().Info("Updated admin info for", zap.String("ownerID", ownerID), zap.String("admin config:", adminConfig))
+	zap.L().Info("Updated admin info for", zap.String("ownerID", ownerID), zap.Any("admin config:", adminConfig))
 	return nil
 }
 
