@@ -30,8 +30,10 @@ import (
 	"context"
 	"fmt" // Using fmt for error printing. Change to hertz error code later
 
+	"github.com/hertz-contrib/logger/zap"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
 )
 
 // Stores the admin data in the database, adds document to existing collection
@@ -44,9 +46,11 @@ func StoreAdminInfo(adminConfig AdminConfig) error {
 
 	_, err := collection.InsertOne(context.Background(), adminConfig)
 	if err != nil {
+		zap.L().Errorf("failed to store admin info: ", zap.Error(err))
 		return fmt.Errorf("failed to store admin info: %w", err)
 	}
 
+	zap.L().Info("Stored admin info", zap.Any("adminConfig", adminConfig))
 	return nil
 }
 
@@ -65,9 +69,11 @@ func DeleteAdminInfo(ownerID string, ownerName string) error {
 	// delete admin info
 	_, err := collection.DeleteOne(context.Background(), filter)
 	if err != nil {
+		zap.L().Error("failed to delete admin info", zap.Error(err))
 		return fmt.Errorf("failed to delete admin info: %w", err)
 	}
 
+	zap.L().Info("Deleted admin info for", zap.String("ownerID", ownerID), zap.String("ownerName", ownerName))
 	return nil
 }
 
@@ -85,9 +91,11 @@ func UpdateAdminInfo(ownerID string, adminConfig AdminConfig) error {
 	// update admin info
 	_, err := collection.UpdateOne(context.Background(), filter, bson.M{"$set": adminConfig})
 	if err != nil {
+		zap.L().Error("failed to update admin info", zap.Error(err))
 		return fmt.Errorf("failed to update admin info: %w", err)
 	}
 
+	zap.L().Info("Updated admin info for", zap.String("ownerID", ownerID), zap.String("admin config:", adminConfig))
 	return nil
 }
 
@@ -106,11 +114,14 @@ func GetAdminInfoByID(ownerID string) (AdminConfig, error) {
 	err := collection.FindOne(context.Background(), filter).Decode(&adminConfig)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			zap.L().Info("Admin data not found for ownerID", zap.String("ownerID", ownerID))
 			return AdminConfig{}, fmt.Errorf("admin data not found")
 		}
+		zap.L().Error("Failed to get admin info", zap.String("ownerID", ownerID), zap.Error(err))
 		return AdminConfig{}, fmt.Errorf("failed to get admin info: %w", err)
 	}
 
+	zap.L().Info("Fetched admin info for ownerID", zap.String("ownerID", ownerID), zap.Any("adminConfig", adminConfig))
 	return adminConfig, nil
 }
 
@@ -128,10 +139,13 @@ func GetApiKey(ownerID string) (string, error) {
 	err := collection.FindOne(context.Background(), filter).Decode(&adminConfig)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
+			zap.L().Info("Admin data not found for ownerID", zap.String("ownerID", ownerID))
 			return "", fmt.Errorf("admin data not found")
 		}
+		zap.L().Error("Failed to get admin info", zap.String("ownerID", ownerID), zap.Error(err))
 		return "", fmt.Errorf("failed to get admin info: %w", err)
 	}
 
+	zap.L().Info("Fetch operation completed")
 	return adminConfig.ApiKey, nil
 }
