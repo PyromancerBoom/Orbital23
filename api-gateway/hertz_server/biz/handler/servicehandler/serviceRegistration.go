@@ -31,7 +31,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	// Decode the JSON request
 	err = json.NewDecoder(buf).Decode(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, "Failed to parse request body"+err.Error())
+		c.String(consts.StatusBadRequest, "Failed to parse request body. Invalid Format")
 		zap.L().Error("Failed to parse request body", zap.Error(err))
 		return
 	}
