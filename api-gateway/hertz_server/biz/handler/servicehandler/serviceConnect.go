@@ -32,8 +32,8 @@ type Request struct {
 
 const (
 	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl            = 10 * time.Second //declare unhealthy after
-	ttd            = 6 * ttl          //remove from registry afer
+	ttl            = 10 * time.Second // Declare unhealthy after
+	ttd            = 6 * ttl          // Remove from registry afer
 )
 
 func Connect(ctx context.Context, c *app.RequestContext) {

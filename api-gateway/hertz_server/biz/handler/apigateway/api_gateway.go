@@ -12,6 +12,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	consul "github.com/kitex-contrib/registry-consul"
+	"go.uber.org/zap"
 
 	client "github.com/cloudwego/kitex/client"
 	genericClient "github.com/cloudwego/kitex/client/genericclient"
@@ -25,10 +26,13 @@ import (
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
 
+	zap.L().Info("Processing POST request")
+
 	// Parsing and validation
 	var req apigateway.GatewayRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
+		zap.L().Error("Error in parsing and validating request", zap.Error(err))
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
@@ -38,12 +42,14 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	reqBody, err := c.Body()
 	if err != nil {
+		zap.L().Error("Error while getting request body", zap.Error(err))
 		c.String(consts.StatusBadRequest, "Request body is missing")
 		return
 	}
 
 	trimmedReqBody := bytes.TrimSpace(reqBody)
 	if len(trimmedReqBody) == 0 {
+		zap.L().Warn("Request body is empty")
 		c.String(consts.StatusBadRequest, "Request body is empty")
 		return
 	}
@@ -51,41 +57,50 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	// Checking if service and method are valid
 	value, err := idlmap.GetService(serviceName, path)
 	if err != nil {
+		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
+	zap.L().Info("Checked that service and method are valid")
 
 	// provider initialisation
 	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
+		zap.L().Error("Error while initializing provider", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
+	zap.L().Info("Provider initialised")
 
 	thriftGeneric, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nJSONThriftGeneric error \n")
+		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
-	//get registry to enable resolving serverIDs
+	// Get registry to enable resolving serverIDs
 	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
 	if err != nil {
-		panic(err)
+		zap.L().Error("Error while getting registry", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// fetch hostport from registry later
+	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithResolver(registry))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
+		zap.L().Error("Error while initializing generic client", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	jsonString := string(reqBody)
 
 	// Make generic Call and get back response
+	zap.L().Info("Making generic Call and getting back response")
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric call error \n")
+		zap.L().Error("Error while making generic call", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	c.String(consts.StatusOK, response.(string))
@@ -95,10 +110,14 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 // @router /{:serviceName}/{:serviceMethod} [GET]
 func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
+
+	zap.L().Info("Processing GET request")
+
 	// Parsing and validation
 	var req apigateway.GatewayRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
+		zap.L().Error("Error in parsing and validating request", zap.Error(err))
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
@@ -109,33 +128,38 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	// Checking if service and method are valid
 	value, err := idlmap.GetService(serviceName, path)
 	if err != nil {
+		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// provider initialisation
+	// Provider initialisation
 	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nProvider Init error \n")
+		zap.L().Error("Error while initializing provider", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
 	thriftGeneric, err := generic.JSONThriftGeneric(provider)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nJSONThriftGeneric error \n")
+		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
-	//get registry to enable resolving serverIDs
+	// Get registry to enable resolving serverIDs
 	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
 	if err != nil {
-		panic(err)
+		zap.L().Error("Error while getting registry", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
-	// fetch hostport from registry later
+	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithResolver(registry))
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric client initialisation error \n")
+		zap.L().Error("Error while initializing generic client", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	queryParams := c.QueryArgs()
@@ -146,17 +170,21 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		params[string(key)] = string(value)
 	})
 
+	zap.L().Info("QueryArgs fetched", zap.Any("Params: ", params))
+
 	// Make Json string from request
 	jsonBytes, err := json.Marshal(params)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nJson Marshalling error \n")
+		zap.L().Error("Error while marshalling json", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 	jsonString := string(jsonBytes)
 
 	// Make generic Call and get back response
 	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
 	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error()+"\nGeneric call error \n")
+		zap.L().Error("Error while making generic call", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	c.String(consts.StatusOK, response.(string))
