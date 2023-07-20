@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"time"
 
 	apigateway "api-gateway/hertz_server/biz/model/apigateway"
 
@@ -15,6 +16,7 @@ import (
 	"go.uber.org/zap"
 
 	client "github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/client/callopt"
 	genericClient "github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/generic"
 
@@ -25,6 +27,7 @@ import (
 // @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
+	options := []callopt.Option{callopt.WithRPCTimeout(time.Second * 100), callopt.WithConnectTimeout(time.Millisecond * 150)}
 
 	zap.L().Info("Processing POST request")
 
@@ -97,19 +100,21 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	// Make generic Call and get back response
 	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
+	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	c.String(consts.StatusOK, response.(string))
+	zap.L().Info("(POST) Execution complete")
 }
 
 // ProcessGetRequest handles the GET request.
 // @router /{:serviceName}/{:serviceMethod} [GET]
 func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	var err error
+	options := []callopt.Option{callopt.WithRPCTimeout(time.Second * 100), callopt.WithConnectTimeout(time.Millisecond * 150)}
 
 	zap.L().Info("Processing GET request")
 
@@ -180,12 +185,20 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	jsonString := string(jsonBytes)
 
-	// Make generic Call and get back response
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString)
+	// Make generic Call and get back response using WithRPC Timeout
+	zap.L().Info("Making generic Call and getting back response")
+	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
+	// response, err := genClient.GenericCall(ctx, value.Method, jsonString)
+	// if err != nil {
+	// 	zap.L().Error("Error while making generic call", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
+
 	c.String(consts.StatusOK, response.(string))
+	zap.L().Info("(GET) Execution complete")
 }

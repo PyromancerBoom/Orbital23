@@ -75,7 +75,7 @@ func MongoHealthCheck() {
 					ticker.Reset(pingInterval)
 					failedPingStart = time.Now()
 				} else if time.Since(failedPingStart) > maxFailedPingDuration {
-					zap.L().Info("MongoDB server is still offline after 3 minutes, stopping health check")
+					zap.L().Warn("MongoDB server is still offline after 3 minutes, stopping health check")
 					ticker.Stop()
 					return
 				}
