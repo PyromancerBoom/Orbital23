@@ -48,11 +48,10 @@ func main() {
 	// // Enter a health loop
 	// gatewayClient.updateHealthLoop(id, 5)
 
-	// svr := asset_management.NewServer(new(AssetManagementImpl), server.WithServiceAddr(addr),
-	// 	server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 1000}),
-	// 	server.WithReadWriteTimeout(100*time.Second))
+	addrDocker, _ := net.ResolveTCPAddr("tcp", "0.0.0.0:8080")
+
 	svr := asset_management.NewServer(new(AssetManagementImpl),
-		server.WithServiceAddr(addr),
+		server.WithServiceAddr(addrDocker),
 		server.WithLimit(&limit.Option{MaxConnections: 100000, MaxQPS: 100000}),
 		server.WithReadWriteTimeout(100*time.Second))
 
