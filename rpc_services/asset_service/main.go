@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
+	"os"
 	asset_management "rpc_services/asset_service/kitex_gen/asset_management/assetmanagement"
 	"strconv"
 	"time"
@@ -11,6 +14,13 @@ import (
 	"github.com/cloudwego/kitex/pkg/limit"
 	server "github.com/cloudwego/kitex/server"
 )
+
+type Configuration struct {
+	URL        string `json:"url"`
+	Port       string `json:"port"`
+	Env        string `json:"env"`
+	ServiceURL string `json:"serviceurl"`
+}
 
 const (
 	apikey = "36e991d3-646d-414a-ac66-0c0e8a310ced"
@@ -22,11 +32,23 @@ var addr = getAddr()
 
 func init() {
 
+	config, err := LoadConfiguration("serverConfig.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	//make a client
 	gatewayClient := NewGatewayClient(apikey, "AssetManagement", gateway)
 
 	//register the server to the system
-	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
+	// id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
+	// if err != nil {
+	// 	log.Fatal(err.Error())
+	// }
+
+	advertisedPort := os.Getenv("PORT")
+
+	id, err := gatewayClient.connectServer(config.ServiceURL, advertisedPort)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -48,8 +70,21 @@ func main() {
 
 	// // Enter a health loop
 	// gatewayClient.updateHealthLoop(id, 5)
+	// ip := os.Getenv("IP")
 
-	addrDocker, _ := net.ResolveTCPAddr("tcp", "localhost:8080")
+	config, err := LoadConfiguration("serverConfig.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(config.URL)
+	fmt.Println(config.Port)
+	fmt.Println(config.Env)
+
+	url := config.URL
+	port := config.Port
+	// port := os.Getenv("PORT")
+	addrDocker, _ := net.ResolveTCPAddr("tcp", url+":"+port)
 
 	svr := asset_management.NewServer(new(AssetManagementImpl),
 		server.WithServiceAddr(addrDocker),
@@ -61,6 +96,19 @@ func main() {
 	if kitexerr != nil {
 		log.Println(kitexerr.Error())
 	}
+}
+
+func LoadConfiguration(filename string) (Configuration, error) {
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return Configuration{}, err
+	}
+	var c Configuration
+	err = json.Unmarshal(bytes, &c)
+	if err != nil {
+		return Configuration{}, err
+	}
+	return c, nil
 }
 
 func getAddr() *net.TCPAddr {
