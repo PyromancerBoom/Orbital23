@@ -8,6 +8,7 @@ services:
       - PORT=8080
     volumes:
       - ./serverConfig.json:/app/serverConfig.json
+
   instance2:
     image: asset_service
     ports: 
@@ -16,6 +17,7 @@ services:
       - PORT=8081
     volumes:
       - ./serverConfig.json:/app/serverConfig.json
+
   instance3:
     image: asset_service
     ports: 
@@ -24,14 +26,14 @@ services:
       - PORT=8082
     volumes:
       - ./serverConfig.json:/app/serverConfig.json
-
-  # service:
-  #   network_mode: host
-  #   image: asset_service
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8000-8005:8000-8005"
-  #   deploy:
-  #     replicas: 3
+  
+  instance4:
+    image: asset_service
+    ports: 
+      - "8000:8080"
+    environment:
+      - PORT=8000
+    volumes:
+      - ./serverConfig.json:/app/serverConfig.json
+  
+  
