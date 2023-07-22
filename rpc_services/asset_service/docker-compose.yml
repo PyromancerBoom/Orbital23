@@ -1,0 +1,12 @@
+version: '3'
+services:
+  service:
+    image: asset_service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: assetServiceKitex
+    deploy:
+      replicas: 3

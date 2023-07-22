@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	apikey  = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	gateway = "http://0.0.0.0:4200"
+	apikey = "36e991d3-646d-414a-ac66-0c0e8a310ced"
+	// gateway = "http://0.0.0.0:4200"
+	gateway = "http://host.docker.internal:4200"
 )
 
 var addr = getAddr()
@@ -48,7 +49,7 @@ func main() {
 	// // Enter a health loop
 	// gatewayClient.updateHealthLoop(id, 5)
 
-	addrDocker, _ := net.ResolveTCPAddr("tcp", "0.0.0.0:8080")
+	addrDocker, _ := net.ResolveTCPAddr("tcp", "localhost:8080")
 
 	svr := asset_management.NewServer(new(AssetManagementImpl),
 		server.WithServiceAddr(addrDocker),

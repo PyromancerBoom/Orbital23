@@ -10,6 +10,7 @@ import (
 func main() {
 	initLogger()
 
+	// hostURL := "127.0.0.1:4200"
 	hostURL := "0.0.0.0:4200"
 
 	if err := repository.ConnectToMongoDB(); err != nil {

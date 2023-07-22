@@ -9,6 +9,8 @@ COPY go.sum .
 
 COPY . .
 
+EXPOSE 4200
+
 RUN go build
 
 CMD ["./hertz_server"]
