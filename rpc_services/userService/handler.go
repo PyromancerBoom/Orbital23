@@ -1,9 +1,9 @@
 package main
 
 import (
-	userservice "rpc_services/userService/kitex_gen/UserService"
 	"context"
 	"fmt"
+	userservice "rpc_services/userService/kitex_gen/UserService"
 )
 
 // UserServiceImpl implements the last service interface defined in the IDL.
@@ -14,36 +14,36 @@ type UserServiceImpl struct {
 // QueryUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) QueryUser(ctx context.Context, req *userservice.QueryUser) (resp *userservice.QueryUserResponse, err error) {
 	// Check if the user ID exists
-	fmt.Println("Reached QueryUser")
-	user, ok := s.userData[req.ID]
-	if !ok {
-		return nil, fmt.Errorf("user with ID '%s' not found", req.ID)
-	}
 
-	// Print userData map
+	// user, ok := s.userData[req.ID]
+	// if !ok {
+	// 	return nil, fmt.Errorf("user with ID '%s' not found", req.ID)
+	// }
 
-	fmt.Println("userData:")
-	fmt.Println(s.userData)
-	fmt.Println("\n Formatted userData:")
-	for id, u := range s.userData {
-		fmt.Printf("ID: %s, Name: %s, Email: %s, Age: %d\n", id, u.Name, u.Email, u.Age)
-	}
+	// // Print userData map
 
-	fmt.Println("Reached QueryUser END")
+	// fmt.Println("userData:")
+	// fmt.Println(s.userData)
+	// fmt.Println("\n Formatted userData:")
+	// for id, u := range s.userData {
+	// 	fmt.Printf("ID: %s, Name: %s, Email: %s, Age: %d\n", id, u.Name, u.Email, u.Age)
+	// }
+
+	// fmt.Println("Reached QueryUser END")
 
 	return &userservice.QueryUserResponse{
 		Exist: true,
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
-		Age:   user.Age,
+		ID:    "100",
+		Name:  "John NOT Doe",
+		Email: "John doe's fancy email",
+		Age:   "200",
 	}, nil
+
 }
 
 // InsertUser implements the UserServiceImpl interface.
 func (s *UserServiceImpl) InsertUser(ctx context.Context, req *userservice.InsertUser) (resp *userservice.InsertUserResponse, err error) {
 	// Check if the user ID already exists
-	fmt.Println("Reached InsertUser")
 
 	if _, ok := s.userData[req.ID]; ok {
 		return &userservice.InsertUserResponse{

@@ -2,15 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
 	asset_management "rpc_services/asset_service/kitex_gen/asset_management"
-	"sync"
 )
 
 // AssetManagementImpl implements the last service interface defined in the IDL.
-type AssetManagementImpl struct {
-	mu sync.Mutex
-}
+type AssetManagementImpl struct{}
 
 type AssetInfo struct {
 	ID     string
@@ -18,44 +14,41 @@ type AssetInfo struct {
 	Market string
 }
 
-var AssetData = make(map[string]AssetInfo)
+var AssetData = make(map[string]AssetInfo, 5)
 
 // QueryAsset implements the AssetManagementImpl interface.
-func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_management.QueryAssetRequest) (*asset_management.QueryAssetResponse, error) {
+func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_management.QueryAssetRequest) (resp *asset_management.QueryAssetResponse, err error) {
 	// TODO: Your code here...
-	s.mu.Lock()
-	defer s.mu.Unlock()
 
-	ast, exist := AssetData[req.ID]
-	if !exist {
-		return &asset_management.QueryAssetResponse{
-			Exist: false,
-		}, nil
+	// ast, exist := AssetData[req.ID]
+	// if !exist {
+	// 	return &asset_management.QueryAssetResponse{
+	// 		Exist: false,
+	// 	}, nil
+	// }
+
+	// fmt.Println("Asset data:")
+	// fmt.Println(AssetData)
+
+	// resp = &asset_management.QueryAssetResponse{
+	// 	Exist:  true,
+	// 	ID:     ast.ID,
+	// 	Name:   ast.Name,
+	// 	Market: ast.Market,
+	// }
+	resp = &asset_management.QueryAssetResponse{
+		Exist:  true,
+		ID:     "100",
+		Name:   "Static Company",
+		Market: "Static Market",
 	}
 
-	// You can use a Logger library here instead of fmt.Println
-	fmt.Println("Asset data:")
-	fmt.Println(AssetData)
-
-	return &asset_management.QueryAssetResponse{
-		Exist:  true,
-		ID:     ast.ID,
-		Name:   ast.Name,
-		Market: ast.Market,
-	}, nil
+	return resp, nil
 }
 
 // InsertAsset implements the AssetManagementImpl interface.
-func (s *AssetManagementImpl) InsertAsset(ctx context.Context, req *asset_management.InsertAssetRequest) (*asset_management.InsertAssetResponse, error) {
+func (s *AssetManagementImpl) InsertAsset(ctx context.Context, req *asset_management.InsertAssetRequest) (resp *asset_management.InsertAssetResponse, err error) {
 	// TODO: Your code here...
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// Basic data validation
-	if req.ID == "" || req.Name == "" || req.Market == "" {
-		return nil, fmt.Errorf("missing required fields")
-	}
-
 	_, exist := AssetData[req.ID]
 	if exist {
 		return &asset_management.InsertAssetResponse{
@@ -69,10 +62,6 @@ func (s *AssetManagementImpl) InsertAsset(ctx context.Context, req *asset_manage
 		Name:   req.Name,
 		Market: req.Market,
 	}
-
-	// You can use a Logger library here instead of fmt.Println
-	fmt.Println("Asset data:")
-	fmt.Println(AssetData)
 
 	return &asset_management.InsertAssetResponse{
 		Ok: true,
