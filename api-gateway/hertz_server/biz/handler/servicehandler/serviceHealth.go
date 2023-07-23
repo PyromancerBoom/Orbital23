@@ -26,6 +26,7 @@ func init() {
 	}
 }
 
+// handler for /health endpoint
 func HealthCheck(ctx context.Context, c *app.RequestContext) {
 	var req HealthRequest
 	err := c.BindAndValidate(&req)

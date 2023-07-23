@@ -20,7 +20,7 @@ import (
 	genericClient "github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/generic"
 
-	idlmap "api-gateway/hertz_server/biz/model/idlmap"
+	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
 // ProcessPostRequest .
@@ -58,7 +58,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Checking if service and method are valid
-	value, err := idlmap.GetService(serviceName, path)
+	idl, err := repository.GetServiceIDL(serviceName)
 	if err != nil {
 		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -66,7 +66,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	zap.L().Info("Checked that service and method are valid")
 
 	// provider initialisation
-	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
+	provider, err := generic.NewThriftContentProvider(idl, nil)
 	if err != nil {
 		zap.L().Error("Error while initializing provider", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -88,6 +88,10 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
+	/*
+		only the idl is used apparently. No need for other info.
+	*/
+
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithResolver(registry))
@@ -98,9 +102,12 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 
 	jsonString := string(reqBody)
 
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//Changed from value.Method to c.Param("path")
+
 	// Make generic Call and get back response
 	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
+	response, err := genClient.GenericCall(ctx, path, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -131,14 +138,14 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	path := c.Param("path")
 
 	// Checking if service and method are valid
-	value, err := idlmap.GetService(serviceName, path)
+	idl, err := repository.GetServiceIDL(serviceName)
 	if err != nil {
 		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
 	// Provider initialisation
-	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
+	provider, err := generic.NewThriftContentProvider(idl, nil)
 	if err != nil {
 		zap.L().Error("Error while initializing provider", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -185,9 +192,12 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	jsonString := string(jsonBytes)
 
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//Changed from value.Method to c.Param("path")
+
 	// Make generic Call and get back response using WithRPC Timeout
 	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
+	response, err := genClient.GenericCall(ctx, path, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())

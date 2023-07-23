@@ -148,3 +148,34 @@ func GetApiKey(ownerID string) (string, error) {
 	zap.L().Info("Fetch operation completed")
 	return adminConfig.ApiKey, nil
 }
+
+// Fetch an array of all Admins from the database
+// @Params:
+// - none
+// @Returns:
+// - []AdminConfig: The list of all Admins in the database
+// - error: An error if any
+func GetAllAdmins() ([]AdminConfig, error) {
+
+	//Fetch the collection
+	collection := Client.Database(db_name).Collection(collection_name)
+
+	//Get a cursor for looping through all the documents
+	cursor, err := collection.Find(context.Background(), bson.D{{}})
+	if err != nil {
+		zap.L().Info("Error getting list of all admins")
+		return nil, err
+	}
+
+	//struct to unmarshal in
+	var adminConfigs []AdminConfig
+
+	//perform unmarshalling of documents
+	err = cursor.All(context.Background(), &adminConfigs)
+	if err != nil {
+		zap.L().Info("Error Unmarshalling data for list of all admins")
+		return nil, err
+	}
+
+	return adminConfigs, nil
+}

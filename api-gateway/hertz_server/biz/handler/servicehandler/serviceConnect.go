@@ -36,6 +36,7 @@ const (
 	ttd            = 6 * ttl          // Remove from registry afer
 )
 
+// handler for /connect endpoint
 func Connect(ctx context.Context, c *app.RequestContext) {
 	var req Request
 	err := c.BindAndValidate(&req)
