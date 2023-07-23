@@ -19,7 +19,7 @@ This occurs due to some settings in the windows environment. When the services a
 #### Using Docker to run the services
 
 1. Make an image : `docker build -t <service_name> .`
-   For ease of use, set the service_name to the same name as it's folder.
+   For ease of use, set the service_name to the same name as it's folder. This is because every instance is associated to that Image by name in the docker-compose file
 
 2. Modify `docker-compose.yml` if needed for more instances or different ports.
 
