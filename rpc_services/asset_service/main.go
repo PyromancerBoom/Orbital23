@@ -32,7 +32,7 @@ var addr = getAddr()
 
 func init() {
 
-	config, err := LoadConfiguration("serverConfig.json")
+	config, err := LoadConfiguration("config.json")
 	if err != nil {
 		log.Fatal(err)
 	}

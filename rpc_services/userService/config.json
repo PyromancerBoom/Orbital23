@@ -1,4 +1,6 @@
 {
-    "gateway-address":"127.0.0.1:4200",
-    "port":"0"
+    "url": "0.0.0.0",
+    "port": "8080",
+    "env": "Stage",
+    "serviceurl": "host.docker.internal"
 }
