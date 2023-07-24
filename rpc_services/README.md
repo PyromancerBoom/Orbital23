@@ -39,12 +39,13 @@ Inside each folder three files are to be taken note of :
     "url": "0.0.0.0",
     "port": "8080",
     "env": "Dev",
-    "serviceurl": "host.docker.internal"
+    "serviceurl": "localhost"
 }
 
 ```
 
-The fields above imply various conmfigurations to run the Kitex server. `url` is the host url of each kitex instance, `port` is the port, `env` is just some info for logs, `servicurl` is the url sent to Docker to communicate. When hosting locally, do NOT change the `"serviceurl": "host.docker.internal"` ` field.
+Change serviceurl to same network as Gateway's network.
+The fields above imply various conmfigurations to run the Kitex server. `url` is the host url of each kitex instance, `port` is the port, `env` is just some info for logs, `servicurl` is the url sent to Docker to communicate. When hosting locally, do NOT change the `"serviceurl": "localhost"` ` field.
 
 2. `Dockerfile`: Dockerfile for the service
 

@@ -18,22 +18,22 @@ services:
     volumes:
       - ./serviceConfig.json:/app/serviceConfig.json
 
-  # instance3:
-  #   image: asset_service
-  #   ports: 
-  #     - "8082:8080"
-  #   environment:
-  #     - PORT=8082
-  #   volumes:
-  #     - ./serverConfig.json:/app/serverConfig.json
+  instance3:
+    image: asset_service
+    ports: 
+      - "8082:8080"
+    environment:
+      - PORT=8082
+    volumes:
+      - ./serviceConfig.json:/app/serviceConfig.json
   
-  # instance4:
-  #   image: asset_service
-  #   ports: 
-  #     - "8000:8080"
-  #   environment:
-  #     - PORT=8000
-  #   volumes:
-  #     - ./serverConfig.json:/app/serverConfig.json
+  instance4:
+    image: asset_service
+    ports: 
+      - "8000:8080"
+    environment:
+      - PORT=8000
+    volumes:
+      - ./serviceConfig.json:/app/serviceConfig.json
   
   

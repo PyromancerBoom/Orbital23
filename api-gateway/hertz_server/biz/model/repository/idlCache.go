@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -17,11 +18,13 @@ type ServiceDetails struct {
 // HashMap of ServiceName_Path: IDL
 var IDLMappings map[string]ServiceDetails
 
+const updateInterval = time.Second * 5
+
 // UpdateIDLcache updates the IDL cache by populating the IDLMappings map.
 // It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
 // @Returns:
 // - error: An error if any
-func UpdateIDLcache() error {
+func updateIDLcache() error {
 	// Update the admins cache
 	err := UpdateAdminCache()
 	if err != nil {
@@ -29,7 +32,9 @@ func UpdateIDLcache() error {
 		return err
 	}
 
+	// Clear the IDLMappings map before populating it again
 	IDLMappings = make(map[string]ServiceDetails)
+
 	for _, admin := range AdminsCache {
 		for _, service := range admin.Services {
 			IDLMappings[service.ServiceName+"_"+service.Path] = ServiceDetails{
@@ -40,15 +45,36 @@ func UpdateIDLcache() error {
 			}
 		}
 	}
+	return nil
+}
 
-	zap.L().Debug("Successfully cached IDL files to memory.")
-
-	// print all service names and paths and method corresponding to those paths
-	for key, value := range IDLMappings {
-		fmt.Println("Key:", key, "Value:", value)
+// UpdateIDLcacheLoop calls the updateIDLcache in a loop concurrently to keep updating
+// the IDL Mappings in an interval (updateInterval)
+// It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
+// @Returns:
+// - error: An error if any
+func UpdateIDLcacheLoop() error {
+	// Run the function immediately to update the cache initially
+	if err := updateIDLcache(); err != nil {
+		zap.L().Error("Error updating IDL cache.", zap.Error(err))
 	}
 
-	return nil
+	// Run the function in a loop at the specified interval
+	ticker := time.NewTicker(updateInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			// zap.L().Info("IDL Mappings", zap.Any("IDL Mappings", IDLMappings))
+			if err := updateIDLcache(); err != nil {
+				zap.L().Error("Error updating IDL cache.", zap.Error(err))
+			}
+			// else {
+			// 	zap.L().Debug("Cached")
+			// }
+		}
+	}
 }
 
 // GetServiceDetails retrieves the complete ServiceDetails struct for a given service name and path from the IDLMappings cache.

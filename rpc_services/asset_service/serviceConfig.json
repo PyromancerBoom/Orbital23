@@ -2,5 +2,5 @@
     "url": "0.0.0.0",
     "port": "8080",
     "env": "Stage",
-    "serviceurl": "localhost" // Change to same network as Gateway's network
+    "serviceurl": "localhost" 
 }

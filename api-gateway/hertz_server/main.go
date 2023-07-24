@@ -19,7 +19,7 @@ func main() {
 	// Perform health check
 	go repository.MongoHealthCheck()
 
-	go repository.UpdateIDLcache()
+	go repository.UpdateIDLcacheLoop()
 
 	h := server.Default(server.WithHostPorts(hostURL))
 
