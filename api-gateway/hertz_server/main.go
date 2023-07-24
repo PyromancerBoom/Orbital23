@@ -19,6 +19,8 @@ func main() {
 	// Perform health check
 	go repository.MongoHealthCheck()
 
+	go repository.UpdateIDLcache()
+
 	h := server.Default(server.WithHostPorts(hostURL))
 
 	zap.L().Info("Starting server", zap.String("hostURL: ", hostURL))

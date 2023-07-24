@@ -55,9 +55,9 @@ func ConnectToMongoDB() error {
 // Perform MongoDB health check by pinging the server every 30 sec normally.
 // If health check fails, ping every 5 seconds until MongoDB server comes back online.
 func MongoHealthCheck() {
-	normalPingInterval := 10 * time.Second
+	normalPingInterval := 20 * time.Second
 	failedPingInterval := 3 * time.Second
-	maxFailedPingDuration := 3 * time.Minute
+	maxFailedPingDuration := 5 * time.Minute
 
 	ticker := time.NewTicker(normalPingInterval)
 	pingInterval := normalPingInterval
@@ -75,7 +75,7 @@ func MongoHealthCheck() {
 					ticker.Reset(pingInterval)
 					failedPingStart = time.Now()
 				} else if time.Since(failedPingStart) > maxFailedPingDuration {
-					zap.L().Warn("MongoDB server is still offline after 3 minutes, stopping health check")
+					zap.L().Warn("MongoDB server is still offline after 5 minutes, stopping health checks")
 					ticker.Stop()
 					return
 				}

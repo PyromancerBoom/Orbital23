@@ -32,7 +32,7 @@ var addr = getAddr()
 
 func init() {
 
-	config, err := LoadConfiguration("config.json")
+	config, err := LoadConfiguration("serviceConfig.json")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func main() {
 	// gatewayClient.updateHealthLoop(id, 5)
 	// ip := os.Getenv("IP")
 
-	config, err := LoadConfiguration("serverConfig.json")
+	config, err := LoadConfiguration("serviceConfig.json")
 	if err != nil {
 		log.Fatal(err)
 	}
