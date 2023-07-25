@@ -12,16 +12,34 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+
 	consul "github.com/kitex-contrib/registry-consul"
+
 	"go.uber.org/zap"
 
 	client "github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
 	genericClient "github.com/cloudwego/kitex/client/genericclient"
+	"github.com/cloudwego/kitex/pkg/discovery"
 	"github.com/cloudwego/kitex/pkg/generic"
 
 	repository "api-gateway/hertz_server/biz/model/repository"
 )
+
+// var tempReg *consul.ConsulResolver
+// var counter int = 0
+
+var resolver discovery.Resolver
+
+// init is called during package initialization and sets up the resolver.
+func init() {
+	// Get registry to enable resolving serverIDs
+	var err error
+	resolver, err = consul.NewConsulResolver("127.0.0.1:8500")
+	if err != nil {
+		zap.L().Error("Error while getting registry", zap.Error(err))
+	}
+}
 
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]
@@ -84,15 +102,34 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Get registry to enable resolving serverIDs
-	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	if err != nil {
-		zap.L().Error("Error while getting registry", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+	// registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	// if err != nil {
+	// 	zap.L().Error("Error while getting registry", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
+
+	// if counter == 0 {
+	// 	// Get registry to enable resolving serverIDs
+	// 	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	// 	zap.L().Debug("Registry: ", zap.Any("details", registry))
+	// 	if err != nil {
+	// 		zap.L().Error("Error while getting registry", zap.Error(err))
+	// 		c.String(consts.StatusInternalServerError, err.Error())
+	// 	}
+	// 	zap.L().Debug("Fetching Registry", zap.Any("Counter : ", counter))
+	// 	tempReg = registry
+	// 	counter++
+	// } else if counter > 100 {
+	// 	counter = 0
+	// 	zap.L().Debug("Resetting counter", zap.Any("Counter : ", counter))
+	// } else {
+	// 	counter++
+	// 	zap.L().Debug("Registry cached incrementing counters", zap.Any("Counter : ", counter))
+	// }
 
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(registry))
+		client.WithResolver(resolver))
 	if err != nil {
 		zap.L().Error("Error while initializing generic client", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -155,15 +192,15 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Get registry to enable resolving serverIDs
-	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	if err != nil {
-		zap.L().Error("Error while getting registry", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+	// registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	// if err != nil {
+	// 	zap.L().Error("Error while getting registry", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
 
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(registry))
+		client.WithResolver(resolver))
 	if err != nil {
 		zap.L().Error("Error while initializing generic client", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
