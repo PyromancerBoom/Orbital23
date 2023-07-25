@@ -57,9 +57,9 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 	res := make(map[string]string)
 	res["Status"] = "Status OK"
 	res["Message"] = "Server Connection Request Accepted."
-	res["serverID"] = uuid.New().String() // Keep this lowercased
+	res["ServerID"] = uuid.New().String()
 
-	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
+	err2 := registerServer(req.ServerAddress, req.ServerPort, res["ServerID"], req.ServiceName, req.ApiKey)
 	if err2 != nil {
 		c.String(consts.StatusInternalServerError, "Unable to connect server.")
 		return

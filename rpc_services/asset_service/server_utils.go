@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	gateway = "http://host.docker.internal:4200"
+	gatewayAddress = "http://host.docker.internal:4200"
 )
 
 type UpdateHealthRequest struct {
@@ -36,7 +36,7 @@ func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	return &GatewayClient{
 		ApiKey:         apikey,
 		ServiceName:    serviceName,
-		GatewayAddress: gateway,
+		GatewayAddress: gatewayAddress,
 	}
 }
 
@@ -94,7 +94,7 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 		return "", err
 	}
 
-	return strings.Trim(string(j["serverID"]), "\""), nil
+	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
 // declares that server is healthy
