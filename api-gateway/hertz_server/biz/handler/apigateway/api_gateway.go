@@ -23,6 +23,21 @@ import (
 	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
+
+// var resolver discovery.Resolver
+
+// // init is called during package initialization and sets up the resolver.
+// func init() {
+// 	// Get registry to enable resolving serverIDs
+// 	var err error
+// 	resolver, err = consul.NewConsulResolver("127.0.0.1:8500")
+// 	if err != nil {
+// 		zap.L().Error("Error while getting registry", zap.Error(err))
+// 	}
+//}
+
+
+
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]
 func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
@@ -87,10 +102,6 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		zap.L().Error("Error while getting registry", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
-
-	/*
-		only the idl is used apparently. No need for other info.
-	*/
 
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,

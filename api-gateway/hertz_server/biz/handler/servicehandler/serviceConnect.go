@@ -12,115 +12,143 @@ package servicehandler
 //3: ServerAddress
 
 import (
+	repository "api-gateway/hertz_server/biz/model/repository"
+	"bytes"
 	"context"
-	"net"
-	"strconv"
-	"time"
+
+	genericClient "github.com/cloudwego/kitex/client/genericclient"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/generic"
 	"github.com/google/uuid"
-	consul "github.com/hashicorp/consul/api"
+	"go.uber.org/zap"
 )
 
 type Request struct {
-	ApiKey        string `json:"api-key"`
-	ServiceName   string `json:"serviceName"`
-	ServerAddress string `json:"serverAddress"`
-	ServerPort    string `json:"serverPort"`
+	ApiKey        string `json:"ApiKey"`
+	ServiceName   string `json:"ServiceName"`
+	ServerAddress string `json:"ServerAddress"`
+	ServerPort    string `json:"ServerPort"`
 }
-
-const (
-	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl            = 10 * time.Second // Declare unhealthy after
-	ttd            = 6 * ttl          // Remove from registry afer
-)
 
 // handler for /connect endpoint
 func Connect(ctx context.Context, c *app.RequestContext) {
+
+	serverIsHealthy, err := checkIfServiceHealthy("RegistryProxy")
+	if err != nil {
+		zap.L().Error(err.Error())
+	}
+
+	//even if we get an error from checking server health, we can still deal with it by trying to perform connection request by the gateway itself
+	if (err != nil) || (!serverIsHealthy) {
+		zap.L().Info("Performing server connection request.")
+		performServerConnectionRequest(ctx, c)
+	} else {
+		zap.L().Info("Proxying server connection request.")
+		proxyServerConnectionRequest(ctx, c)
+	}
+
+}
+
+func proxyServerConnectionRequest(ctx context.Context, c *app.RequestContext) {
+	reqBody, err := c.Body()
+	if err != nil {
+		zap.L().Error("Error while getting request body", zap.Error(err))
+		c.String(consts.StatusBadRequest, "Request body is missing.")
+		return
+	}
+
+	trimmedReqBody := bytes.TrimSpace(reqBody)
+	if len(trimmedReqBody) == 0 {
+		zap.L().Warn("Request body is empty")
+		c.String(consts.StatusBadRequest, "Request body is empty.")
+		return
+	}
+
+	// Checking if service is valid
+	idl, err := repository.GetServiceIDL(healthCheckServiceName)
+	if err != nil {
+		zap.L().Error("Error getting Registry Proxy IDL", zap.Error(err))
+		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
+		return
+	}
+
+	// provider initialisation
+	provider, err := generic.NewThriftContentProvider(idl, nil)
+	if err != nil {
+		zap.L().Error("Error while initializing provider for Registry Proxy", zap.Error(err))
+		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
+		return
+	}
+
+	thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	if err != nil {
+		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
+		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
+		return
+	}
+
+	// Fetch hostport from registry later
+	genClient, err := genericClient.NewClient(healthCheckServiceName, thriftGeneric,
+		client.WithResolver(registryResolver))
+	if err != nil {
+		zap.L().Error("Error while initializing generic client", zap.Error(err))
+		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
+		return
+	}
+
+	jsonString := string(reqBody)
+
+	// Make generic Call and get back response
+	zap.L().Info("Making generic Call and getting back response")
+	response, err := genClient.GenericCall(ctx, connectMethodName, jsonString)
+	if err != nil {
+		zap.L().Error("Error while making generic call", zap.Error(err))
+
+		if err.Error() == "service discovery error: no service found" {
+			c.String(consts.StatusInternalServerError, "Server connection services are currently down.")
+		} else {
+			c.String(consts.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	c.String(consts.StatusOK, response.(string))
+}
+
+func performServerConnectionRequest(ctx context.Context, c *app.RequestContext) {
 	var req Request
 	err := c.BindAndValidate(&req)
 	if err != nil {
+		zap.L().Error(err.Error())
 		c.String(consts.StatusExpectationFailed, "Invalid Request.")
 		return
 	}
 
 	if !authoriseConnect(req.ApiKey, req.ServiceName) {
+		zap.L().Info(req.ApiKey + "unauthorized for " + req.ServiceName + "service.")
 		c.String(consts.StatusUnauthorized, "Unauthorized.")
 		return
 	}
 
 	if validateAddress(req.ServerAddress, req.ServerPort) != nil {
+		zap.L().Info("Invalid address" + req.ServerAddress + "for server connection.")
 		c.String(consts.StatusBadRequest, "Address is invalid.")
 		return
 	}
 
 	res := make(map[string]string)
-	res["status"] = "status OK"
-	res["message"] = "Server Connection Request Accepted."
-	res["serverID"] = uuid.New().String()
+	res["Status"] = "status OK"
+	res["Message"] = "Server Connection Request Accepted."
+	res["ServerID"] = uuid.New().String()
 
-	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
-	if err2 != nil {
+	err = registerServer(req.ServerAddress, req.ServerPort, res["ServerID"], req.ServiceName, req.ApiKey)
+	if err != nil {
 		c.String(consts.StatusInternalServerError, "Unable to connect server.")
 		return
 	}
 
 	c.JSON(consts.StatusOK, res)
-}
-
-// Add logic here
-// Auhorize only if
-// 1: apikey is valid
-// and API key has a registered service with the provided name
-func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTER_API_KEY) && (serviceName == "UserService" || serviceName == "AssetManagement")
-}
-
-func validateAddress(address string, port string) error {
-	_, err := strconv.Atoi(port)
-	if err != nil {
-		return err
-	}
-
-	if net.ParseIP(address) == nil {
-		return err
-	}
-	return nil
-}
-
-func registerServer(address string, port string, serverId string, serviceName string, apikey string) error {
-
-	portNum, _ := strconv.Atoi(port)
-
-	check := &consul.AgentServiceCheck{
-		DeregisterCriticalServiceAfter: ttd.String(),
-		TLSSkipVerify:                  true,
-		TTL:                            ttl.String(),
-		CheckID:                        serverId,
-	}
-
-	req := &consul.AgentServiceRegistration{
-		ID:      serverId,
-		Name:    serviceName,
-		Tags:    []string{serviceName, serverId, apikey},
-		Address: address,
-		Port:    portNum,
-		Check:   check,
-	}
-
-	client, err := consul.NewClient(&consul.Config{})
-	if err != nil {
-		return err
-	}
-
-	err2 := client.Agent().ServiceRegister(req)
-	if err2 != nil {
-		return err
-	}
-
-	//performs a health check [no need for error checks as this code cannot reach unless auth is valid and registry is online.]
-	go updateAsHealthy(serverId)
-
-	return nil
 }

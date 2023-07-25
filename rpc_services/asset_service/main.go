@@ -31,7 +31,7 @@ func init() {
 	}
 
 	//enter a health loop
-	gatewayClient.updateHealthLoop(id, 5)
+	gatewayClient.updateHealthLoop(id, 30)
 }
 
 func main() {

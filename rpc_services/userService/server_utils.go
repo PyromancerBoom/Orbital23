@@ -21,10 +21,24 @@ func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) 
 }
 
 type ConnectRequest struct {
-	APIKEY      string `json:"api-key"`
-	ServiceName string `json:"serviceName"`
-	Address     string `json:"serverAddress"`
-	Port        string `json:"serverPort"`
+	APIKEY      string `json:"ApiKey"`
+	ServiceName string `json:"ServiceName"`
+	Address     string `json:"ServerAddress"`
+	Port        string `json:"ServerPort"`
+}
+
+func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {
+	for {
+		log.Println("Connecting to gateway...")
+		id, err := client.connectServer(serverAddress, serverPort)
+		if err == nil {
+			return id, nil
+		}
+
+		log.Println("Error connecting to gateway:", err.Error())
+		log.Println("Retrying connection in 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
 }
 
 // gateway address example : "http://localhost:4200"
@@ -67,12 +81,12 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 		return "", err
 	}
 
-	return strings.Trim(string(j["serverID"]), "\""), nil
+	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
 type UpdateHealthRequest struct {
-	APIKEY   string `json:"api-key"`
-	ServerID string `json:"serverID"`
+	APIKEY   string `json:"ApiKey"`
+	ServerID string `json:"ServerID"`
 }
 
 // declares that server is healthy
