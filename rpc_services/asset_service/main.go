@@ -11,9 +11,7 @@ import (
 	server "github.com/cloudwego/kitex/server"
 )
 
-var addr = getAddr()
-
-func init() {
+func main() {
 	config, err := LoadConfiguration("serviceConfig.json")
 	if err != nil {
 		log.Fatal(err)
@@ -28,13 +26,6 @@ func init() {
 	}
 
 	go gatewayClient.updateHealthLoop(id, 5)
-}
-
-func main() {
-	config, err := LoadConfiguration("serviceConfig.json")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	url := config.URL
 	port := config.Port

@@ -40,22 +40,6 @@ func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	}
 }
 
-func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {
-	for {
-		log.Println("Connecting to gateway...")
-		id, err := client.connectServer(serverAddress, serverPort)
-		if err == nil {
-			return id, nil
-		}
-
-		log.Println("Error connecting to gateway:", err.Error())
-		log.Println("Retrying connection in 5 seconds...")
-		time.Sleep(5 * time.Second)
-	}
-}
-
-// gateway address example : "http://localhost:4200"
-// connectsServer to system and gets the server ID back.
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
 	url := client.GatewayAddress + "/connect"
 
@@ -97,7 +81,7 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
-// declares that server is healthy
+// Declares that server instance is healthy
 func (client *GatewayClient) updateHealth(serverID string) error {
 
 	url := client.GatewayAddress + "/health"
@@ -136,19 +120,17 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 	return nil
 }
 
-// keeps declaring server is healthy continuously
+// Keeps declaring server instance is healthy
 func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
-	go client.helper(client.GatewayAddress, client.ApiKey, id, timeBetweenLoops)
-}
-
-func (client *GatewayClient) helper(gateway string, api string, id string, timeBetweenLoops int) error {
 	ticker := time.NewTicker(time.Duration(timeBetweenLoops) * time.Second)
 	for {
-		err := client.updateHealth(id)
-		if err != nil {
-			log.Fatal(err.Error())
-			return err
+		select {
+		case <-ticker.C:
+			err := client.updateHealth(id)
+			if err != nil {
+				// Log the error and continue with the health check loop
+				log.Println("Error updating health:", err)
+			}
 		}
-		<-ticker.C
 	}
 }
