@@ -7,6 +7,7 @@ package servicehandler
 
 // Master key here is a temporary API key for easy testing
 // Because API Keys are supposed to be authenticated on connection
+// In real-world scenarios, we'd typically want to have a more robust and secure authentication mechanism.
 
 import (
 	"context"
@@ -28,9 +29,9 @@ type ConnectionRequest struct {
 }
 
 const (
-	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl            = 10 * time.Second
-	ttd            = 6 * ttl
+	MasterApiKey = "master_api_key_uuid" // A temporary key which is easy to read also
+	ttl          = 10 * time.Second
+	ttd          = 6 * ttl
 )
 
 func Connect(ctx context.Context, c *app.RequestContext) {
@@ -70,7 +71,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTER_API_KEY) && (serviceName == "UserService" || serviceName == "AssetManagement")
+	return (apiKey == MasterApiKey) && (serviceName == "UserService" || serviceName == "AssetManagement")
 }
 
 func validateAddress(address string, port string) error {
