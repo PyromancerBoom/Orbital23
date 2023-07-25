@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+const (
+	gateway = "http://host.docker.internal:4200"
+)
+
 type UpdateHealthRequest struct {
 	ApiKey   string `json:"ApiKey"`
 	ServerID string `json:"ServerID"`
@@ -28,8 +32,12 @@ type ConnectRequest struct {
 	Port        string `json:"ServerPort"`
 }
 
-func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
-	return &GatewayClient{apikey, serviceName, gatewayAddress}
+func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
+	return &GatewayClient{
+		ApiKey:         apikey,
+		ServiceName:    serviceName,
+		GatewayAddress: gateway,
+	}
 }
 
 func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {

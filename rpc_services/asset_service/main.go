@@ -11,11 +11,6 @@ import (
 	server "github.com/cloudwego/kitex/server"
 )
 
-const (
-	apikey  = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	gateway = "http://host.docker.internal:4200"
-)
-
 var addr = getAddr()
 
 func init() {
@@ -24,7 +19,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	gatewayClient := NewGatewayClient(apikey, "AssetManagement", gateway)
+	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName)
 	advertisedPort := os.Getenv("PORT")
 
 	id, err := gatewayClient.connectServer(config.ServiceURL, advertisedPort)

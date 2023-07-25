@@ -9,10 +9,12 @@ import (
 )
 
 type Configuration struct {
-	URL        string `json:"url"`
-	Port       string `json:"port"`
-	Env        string `json:"env"`
-	ServiceURL string `json:"serviceurl"`
+	Apikey      string `json:"apikey"`
+	ServiceName string `json:"servicename"`
+	URL         string `json:"url"`
+	Port        string `json:"port"`
+	Env         string `json:"env"`
+	ServiceURL  string `json:"serviceurl"`
 }
 
 func LoadConfiguration(filename string) (Configuration, error) {

@@ -1,4 +1,6 @@
 {
+    "apikey": "36e991d3-646d-414a-ac66-0c0e8a310ced",
+    "ServiceName": "AssetManagement",
     "url": "0.0.0.0",
     "port": "8080",
     "env": "Stage",
