@@ -34,6 +34,8 @@ const (
 	ttd          = 6 * ttl
 )
 
+// Handler for connection of a service
+// @Route = /health
 func Connect(ctx context.Context, c *app.RequestContext) {
 	var req ConnectionRequest
 	err := c.BindAndValidate(&req)
@@ -53,9 +55,9 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 	}
 
 	res := make(map[string]string)
-	res["status"] = "status OK"
-	res["message"] = "Server Connection Request Accepted."
-	res["serverID"] = uuid.New().String()
+	res["Status"] = "Status OK"
+	res["Message"] = "Server Connection Request Accepted."
+	res["serverID"] = uuid.New().String() // Keep this lowercased
 
 	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
 	if err2 != nil {
@@ -71,7 +73,8 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MasterApiKey) && (serviceName == "UserService" || serviceName == "AssetManagement")
+	return (apiKey == MasterApiKey)
+	// && (serviceName == "UserService" || serviceName == "AssetManagement")
 }
 
 func validateAddress(address string, port string) error {
