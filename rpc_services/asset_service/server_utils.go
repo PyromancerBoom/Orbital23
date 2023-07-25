@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+type UpdateHealthRequest struct {
+	ApiKey   string `json:"ApiKey"`
+	ServerID string `json:"ServerID"`
+}
+
 type GatewayClient struct {
 	ApiKey         string
 	ServiceName    string
@@ -82,11 +87,6 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 	}
 
 	return strings.Trim(string(j["serverID"]), "\""), nil
-}
-
-type UpdateHealthRequest struct {
-	ApiKey   string `json:"ApiKey"`
-	ServerID string `json:"ServerID"`
 }
 
 // declares that server is healthy
