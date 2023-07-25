@@ -1,0 +1,8 @@
+{
+    "apikey": "master_api_key_uuid",
+    "ServiceName": "AssetManagement",
+    "url": "0.0.0.0",
+    "port": "8080",
+    "env": "Stage",
+    "serviceurl": "localhost" 
+}

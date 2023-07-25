@@ -1,15 +1,13 @@
 package servicehandler
 
-//handles :/connect endpoint to register a server
+// Request here has to have
+//	1: API KEY
+//	2: ServiceName
+//	3: ServerAddress
 
-//authorise if the api-key is valid
-
-//register the server.
-
-//request here has to have
-//1: API KEY
-//2: ServiceName
-//3: ServerAddress
+// Master key here is a temporary API key for easy testing
+// Because API Keys are supposed to be authenticated on connection
+// In real-world scenarios, we'd typically want to have a more robust and secure authentication mechanism.
 
 import (
 	"context"
@@ -23,21 +21,23 @@ import (
 	consul "github.com/hashicorp/consul/api"
 )
 
-type Request struct {
-	ApiKey        string `json:"api-key"`
-	ServiceName   string `json:"serviceName"`
-	ServerAddress string `json:"serverAddress"`
-	ServerPort    string `json:"serverPort"`
+type ConnectionRequest struct {
+	ApiKey        string `json:"ApiKey"`
+	ServiceName   string `json:"ServiceName"`
+	ServerAddress string `json:"ServerAddress"`
+	ServerPort    string `json:"ServerPort"`
 }
 
 const (
-	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl            = 10 * time.Second // Declare unhealthy after
-	ttd            = 6 * ttl          // Remove from registry afer
+	MasterApiKey = "master_api_key_uuid" // A temporary key which is easy to read also
+	ttl          = 10 * time.Second
+	ttd          = 6 * ttl
 )
 
+// Handler for connection of a service
+// @Route = /health
 func Connect(ctx context.Context, c *app.RequestContext) {
-	var req Request
+	var req ConnectionRequest
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusExpectationFailed, "Invalid Request.")
@@ -55,11 +55,11 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 	}
 
 	res := make(map[string]string)
-	res["status"] = "status OK"
-	res["message"] = "Server Connection Request Accepted."
-	res["serverID"] = uuid.New().String()
+	res["Status"] = "Status OK"
+	res["Message"] = "Server Connection Request Accepted."
+	res["ServerID"] = uuid.New().String()
 
-	err2 := registerServer(req.ServerAddress, req.ServerPort, res["serverID"], req.ServiceName, req.ApiKey)
+	err2 := registerServer(req.ServerAddress, req.ServerPort, res["ServerID"], req.ServiceName, req.ApiKey)
 	if err2 != nil {
 		c.String(consts.StatusInternalServerError, "Unable to connect server.")
 		return
@@ -73,7 +73,8 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTER_API_KEY) && (serviceName == "UserService" || serviceName == "AssetManagement")
+	return (apiKey == MasterApiKey)
+	// && (serviceName == "UserService" || serviceName == "AssetManagement")
 }
 
 func validateAddress(address string, port string) error {
@@ -118,7 +119,7 @@ func registerServer(address string, port string, serverId string, serviceName st
 		return err
 	}
 
-	//performs a health check [no need for error checks as this code cannot reach unless auth is valid and registry is online.]
+	// Performs a health check [no need for error checks as this code cannot reach unless auth is valid and registry is online.]
 	go updateAsHealthy(serverId)
 
 	return nil

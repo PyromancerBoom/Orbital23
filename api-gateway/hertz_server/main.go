@@ -10,6 +10,7 @@ import (
 func main() {
 	initLogger()
 
+	// hostURL := "127.0.0.1:4200"
 	hostURL := "0.0.0.0:4200"
 
 	if err := repository.ConnectToMongoDB(); err != nil {
@@ -17,6 +18,8 @@ func main() {
 	}
 	// Perform health check
 	go repository.MongoHealthCheck()
+
+	go repository.UpdateIDLcacheLoop()
 
 	h := server.Default(server.WithHostPorts(hostURL))
 

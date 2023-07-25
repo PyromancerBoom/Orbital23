@@ -1,11 +1,13 @@
 version: '3'
 services:
-  app:
+  apigateway:
+    network_mode: host
     image: api-gateway
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080"
-    deploy:
-      replicas: 5
+      - "4200:4200"
+    container_name: hertzgateway
+    # deploy:
+    #   replicas: 1

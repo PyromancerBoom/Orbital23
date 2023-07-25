@@ -10,21 +10,34 @@ import (
 	"time"
 )
 
+const (
+	gatewayAddress = "http://host.docker.internal:4200"
+)
+
+type UpdateHealthRequest struct {
+	ApiKey   string `json:"ApiKey"`
+	ServerID string `json:"ServerID"`
+}
+
 type GatewayClient struct {
-	API_KEY        string
-	Service_Name   string
+	ApiKey         string
+	ServiceName    string
 	GatewayAddress string
 }
 
-func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
-	return &GatewayClient{apikey, serviceName, gatewayAddress}
+type ConnectRequest struct {
+	ApiKey      string `json:"Apikey"`
+	ServiceName string `json:"ServiceName"`
+	Address     string `json:"ServerAddress"`
+	Port        string `json:"ServerPort"`
 }
 
-type ConnectRequest struct {
-	APIKEY      string `json:"api-key"`
-	ServiceName string `json:"serviceName"`
-	Address     string `json:"serverAddress"`
-	Port        string `json:"serverPort"`
+func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
+	return &GatewayClient{
+		ApiKey:         apikey,
+		ServiceName:    serviceName,
+		GatewayAddress: gatewayAddress,
+	}
 }
 
 func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {
@@ -46,7 +59,7 @@ func connectServerWithRetry(client *GatewayClient, serverAddress string, serverP
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
 	url := client.GatewayAddress + "/connect"
 
-	req := &ConnectRequest{APIKEY: client.API_KEY, ServiceName: client.Service_Name, Address: serverAddress, Port: serverPort}
+	req := &ConnectRequest{ApiKey: client.ApiKey, ServiceName: client.ServiceName, Address: serverAddress, Port: serverPort}
 
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -81,12 +94,7 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 		return "", err
 	}
 
-	return strings.Trim(string(j["serverID"]), "\""), nil
-}
-
-type UpdateHealthRequest struct {
-	APIKEY   string `json:"api-key"`
-	ServerID string `json:"serverID"`
+	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
 // declares that server is healthy
@@ -94,7 +102,7 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 
 	url := client.GatewayAddress + "/health"
 
-	req := &UpdateHealthRequest{APIKEY: client.API_KEY, ServerID: serverID}
+	req := &UpdateHealthRequest{ApiKey: client.ApiKey, ServerID: serverID}
 
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -130,7 +138,7 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 
 // keeps declaring server is healthy continuously
 func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
-	go client.helper(client.GatewayAddress, client.API_KEY, id, timeBetweenLoops)
+	go client.helper(client.GatewayAddress, client.ApiKey, id, timeBetweenLoops)
 }
 
 func (client *GatewayClient) helper(gateway string, api string, id string, timeBetweenLoops int) error {

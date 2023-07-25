@@ -28,7 +28,7 @@ Fetches the API key from the database based on the owner ID and returns the API 
 
 import (
 	"context"
-	"fmt" // Using fmt for error printing. Change to hertz error code later
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -147,4 +147,34 @@ func GetApiKey(ownerID string) (string, error) {
 
 	zap.L().Info("Fetch operation completed")
 	return adminConfig.ApiKey, nil
+}
+
+// Fetch an array of all Admins from the database
+// @Params:
+// - none
+// @Returns:
+// - []AdminConfig: The list of all Admins in the database
+// - error: An error if any
+func GetAllAdmins() ([]AdminConfig, error) {
+	// Fetch the collection
+	collection := Client.Database(db_name).Collection(collection_name)
+
+	// Get a cursor for looping through all the documents
+	cursor, err := collection.Find(context.Background(), bson.D{{}})
+	if err != nil {
+		zap.L().Info("Error getting list of all admins")
+		return nil, err
+	}
+
+	// Struct to unmarshal in
+	var adminConfigs []AdminConfig
+
+	// Perform unmarshalling of documents
+	err = cursor.All(context.Background(), &adminConfigs)
+	if err != nil {
+		zap.L().Info("Error Unmarshalling data for list of all admins")
+		return nil, err
+	}
+
+	return adminConfigs, nil
 }
