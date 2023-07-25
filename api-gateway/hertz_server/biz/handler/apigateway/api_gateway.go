@@ -26,9 +26,6 @@ import (
 	repository "api-gateway/hertz_server/biz/model/repository"
 )
 
-// var tempReg *consul.ConsulResolver
-// var counter int = 0
-
 var resolver discovery.Resolver
 
 // init is called during package initialization and sets up the resolver.
@@ -101,32 +98,6 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Get registry to enable resolving serverIDs
-	// registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	// if err != nil {
-	// 	zap.L().Error("Error while getting registry", zap.Error(err))
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
-
-	// if counter == 0 {
-	// 	// Get registry to enable resolving serverIDs
-	// 	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	// 	zap.L().Debug("Registry: ", zap.Any("details", registry))
-	// 	if err != nil {
-	// 		zap.L().Error("Error while getting registry", zap.Error(err))
-	// 		c.String(consts.StatusInternalServerError, err.Error())
-	// 	}
-	// 	zap.L().Debug("Fetching Registry", zap.Any("Counter : ", counter))
-	// 	tempReg = registry
-	// 	counter++
-	// } else if counter > 100 {
-	// 	counter = 0
-	// 	zap.L().Debug("Resetting counter", zap.Any("Counter : ", counter))
-	// } else {
-	// 	counter++
-	// 	zap.L().Debug("Registry cached incrementing counters", zap.Any("Counter : ", counter))
-	// }
-
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
 		client.WithResolver(resolver))
@@ -190,13 +161,6 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
-
-	// Get registry to enable resolving serverIDs
-	// registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	// if err != nil {
-	// 	zap.L().Error("Error while getting registry", zap.Error(err))
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
 
 	// Fetch hostport from registry later
 	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
