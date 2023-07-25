@@ -12,8 +12,8 @@ import (
 )
 
 type HealthRequest struct {
-	ServerID string `json:"serverID"`
-	APIKey   string `json:"api-key"`
+	ServerID string `json:"ServerID"`
+	ApiKey   string `json:"ApiKey"`
 }
 
 var consulClient *consul.Client
@@ -34,7 +34,7 @@ func HealthCheck(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	if !authoriseHealthCheckRight(req.APIKey, req.ServerID) {
+	if !authoriseHealthCheckRight(req.ApiKey, req.ServerID) {
 		c.String(consts.StatusUnauthorized, "Unauthorized.")
 		return
 	}

@@ -21,10 +21,10 @@ import (
 )
 
 type ConnectionRequest struct {
-	ApiKey        string `json:"api-key"`
-	ServiceName   string `json:"serviceName"`
-	ServerAddress string `json:"serverAddress"`
-	ServerPort    string `json:"serverPort"`
+	ApiKey        string `json:"ApiKey"`
+	ServiceName   string `json:"ServiceName"`
+	ServerAddress string `json:"ServerAddress"`
+	ServerPort    string `json:"ServerPort"`
 }
 
 const (
