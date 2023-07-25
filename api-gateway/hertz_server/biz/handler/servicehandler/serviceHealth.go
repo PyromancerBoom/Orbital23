@@ -2,10 +2,11 @@ package servicehandler
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"time"
 
 	consul "github.com/hashicorp/consul/api"
+	"go.uber.org/zap"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -22,10 +23,12 @@ func init() {
 	var err error
 	consulClient, err = consul.NewClient(&consul.Config{})
 	if err != nil {
-		log.Fatal(err.Error())
+		zap.L().Error("Failed to create consul client", zap.Error(err))
 	}
 }
 
+// HealthCheck is the handler for health check requests
+// @Route = /health
 func HealthCheck(ctx context.Context, c *app.RequestContext) {
 	var req HealthRequest
 	err := c.BindAndValidate(&req)
@@ -34,6 +37,7 @@ func HealthCheck(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	// Not required. Health checks need only be done for authorised connected servers
 	if !authoriseHealthCheckRight(req.ApiKey, req.ServerID) {
 		c.String(consts.StatusUnauthorized, "Unauthorized.")
 		return
@@ -52,32 +56,26 @@ func HealthCheck(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, res)
 }
 
-// TODO:
-// Implement auth
-func authoriseHealthCheckRight(apiKey string, serverID string) bool {
-	return true
-}
-
-// Original updateAsHealthy func
-// func updateAsHealthy(checkID string) error {
-// 	err2 := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
-// 	if err2 != nil {
-// 		println(err2.Error())
-// 		return err2
-// 	}
-
-// 	return nil
-// }
-
+// Updates a service as Healthy
+// @Params
+// checkID: The ID of the service to be updated
+// @Returns
+// error: If any error occurs while updating the service
 func updateAsHealthy(checkID string) error {
-	for {
+	maxRetry := 10
+	for retry := 0; retry < maxRetry; retry++ {
 		err := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
 		if err == nil {
 			return nil // Health update successful
 		}
 
-		log.Println("Failed to update health:", err.Error())
-		log.Println("Retrying health update in 5 seconds...")
+		zap.L().Error("Failed to update health. Retrying health update in 5 seconds...", zap.Error(err))
 		time.Sleep(5 * time.Second)
 	}
+	return fmt.Errorf("failed to update health after %d retries", maxRetry)
+}
+
+// Mocked
+func authoriseHealthCheckRight(apiKey string, serverID string) bool {
+	return true
 }
