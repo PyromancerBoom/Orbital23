@@ -44,6 +44,8 @@ Inside each folder three files are to be taken note of :
 
 ```
 
+This file serves to allow us to change server hosting configurations without requiring. to re-build docker image.
+
 Change serviceurl to same network as Gateway's network.
 The fields above imply various conmfigurations to run the Kitex server. `url` is the host url of each kitex instance, `port` is the port, `env` is just some info for logs, `servicurl` is the url sent to Docker to communicate. When hosting locally, do NOT change the `"serviceurl": "localhost"` ` field.
 

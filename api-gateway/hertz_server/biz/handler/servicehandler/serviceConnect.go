@@ -1,15 +1,12 @@
 package servicehandler
 
-//handles :/connect endpoint to register a server
+// Request here has to have
+//	1: API KEY
+//	2: ServiceName
+//	3: ServerAddress
 
-//authorise if the api-key is valid
-
-//register the server.
-
-//request here has to have
-//1: API KEY
-//2: ServiceName
-//3: ServerAddress
+// Master key here is a temporary API key for easy testing
+// Because API Keys are supposed to be authenticated on connection
 
 import (
 	"context"
@@ -23,7 +20,7 @@ import (
 	consul "github.com/hashicorp/consul/api"
 )
 
-type Request struct {
+type ConnectionRequest struct {
 	ApiKey        string `json:"api-key"`
 	ServiceName   string `json:"serviceName"`
 	ServerAddress string `json:"serverAddress"`
@@ -32,12 +29,12 @@ type Request struct {
 
 const (
 	MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl            = 10 * time.Second // Declare unhealthy after
-	ttd            = 6 * ttl          // Remove from registry afer
+	ttl            = 10 * time.Second
+	ttd            = 6 * ttl
 )
 
 func Connect(ctx context.Context, c *app.RequestContext) {
-	var req Request
+	var req ConnectionRequest
 	err := c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusExpectationFailed, "Invalid Request.")
@@ -118,7 +115,7 @@ func registerServer(address string, port string, serverId string, serviceName st
 		return err
 	}
 
-	//performs a health check [no need for error checks as this code cannot reach unless auth is valid and registry is online.]
+	// Performs a health check [no need for error checks as this code cannot reach unless auth is valid and registry is online.]
 	go updateAsHealthy(serverId)
 
 	return nil

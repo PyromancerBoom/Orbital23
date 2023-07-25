@@ -11,20 +11,20 @@ import (
 )
 
 type GatewayClient struct {
-	API_KEY        string
-	Service_Name   string
+	ApiKey         string
+	ServiceName    string
 	GatewayAddress string
+}
+
+type ConnectRequest struct {
+	ApiKey      string `json:"apikey"`
+	ServiceName string `json:"serviceName"`
+	Address     string `json:"serverAddress"`
+	Port        string `json:"serverPort"`
 }
 
 func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
 	return &GatewayClient{apikey, serviceName, gatewayAddress}
-}
-
-type ConnectRequest struct {
-	APIKEY      string `json:"api-key"`
-	ServiceName string `json:"serviceName"`
-	Address     string `json:"serverAddress"`
-	Port        string `json:"serverPort"`
 }
 
 func connectServerWithRetry(client *GatewayClient, serverAddress string, serverPort string) (string, error) {
