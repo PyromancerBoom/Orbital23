@@ -54,6 +54,23 @@ func ConnectToMongoDB() error {
 	return nil
 }
 
+// Function to close MongoDB Client before server is shutdown
+// @Params:
+// - None
+// @Returns:
+// - error: An error if any
+func CloseMongoDB() error {
+	err := Client.Disconnect(context.Background())
+	if err != nil {
+		zap.L().Error("Failed to disconnect from MongoDB", zap.Error(err))
+		return fmt.Errorf("failed to disconnect from MongoDB: %w", err)
+	}
+
+	zap.L().Debug("Disconnected from MongoDB")
+
+	return nil
+}
+
 // Perform MongoDB health check by pinging the server every 30 sec normally.
 // If health check fails, ping every 5 seconds until MongoDB server comes back online.
 func MongoHealthCheck() {

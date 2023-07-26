@@ -29,9 +29,8 @@ type ConnectionRequest struct {
 }
 
 const (
-	MasterApiKey = "master_api_key_uuid" // A temporary key which is easy to read also
-	ttl          = 10 * time.Second
-	ttd          = 6 * ttl
+	ttl = 10 * time.Second
+	ttd = 6 * ttl
 )
 
 // Handler for connection of a service
@@ -73,7 +72,7 @@ func Connect(ctx context.Context, c *app.RequestContext) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MasterApiKey)
+	return (apiKey == MASTERAPIKEY)
 	// && (serviceName == "UserService" || serviceName == "AssetManagement")
 }
 

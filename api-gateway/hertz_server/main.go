@@ -16,6 +16,7 @@ func main() {
 	if err := repository.ConnectToMongoDB(); err != nil {
 		panic(err)
 	}
+	defer repository.CloseMongoDB()
 	// Perform health check
 	// Commented out to test performance improvement
 	// go repository.MongoHealthCheck()

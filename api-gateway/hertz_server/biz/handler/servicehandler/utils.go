@@ -18,7 +18,7 @@ import (
 )
 
 // Define master api key for testing purposees only
-const MASTERAPIKEY = "masterapikey"
+const MASTERAPIKEY = "master_api_key_uuid"
 
 // Utility Function to check if ownerID is already registered in the database
 // @Params:
