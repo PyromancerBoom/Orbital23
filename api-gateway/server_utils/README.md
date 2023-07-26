@@ -18,3 +18,19 @@ if err != nil {
 
 go gatewayClient.updateHealthLoop(id, 5) // Health Checks must be in a separate Go routine
 ```
+
+Further, feel free to modify the following code snippet in at the starting of the server utils package :
+
+```
+const (
+	// For Dockerised services on localhost
+	// gatewayAddress = "http://host.docker.internal:4200"
+
+	// For services on LocalHost
+	gatewayAddress = "http://0.0.0.0:4200"
+
+    // Absolute URL for gatewayAddress can be updated and abstracted in the package
+    // during production
+)
+
+```

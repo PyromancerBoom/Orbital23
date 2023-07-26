@@ -11,11 +11,14 @@ import (
 )
 
 const (
-	// For Dockerised services
+	// For Dockerised services on localhost
 	// gatewayAddress = "http://host.docker.internal:4200"
 
 	// For services on LocalHost
 	gatewayAddress = "http://0.0.0.0:4200"
+
+	// Absolute URL for gatewayAddress can be updated and abstracted in the package
+	// during production
 )
 
 type UpdateHealthRequest struct {
