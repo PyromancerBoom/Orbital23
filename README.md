@@ -1,5 +1,46 @@
 This is the repository for the ByteDance and Tiktok Orbital 2023.
 
+#### Registration request format
+
+```
+[
+    {
+      "OwnerName": "John Doe 2",
+      "OwnerId": "hellowworld",
+      "Services": [
+        {
+          "ServiceId": "1",
+          "ServiceName": "AssetManagement",
+          "IdlContent": "namespace Go asset.management\n\nstruct QueryAssetRequest {\n    1: string ID;\n}\n\nstruct QueryAssetResponse {\n    1: bool   Exist;\n    2: string ID;\n    3: string Name;\n    4: string Market;\n}\n\nstruct InsertAssetRequest {\n    1: string ID;\n    2: string Name;\n    3: string Market;\n}\n\nstruct InsertAssetResponse {\n    1: bool Ok;\n    2: string Msg;\n}\n\nservice AssetManagement {\n    QueryAssetResponse queryAsset(1: QueryAssetRequest req);\n    InsertAssetResponse insertAsset(1: InsertAssetRequest req);\n}\n",
+          "Version": "1.0",
+          "ServiceDescription": "Service A Description",
+          "ServerCount": 2,
+          "Paths": [
+            {
+              "ExposedMethod": "insertAsset",
+              "MethodPath": "newAsset"
+            },
+            {
+              "ExposedMethod": "queryAsset",
+              "MethodPath": "getAsset"
+            }
+          ],
+          "RegisteredServers": [
+            {
+              "ServerUrl": "http://localhost:8000",
+              "Port": 8000
+            },
+            {
+              "ServerUrl": "http://localhost:8001",
+              "Port": 8001
+            }
+          ]
+        }
+      ]
+    }
+]
+```
+
 ## About
 
 This is the MVP project for our API Gateway based on one Hertz server and multiple RPC servers.

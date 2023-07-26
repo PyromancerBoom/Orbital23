@@ -16,13 +16,17 @@ type AdminConfig struct {
 type Service struct {
 	ServiceId          string             `json:"ServiceId"`
 	ServiceName        string             `json:"ServiceName"`
-	ExposedMethod      string             `json:"ExposedMethod"`
-	Path               string             `json:"Path"`
 	IdlContent         string             `json:"IdlContent"`
 	Version            string             `json:"version"`
 	ServiceDescription string             `json:"ServiceDescription"`
 	ServerCount        int                `json:"ServerCount"`
+	Paths              []Path             `json:"Paths"`
 	RegisteredServers  []RegisteredServer `json:"RegisteredServers"`
+}
+
+type Path struct {
+	MethodPath    string `json:"MethodPath"`
+	ExposedMethod string `json:"ExposedMethod"`
 }
 
 type RegisteredServer struct {

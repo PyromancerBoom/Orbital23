@@ -9,10 +9,8 @@ import (
 
 // ServiceDetails represents the details of the service, including IDL.
 type ServiceDetails struct {
-	Service string
-	Path    string
-	Method  string // Added the ExposedMethod field
-	IDL     string
+	Method string
+	IDL    string
 }
 
 // HashMap of ServiceName_Path: IDL
@@ -35,13 +33,17 @@ func updateIDLcache() error {
 	// Clear the IDLMappings map before populating it again
 	IDLMappings = make(map[string]ServiceDetails)
 
+	// Make the IDL Mappings - "ServiceName+Path" : Method, IDL
 	for _, admin := range AdminsCache {
 		for _, service := range admin.Services {
-			IDLMappings[service.ServiceName+"_"+service.Path] = ServiceDetails{
-				Service: service.ServiceName,
-				Path:    service.Path,
-				Method:  service.ExposedMethod,
-				IDL:     service.IdlContent,
+			for _, path := range service.Paths {
+				// Create the key for IDLMappings using ServiceName and MethodPath
+				key := fmt.Sprintf("%s+%s", service.ServiceName, path.MethodPath)
+				// Populate the IDLMappings map with ServiceDetails
+				IDLMappings[key] = ServiceDetails{
+					Method: path.ExposedMethod,
+					IDL:    service.IdlContent,
+				}
 			}
 		}
 	}
@@ -86,7 +88,7 @@ func UpdateIDLcacheLoop() error {
 // - ServiceDetails: The complete ServiceDetails struct for the specified service name and path.
 // - error: An error if the service name and path combination does not exist in the cache.
 func GetServiceDetails(serviceName string, path string) (ServiceDetails, error) {
-	idlDetails, ok := IDLMappings[serviceName+"_"+path]
+	idlDetails, ok := IDLMappings[serviceName+"+"+path]
 
 	// Throw an error if the IDL file is not found.
 	if !ok {

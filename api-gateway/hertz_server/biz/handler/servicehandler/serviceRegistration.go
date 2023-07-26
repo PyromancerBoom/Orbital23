@@ -82,7 +82,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 
 	response := make(map[string]string)
 	response["Message"] = "Registered successfully. You're good to GO :D"
-	response["api-key"] = apiKey
+	response["API-Key"] = apiKey
 
 	c.JSON(consts.StatusOK, response)
 }
