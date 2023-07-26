@@ -267,15 +267,66 @@ Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset S
 ]
 ```
 
-A reponse will be received :
-
-```
-
-```
+A response with the API Key and Status will be recieved.
 
 #### 6. Update your service <a name="step6"></a>
 
 This step can actually be done anytime after registration but placing it here made sense.
+
+For updating, put in the api key received on registration. OR, for easier testing we made the provision that if a service tries to updated using a master key the update will still be authorised. Further add the correct owner ID in the parameters. So the request URL should look something like this :
+
+`http://localhost:4200/update?ownerid=UserName`
+
+The master api key is "master_api_key_uuid" without the quotes.
+
+_The Master Key is just a temporary provision made for easy testing and WILL be removed in the future. Managing API keys can be quite a hassle._
+
+Try updating with the new request body :
+
+```
+[
+    {
+      "OwnerName": "John Doe Updated",
+      "OwnerId": "UserName",
+      "Services": [
+        {
+          "ServiceId": "1",
+          "ServiceName": "AssetManagement",
+          "IdlContent": " ",
+          "Version": "5.0",
+          "ServiceDescription": "Service Description Updated",
+          "ServerCount": 2,
+          "Paths": [
+            {
+              "ExposedMethod": "insertAsset",
+              "MethodPath": "newAsset"
+            },
+            {
+              "ExposedMethod": "queryAsset",
+              "MethodPath": "getAsset"
+            }
+          ],
+          "RegisteredServers": [
+            {
+              "ServerUrl": "http://localhost:8000",
+              "Port": 8000
+            },
+            {
+              "ServerUrl": "http://localhost:8001",
+              "Port": 8001
+            }
+          ]
+        }
+      ]
+    }
+]
+```
+
+With the above updated blank IDL, we try sending a request now, and but it will not be authorised by the gateway.
+
+In MongoDB we can notice the updated changes.
+
+A provision for getting back information for an Admin has not yet been implemented due to time constraints of the project. But it would certainly be a great feature to have.
 
 **Step 1:**
 
