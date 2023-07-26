@@ -144,22 +144,62 @@ During production, the gatewayAddress should be updated to the absolute URL of t
 
 ## Data <a name="data"></a>
 
-Data is stored in Mongo
+Data is stored in MongoDB for this Project for ease of use and flexibility. The MongoDB client is configured to connect to Mongo at `localhost:27107`
 
-1. Asset Management
+For each unique owner, a document is made in MongoDB, with the following data :
 
-Public endpoints:
+(The API Key is provided by the gateway. Rest is provided by the user.)
 
-- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
-- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
+```
+{
+  "ApiKey": "your-api-key", // Appended by the Gateway
+  "OwnerName": "John Doe",
+  "OwnerId": "user123",
+  "Services": [
+    {
+      "ServiceId": "service1",
+      "ServiceName": "Service One",
+      "IdlContent": "<Thrift IDL content for Service One>",
+      "Version": "1.0.0",
+      "ServiceDescription": "This is Service One description.",
+      "ServerCount": 3,
+      "Paths": [
+        {
+          "MethodPath": "/method1",
+          "ExposedMethod": "GET"
+        },
+        {
+          "MethodPath": "/method2",
+          "ExposedMethod": "POST"
+        }
+      ],
+      "RegisteredServers": [
+        {
+          "ServerUrl": "http://server1.example.com",
+          "Port": 8080
+        },
+        {
+          "ServerUrl": "http://server2.example.com",
+          "Port": 8080
+        },
+        {
+          "ServerUrl": "http://server3.example.com",
+          "Port": 8080
+        }
+      ]
+    },
+    {
+      "ServiceId": "service2",
+      ... and so on
+  ]
+}
+```
 
-2. User Service
+The IDL must be provided by stringifying it. A tool like https://jsonformatter.org/json-stringify-online can be used for this.
 
-##### Public endpoints:
+A user can register multiple services, and multiple registered servers for their services and along with some flexibility in exposed URLs, the method is masked with Path field.
 
-- (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
-- (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
-- (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
+_For ease of testing, regardless of how many Registered Servers are there, we can connect more, and with different ServerURLs. "Mocking" the authentication of RPC servers this way will save time on testing._
 
 <a href="#top">Back to top</a>
 
@@ -303,6 +343,13 @@ Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset S
     }
 ]
 ```
+
+Note:
+
+The above service would have the following public endpoints registered on the gateway:
+
+- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
+- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
 
 A response with the API Key and Status will be recieved.
 
