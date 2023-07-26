@@ -1,5 +1,42 @@
 This is the repository for the ByteDance and Tiktok Orbital 2023.
 
+# Table of Contents
+
+1. [About](#about)
+2. [Features and Design](#features)
+   1. [IDL Management](#idlmanagement)
+3. [Getting Started with an example](#gettingstarted)
+4. [Performance](#performance)
+5. [Third Example](#third-example)
+6. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+
+## About <a name="about"></a>
+
+This is the project for our API Gateway based on one scalable Hertz server which serves multiple RPC servers.
+
+The API Gateway has the following endpoints :
+
+- _GET and POST /:serviceName/:path_
+  Every service has a registered URL which is it's s
+
+- _GET /ping_
+  This endpoint checks the availability of the API gateway (ping).
+  Run it to verify if the server is running or not
+
+- _POST /register_
+  Handles user registration requests.
+
+- _PUT /update_
+  Server to Update details of Registered services
+
+- _POST /connect_
+  Once services are registered, their servers are connected through this endpoint automatically.
+
+- _POST /health_
+  This endpoint handles health checks for a service. Services ping to /health to update their healthchecks.
+
+<a href="#top">Back to top</a>
+
 #### Registration request format
 
 ```
@@ -42,10 +79,6 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
 ```
 
 ## About
-
-This is the MVP project for our API Gateway based on one Hertz server and multiple RPC servers.
-
-The API Gateway, which is a Hertz server, listens to requests at port 4200 on multiple exposed endpoints "/{serviceName}/{path}" [POST] and "/{serviceName}/{serviceMethod}" [GET]. Once it receives an API request, it then forwards the request to the Kitex server (using RPC generic call).
 
 MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
 
