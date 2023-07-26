@@ -4,10 +4,13 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
 
 1. [About](#about)
 2. [Features and Design](#features)
-   1. [IDL Management](#idlmanagement)
+   - [Components](#components)
+   - [IDL Management](#idlmanagement)
+   - [Server Utility Package](#serverutils)
 3. [Getting Started with an example](#gettingstarted)
+   - [Setting up kitex](#kitexsetup)
 4. [Performance](#performance)
-5. [Third Example](#third-example)
+5. [Data](#data)
 6. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
 
 ## About <a name="about"></a>
@@ -34,6 +37,30 @@ The API Gateway has the following endpoints :
 
 - _POST /health_
   This endpoint handles health checks for a service. Services ping to /health to update their healthchecks.
+
+<a href="#top">Back to top</a>
+
+### Features and Design <a name="features"></a>
+
+### The project has the following features : <a name="components"></a>
+
+1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers performing load balancing, service discovery, health checks, etc. It accepts incoming HTTP requests and decodes on which service to make a generic RPC call and returns a response.
+
+2. Service Registration and Caching: A user can send in POST requests on `:/register` to register their services. The JSON payload includes details about the owner, their services, IDLs and masked service URLs. This data is stored in MongoDB and is also cached inside the gateway server for quick access. Refer to the <a href="#data">Data</a>section below for the exact info on how data is stored.
+
+3. RPC Protocal Translation: The API Gateway forwards incoming API requests to the Kitex servers using the internal RPC clients within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services. This is done with their Thrift IDL information sent on registration.
+
+4. Automated Server Connection: The API Gateway provides another package called _server_utils_ to make it easy for Services can automate the registration of their servers to our system by making an HTTP POST request at the `:/connect` endpoint of the API Gateway using their registered API key. This enables services to scale up or down dynamically according to their needs.
+
+5. Health Checks: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. This is part of the Server Utility Package and can be easily automated. For this, we have used Consul.
+
+6. Discovery and Load Balancing: The gateway uses Consul's resolver for service discovery and load balancing. It uses Consul’s DNS interface to resolve service names. It can be used to discover services registered with Consul and load balance requests between them. The MVP version of the NewConsulResolver implements round-robin load balancing, distributing the requests equally among the connected RPC servers.
+
+7. Service Registry: Consul has been integrated as the service registry as well. It is completely isolated from the RPC servers. The servers have to therefore, interact with the Gateway for Consul related business. This was done to prevent malicious attacks on the service registry. The consul service registry provides a beautiful graphical view of all the connected servers to help admins track, manage and troubleshoot connections. This also allows us for more freedom in logic handling for tasks related to the Registry.
+
+- Consul Agent is for the purpose of Service Registry, Health Checks, Discovery, Load Balancing. It is hosted on `localhost:8500` for this project. The logic for exact functioning however has been coded manually.
+
+### IDL Management <a name="idlmanagement"></a>
 
 <a href="#top">Back to top</a>
 
@@ -77,26 +104,6 @@ The API Gateway has the following endpoints :
     }
 ]
 ```
-
-## About
-
-MASTER_API_KEY = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-
-### Components and features of MVP:
-
-1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers.
-
-2. RPC Server Integration: The API Gateway forwards incoming API requests to the Kitex server using the internal RPC client within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services.
-
-3. Service Registration: Although the registration functionality is not yet integrated with the service registry, service information can be sent to the `:/register` endpoint in JSON format. The JSON payload includes service details such as the service name, address, port, and additional metadata like service description, version, and IDL content.
-
-4. Automated Server Connection: Services can automate the registration of their servers to our system by making an HTTP POST request at the `:/connect` endpoint of the API Gateway using an API key. This enables services to scale up or down dynamically according to their needs.
-
-5. Health Declaration: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. If a server fails to declare its health for 1 minute, it is delisted from the system and needs to reconnect.
-
-6. Load Balancing: The MVP version implements round-robin load balancing, distributing the requests equally among the connected RPC servers. This helps achieve better scalability and performance by effectively utilizing the available server resources. Future updates will include weighted round-robin load balancing for improved efficiency.
-
-7. Service Registry: Consul by Hashicorp is used as the service registry. It is completely masked from the RPC servers and servers can only register themselves through the `:/connect` endpoint, using the gateway as a proxy. This was done to prevent malicious attacks on the service registry. The consul service registry provides a beautiful graphical view of all the connected servers to help admins track, manage and troubleshoot connections.
 
 ## Performance
 
