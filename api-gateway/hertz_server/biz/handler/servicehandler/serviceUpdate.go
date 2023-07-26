@@ -6,6 +6,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"api-gateway/hertz_server/biz/model/cache"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"go.uber.org/zap"
@@ -87,7 +89,7 @@ func Update(ctx context.Context, c *app.RequestContext) {
 
 	zap.L().Info("Admin info updated successfully")
 
-	go repository.UpdateIDLcache()
+	go cache.UpdateIDLcache()
 
 	response := make(map[string]string)
 	response["Message"] = "Updated successfully. You're good to GO :D"

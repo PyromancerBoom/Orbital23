@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"api-gateway/hertz_server/biz/model/cache"
 	repository "api-gateway/hertz_server/biz/model/repository"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -84,7 +85,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	response["Message"] = "Registered successfully. You're good to GO :D"
 	response["API-Key"] = apiKey
 
-	go repository.UpdateIDLcache()
+	go cache.UpdateIDLcache()
 
 	c.JSON(consts.StatusOK, response)
 }

@@ -23,7 +23,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/discovery"
 	"github.com/cloudwego/kitex/pkg/generic"
 
-	repository "api-gateway/hertz_server/biz/model/repository"
+	cache "api-gateway/hertz_server/biz/model/cache"
 )
 
 var resolver discovery.Resolver
@@ -73,7 +73,7 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// Checking if service and method are valid
-	value, err := repository.GetServiceDetails(serviceName, path)
+	value, err := cache.GetServiceDetails(serviceName, path)
 	if err != nil {
 		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -141,7 +141,7 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	path := c.Param("path")
 
 	// Checking if service and method are valid
-	value, err := repository.GetServiceDetails(serviceName, path)
+	value, err := cache.GetServiceDetails(serviceName, path)
 	if err != nil {
 		zap.L().Error("Error while getting service", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
