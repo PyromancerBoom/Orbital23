@@ -62,6 +62,20 @@ The API Gateway has the following endpoints :
 
 ### IDL Management <a name="idlmanagement"></a>
 
+IDL (Interface Definition Language) management plays a crucial role in facilitating communication between the API Gateway and the backend RPC servers using Kitex. Here's how IDLs are managed in the project:
+
+During service registration with POST /register, service owners include their service's IDL details in the JSON payload.
+
+- IDL Mapping and Translation:
+  API Gateway stores and uses the IDL contents to translate incoming JSON API requests to Thrift binary format for Kitex.
+  The IDLs are also cached for faster API Calls and are used to make and store all the generic clients so that the parsing need to be done again and again. Thrift's compact binary format facilitates efficient communication between the API Gateway and backend RPC servers.
+
+- IDL Versioning and Compatibility:
+  The Data Model allows services to keep track of their IDLs and versions. Although one limitation (due to time constraints) is that only the latest IDL version is stored. IDLs can be updated using the `/update` endpoint.
+
+- Synchronization:
+  Ensuring IDL information remains consistent and synchronized between components is crucial, which is why IDLs are cached regularly.
+
 <a href="#top">Back to top</a>
 
 #### Registration request format
