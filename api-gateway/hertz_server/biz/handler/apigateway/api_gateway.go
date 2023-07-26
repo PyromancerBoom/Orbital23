@@ -15,28 +15,23 @@ import (
 	consul "github.com/kitex-contrib/registry-consul"
 	"go.uber.org/zap"
 
-	client "github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
-	genericClient "github.com/cloudwego/kitex/client/genericclient"
-	"github.com/cloudwego/kitex/pkg/generic"
+	"github.com/cloudwego/kitex/pkg/discovery"
 
-	repository "api-gateway/hertz_server/biz/model/repository"
+	"api-gateway/hertz_server/biz/model/cache"
 )
 
+var Resolver discovery.Resolver
 
-// var resolver discovery.Resolver
-
-// // init is called during package initialization and sets up the resolver.
-// func init() {
-// 	// Get registry to enable resolving serverIDs
-// 	var err error
-// 	resolver, err = consul.NewConsulResolver("127.0.0.1:8500")
-// 	if err != nil {
-// 		zap.L().Error("Error while getting registry", zap.Error(err))
-// 	}
-//}
-
-
+// init is called during package initialization and sets up the resolver.
+func init() {
+	// Get registry to enable resolving serverIDs
+	var err error
+	Resolver, err = consul.NewConsulResolver("127.0.0.1:8500")
+	if err != nil {
+		zap.L().Error("Error while getting registry", zap.Error(err))
+	}
+}
 
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]
@@ -72,49 +67,14 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Checking if service and method are valid
-	idl, err := repository.GetServiceIDL(serviceName)
-	if err != nil {
-		zap.L().Error("Error while getting service", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-	zap.L().Info("Checked that service and method are valid")
-
-	// provider initialisation
-	provider, err := generic.NewThriftContentProvider(idl, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-	zap.L().Info("Provider initialised")
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Get registry to enable resolving serverIDs
-	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	if err != nil {
-		zap.L().Error("Error while getting registry", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(registry))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
 	jsonString := string(reqBody)
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//Changed from value.Method to c.Param("path")
+	genClient, err := cache.GetGenericClient(serviceName)
+	if err != nil {
+		zap.L().Error(err.Error())
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
 	// Make generic Call and get back response
 	zap.L().Info("Making generic Call and getting back response")
@@ -148,43 +108,6 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	serviceName := c.Param("serviceName")
 	path := c.Param("path")
 
-	// Checking if service and method are valid
-	idl, err := repository.GetServiceIDL(serviceName)
-	if err != nil {
-		zap.L().Error("Error while getting service", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
-	// Provider initialisation
-	provider, err := generic.NewThriftContentProvider(idl, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Get registry to enable resolving serverIDs
-	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
-	if err != nil {
-		zap.L().Error("Error while getting registry", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(registry))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
 	queryParams := c.QueryArgs()
 
 	// Extract query parameters
@@ -203,8 +126,47 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	jsonString := string(jsonBytes)
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//Changed from value.Method to c.Param("path")
+	// // Checking if service and method are valid
+	// idl, err := cache.GetServiceIDL(serviceName)
+	// if err != nil {
+	// 	zap.L().Error("Error while getting service", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
+	// zap.L().Info("Checked that service and method are valid")
+
+	// // provider initialisation
+	// provider, err := generic.NewThriftContentProvider(idl, nil)
+	// if err != nil {
+	// 	zap.L().Error("Error while initializing provider", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+	// zap.L().Info("Provider initialised")
+
+	// thriftGeneric, err := generic.JSONThriftGeneric(provider)
+	// if err != nil {
+	// 	zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// 	return
+	// }
+
+	// // Fetch hostport from registry later
+	// genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
+	// 	client.WithResolver(Resolver))
+	// if err != nil {
+	// 	zap.L().Error("Error while initializing generic client", zap.Error(err))
+	// 	c.String(consts.StatusInternalServerError, err.Error())
+	// }
+
+	// zap.L().Debug("Using no caching client calls")
+
+	//Perform better error handling, this call may give us errors!! We need to send back the right error message.
+	genClient, err := cache.GetGenericClient(serviceName)
+	if err != nil {
+		zap.L().Error(err.Error())
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
 	// Make generic Call and get back response using WithRPC Timeout
 	zap.L().Info("Making generic Call and getting back response")
@@ -213,12 +175,6 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
-
-	// response, err := genClient.GenericCall(ctx, value.Method, jsonString)
-	// if err != nil {
-	// 	zap.L().Error("Error while making generic call", zap.Error(err))
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
 
 	c.String(consts.StatusOK, response.(string))
 	zap.L().Info("(GET) Execution complete")

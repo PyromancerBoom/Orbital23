@@ -1,7 +1,7 @@
 package servicehandler
 
 import (
-	repository "api-gateway/hertz_server/biz/model/repository"
+	"api-gateway/hertz_server/biz/model/cache"
 	"bytes"
 	"context"
 	"time"
@@ -10,10 +10,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
-	genericClient "github.com/cloudwego/kitex/client/genericclient"
-	"github.com/cloudwego/kitex/pkg/generic"
 )
 
 type HealthRequest struct {
@@ -55,39 +52,14 @@ func proxyHealthCheckRequst(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Checking if service is valid
-	idl, err := repository.GetServiceIDL(healthCheckServiceName)
-	if err != nil {
-		zap.L().Error("Error getting Registry Proxy IDL", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to perform health check.")
-		return
-	}
-
-	// provider initialisation
-	provider, err := generic.NewThriftContentProvider(idl, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider for Registry Proxy", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to perform health check.")
-		return
-	}
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to perform health check.")
-		return
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(healthCheckServiceName, thriftGeneric,
-		client.WithResolver(registryResolver))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to perform health check.")
-		return
-	}
-
 	jsonString := string(reqBody)
+
+	genClient, err := cache.GetGenericClient("RegistryProxy")
+	if err != nil {
+		zap.L().Error(err.Error())
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 
 	// Make generic Call and get back response
 	zap.L().Info("Making generic Call and getting back response")

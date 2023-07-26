@@ -28,7 +28,7 @@ import (
 
 const (
 	MASTER_API_KEY         = "36e991d3-646d-414a-ac66-0c0e8a310ced"
-	ttl                    = 10 * time.Second // Declare unhealthy after
+	ttl                    = 30 * time.Second // Declare unhealthy after
 	ttd                    = 6 * ttl          // Remove from registry afer
 	consulAddr             = "127.0.0.1:8500"
 	healthCheckServiceName = "RegistryProxy"

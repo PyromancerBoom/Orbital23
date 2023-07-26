@@ -12,16 +12,12 @@ package servicehandler
 //3: ServerAddress
 
 import (
-	repository "api-gateway/hertz_server/biz/model/repository"
+	"api-gateway/hertz_server/biz/model/cache"
 	"bytes"
 	"context"
 
-	genericClient "github.com/cloudwego/kitex/client/genericclient"
-
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/generic"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -67,51 +63,19 @@ func proxyServerConnectionRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Checking if service is valid
-	idl, err := repository.GetServiceIDL(healthCheckServiceName)
+	genClient, err := cache.GetGenericClient("RegistryProxy")
 	if err != nil {
-		zap.L().Error("Error getting Registry Proxy IDL", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
-		return
-	}
-
-	// provider initialisation
-	provider, err := generic.NewThriftContentProvider(idl, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider for Registry Proxy", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
-		return
-	}
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
-		return
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(healthCheckServiceName, thriftGeneric,
-		client.WithResolver(registryResolver))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
-		c.String(consts.StatusInternalServerError, "Unable to connect to gateway.")
+		zap.L().Error(err.Error())
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
 	jsonString := string(reqBody)
 
-	// Make generic Call and get back response
-	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, connectMethodName, jsonString)
+	response, err := genClient.GenericCall(ctx, "connectServer", jsonString)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
-
-		if err.Error() == "service discovery error: no service found" {
-			c.String(consts.StatusInternalServerError, "Server connection services are currently down.")
-		} else {
-			c.String(consts.StatusInternalServerError, err.Error())
-		}
+		c.String(consts.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -140,7 +104,7 @@ func performServerConnectionRequest(ctx context.Context, c *app.RequestContext) 
 	}
 
 	res := make(map[string]string)
-	res["Status"] = "status OK"
+	res["Status"] = "ok"
 	res["Message"] = "Server Connection Request Accepted."
 	res["ServerID"] = uuid.New().String()
 

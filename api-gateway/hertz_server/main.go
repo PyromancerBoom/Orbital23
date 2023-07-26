@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api-gateway/hertz_server/biz/model/cache"
 	repository "api-gateway/hertz_server/biz/model/repository"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -18,7 +19,7 @@ func main() {
 	// Perform health check
 	go repository.MongoHealthCheck()
 
-	go repository.UpdateIDLcache()
+	cache.UpdateAllCache()
 
 	h := server.Default(server.WithHostPorts(hostURL))
 

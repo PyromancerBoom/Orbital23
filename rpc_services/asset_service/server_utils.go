@@ -44,6 +44,9 @@ func connectServerWithRetry(client *GatewayClient, serverAddress string, serverP
 // gateway address example : "http://localhost:4200"
 // connectsServer to system and gets the server ID back.
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
+
+	println("Connecting to server")
+
 	url := client.GatewayAddress + "/connect"
 
 	req := &ConnectRequest{APIKEY: client.API_KEY, ServiceName: client.Service_Name, Address: serverAddress, Port: serverPort}
@@ -80,6 +83,9 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 	if e != nil {
 		return "", err
 	}
+
+	println("Got back ID!!")
+	print(j["ServerID"])
 
 	return strings.Trim(string(j["ServerID"]), "\""), nil
 }

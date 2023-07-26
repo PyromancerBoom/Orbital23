@@ -1,4 +1,4 @@
-package repository
+package cache
 
 import (
 	"errors"
@@ -7,20 +7,18 @@ import (
 )
 
 // HashMap of ServiceName : IDL
-var IDLMappings map[string]string
+var idlMappings map[string]string
 
+// dependent on the admins cache
 func UpdateIDLcache() error {
-	//update the admins cache
-	err := UpdateAdminCache()
-	if err != nil {
-		zap.L().Info("Error updating Admins cache.")
-		return err
-	}
 
-	IDLMappings = make(map[string]string)
-	for _, admin := range AdminsCache {
+	//we make a new hashmap everytime we update because client may delete an idl file
+	//but it will remain in our hashmap if we dont just keep updating the hashmap with keys.
+	idlMappings = make(map[string]string)
+
+	for _, admin := range adminsCache {
 		for _, service := range admin.Services {
-			IDLMappings[service.ServiceName] = service.IdlContent
+			idlMappings[service.ServiceName] = service.IdlContent
 		}
 	}
 
@@ -29,7 +27,7 @@ func UpdateIDLcache() error {
 }
 
 func GetServiceIDL(serviceName string) (string, error) {
-	idlstring, ok := IDLMappings[serviceName]
+	idlstring, ok := idlMappings[serviceName]
 
 	//throw an error if the idl file is not there.
 	if !ok {
