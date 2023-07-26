@@ -421,6 +421,11 @@ Again, after the spike, the gateway showed great recovery.
 
 ## Limitations <a name="limit"></a>
 
+On thorough testing we found some limitations such as :
+
+- Kitex Servers cannot reconnect if the Gateway server goes down, even for a second. The server_utility package needs to be updated for this.
+- While the Gateway is designed to be Scalable, the only non-scalable aspect as of now is the Data Management.
+
 ## What Else? <a name="misc"></a>
 
 For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
