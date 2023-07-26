@@ -23,7 +23,7 @@ func main() {
 	// Commented out to test performance improvement
 	go repository.MongoHealthCheck()
 
-	go cache.UpdateIDLcache()
+	go cache.UpdateCache()
 
 	h := server.Default(server.WithHostPorts(hostURL))
 

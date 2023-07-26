@@ -19,22 +19,14 @@ type ServiceDetails struct {
 	IDL    string
 }
 
-// HashMap of ServiceName_Path: IDL
+// HashMap of ServiceName+Path: IDL
 var idlMappings map[string]ServiceDetails
 
-const updateInterval = time.Second * 5
-
-// UpdateIDLcache updates the IDL cache by populating the IDLMappings map.
+// updateIDLcache updates the IDL cache by populating the IDLMappings map.
 // It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
 // @Returns:
 // - error: An error if any
-func UpdateIDLcache() error {
-	// Update the admins cache
-	err := UpdateAdminCache()
-	if err != nil {
-		zap.L().Error("Error updating Admins cache.", zap.Error(err))
-		return err
-	}
+func updateIDLcache() error {
 
 	// Clear the IDLMappings map before populating it again
 	idlMappings = make(map[string]ServiceDetails)
@@ -63,9 +55,9 @@ func UpdateIDLcache() error {
 // It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
 // @Returns:
 // - error: An error if any
-func UpdateIDLcacheLoop() error {
+func UpdateIDLcacheLoop(updateInterval time.Duration) error {
 	// Run the function immediately to update the cache initially
-	if err := UpdateIDLcache(); err != nil {
+	if err := updateIDLcache(); err != nil {
 		zap.L().Error("Error updating IDL cache.", zap.Error(err))
 	}
 
@@ -77,7 +69,7 @@ func UpdateIDLcacheLoop() error {
 		select {
 		case <-ticker.C:
 			// zap.L().Info("IDL Mappings", zap.Any("IDL Mappings", IDLMappings))
-			if err := UpdateIDLcache(); err != nil {
+			if err := updateAdminCache(); err != nil {
 				zap.L().Error("Error updating IDL cache.", zap.Error(err))
 			}
 			// else {
@@ -100,7 +92,7 @@ func GetServiceDetails(serviceName string, path string) (ServiceDetails, error) 
 
 	// Throw an error if the IDL file is not found.
 	if !ok {
-		err := fmt.Errorf("The service does not exist.")
+		err := fmt.Errorf("The service/method does not exist.")
 		zap.L().Error(err.Error(), zap.String("serviceName", serviceName), zap.String("servicePath", path))
 		return ServiceDetails{}, err
 	}

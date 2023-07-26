@@ -89,7 +89,7 @@ func Update(ctx context.Context, c *app.RequestContext) {
 
 	zap.L().Info("Admin info updated successfully")
 
-	go cache.UpdateIDLcache()
+	go cache.UpdateCache()
 
 	response := make(map[string]string)
 	response["Message"] = "Updated successfully. You're good to GO :D"

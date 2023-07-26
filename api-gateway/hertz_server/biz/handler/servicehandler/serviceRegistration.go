@@ -85,7 +85,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	response["Message"] = "Registered successfully. You're good to GO :D"
 	response["API-Key"] = apiKey
 
-	go cache.UpdateIDLcache()
+	go cache.UpdateCache()
 
 	c.JSON(consts.StatusOK, response)
 }

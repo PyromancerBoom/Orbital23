@@ -7,10 +7,14 @@ import (
 )
 
 var (
+	// adminsCache is used to store admin data in memory.
 	adminsCache []repository.AdminConfig
 )
 
-func UpdateAdminCache() error {
+// updateAdminCache updates the admins cache in an array.
+// @Returns:
+// - error: An error if any
+func updateAdminCache() error {
 	a, err := repository.GetAllAdmins()
 	if err != nil {
 		return err
