@@ -1,4 +1,4 @@
-package main
+package server_utils
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ const (
 	// For Dockerised services
 	// gatewayAddress = "http://host.docker.internal:4200"
 
-	// For LocalHost
+	// For services on LocalHost
 	gatewayAddress = "http://0.0.0.0:4200"
 )
 
