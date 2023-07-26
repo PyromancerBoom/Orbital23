@@ -39,6 +39,12 @@ type ConnectRequest struct {
 	Port        string `json:"ServerPort"`
 }
 
+// Make a client to api gateway with api key, and service name
+// @Params
+// apikey: string
+// serviceName: string
+// @Returns
+// GatewayClient
 func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	return &GatewayClient{
 		ApiKey:         apikey,
@@ -47,23 +53,36 @@ func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	}
 }
 
+// Connects to the api gateway and returns the server id
+// @Params
+// serverAddress: string
+// serverPort: string
+// @Returns
+// serverID: string
+// error: error
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
+	// Construct the URL for the connect request
 	url := client.GatewayAddress + "/connect"
 
+	// Create a new ConnectRequest object with the specified parameters
 	req := &ConnectRequest{ApiKey: client.ApiKey, ServiceName: client.ServiceName, Address: serverAddress, Port: serverPort}
 
+	// Marshal the ConnectRequest object into JSON
 	b, err := json.Marshal(req)
 	if err != nil {
 		return "", err
 	}
 
+	// Create a new HTTP request with the JSON payload
 	r, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
 		return "", err
 	}
 
+	// Set the Content-Type header to application/json
 	r.Header.Add("Content-Type", "application/json")
 
+	// Send the HTTP request and get the response
 	httpCli := &http.Client{}
 	res, err := httpCli.Do(r)
 	if err != nil {
@@ -72,6 +91,7 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 
 	defer res.Body.Close()
 
+	// Read the response body into a byte array
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return "", err
@@ -79,12 +99,13 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 
 	j := make(map[string]json.RawMessage)
 
-	// unmarschal JSON
+	// Unmarshal JSON into a map[string]json.RawMessage
 	e := json.Unmarshal(body, &j)
 	if e != nil {
 		return "", err
 	}
 
+	// Extract the ServerID field from the JSON response and return it as a string
 	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
