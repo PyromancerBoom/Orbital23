@@ -76,6 +76,59 @@ During service registration with POST /register, service owners include their se
 - Synchronization:
   Ensuring IDL information remains consistent and synchronized between components is crucial, which is why IDLs are cached regularly.
 
+### Server Utility Package <a name="serverutils"></a>
+
+The Server Utility Package provides convenient functions to interact with the API Gateway for automated server registration, health checks, and communication. Importing this package simplifies the process of connecting backend RPC servers to the API Gateway.
+
+1. Importing the Package:
+
+To use the Server Utility Package, import it into your main package or copy-paste the file contents directly into your main package.
+
+2. Example Usage:
+
+The following code snippet demonstrates how to use the Server Utility Package to connect a backend RPC server to the API Gateway and perform health checks:
+
+```
+
+func main() {
+  // Other code above
+
+	// Initialize Gateway Client with API key and service name
+	gatewayClient := server_utils.NewGatewayClient(configuration.Apikey, configuration.ServiceName)
+
+	// Connect to the API Gateway and get the server ID
+	id, err := gatewayClient.ConnectServer(configuration.ServiceURL, advertisedPort)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// Perform health checks in a separate goroutine (every 5 seconds)
+	go gatewayClient.UpdateHealthLoop(id, 5)
+
+	// Your server's main logic here
+}
+```
+
+3. Gateway Address Configuration:
+   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided right at the beginning of the Server Utils file :
+
+```
+const (
+	// For Dockerised services on localhost
+	// gatewayAddress = "http://host.docker.internal:4200"
+
+	// For services on LocalHost
+	gatewayAddress = "http://0.0.0.0:4200"
+
+	// Absolute URL for gatewayAddress can be updated and abstracted in the package
+	// during production
+)
+```
+
+If you are running the service in Docker, locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
+
+During production, the gatewayAddress should be updated to the absolute URL of the API Gateway and can be abstracted within the package to avoid hardcoding.
+
 <a href="#top">Back to top</a>
 
 #### Registration request format
