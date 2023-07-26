@@ -8,10 +8,14 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
    - [IDL Management](#idlmanagement)
    - [Server Utility Package](#serverutils)
 3. [Getting Started with an example](#gettingstarted)
-   - [Setting up kitex](#kitexsetup)
+   1. [Set up Hertz](#step1)
+   2. [Set up Consul](#step2)
+   3. [Start MongoDB](#step3)
+   4. [Setting up kitex](#step4)
+   5. [Send requests](#step5)
 4. [Performance](#performance)
-5. [Data](#data)
-6. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+5. [Limitations and assumptions](#limit)
+6. [Data](#data)
 
 ## About <a name="about"></a>
 
@@ -60,6 +64,8 @@ The API Gateway has the following endpoints :
 
 - Consul Agent is for the purpose of Service Registry, Health Checks, Discovery, Load Balancing. It is hosted on `localhost:8500` for this project. The logic for exact functioning however has been coded manually.
 
+  <a href="#top">Back to top</a>
+
 ### IDL Management <a name="idlmanagement"></a>
 
 IDL (Interface Definition Language) management plays a crucial role in facilitating communication between the API Gateway and the backend RPC servers using Kitex. Here's how IDLs are managed in the project:
@@ -75,6 +81,8 @@ During service registration with POST /register, service owners include their se
 
 - Synchronization:
   Ensuring IDL information remains consistent and synchronized between components is crucial, which is why IDLs are cached regularly.
+
+  <a href="#top">Back to top</a>
 
 ### Server Utility Package <a name="serverutils"></a>
 
@@ -131,20 +139,107 @@ During production, the gatewayAddress should be updated to the absolute URL of t
 
 <a href="#top">Back to top</a>
 
-#### Registration request format
+## Getting Started with an example <a name="gettingstarted"></a>
+
+#### 1. Build and run the Hertz server <a name="step1"></a>
+
+Run `go build; go run .` to build and run the API Gateway server
+
+#### 2. Start Consul <a name="step2"></a>
+
+Assuming Consul is already installed, run `consul agent -dev`. This will start Consul on `localhost:8500` with a beautiful GUI of all Services connected.
+
+![consul](consulservicesconnection.png)
+
+#### 3. Start MongoDB <a name="step3"></a>
+
+Start MongoDB server on `localhost:27017`
+
+#### 4. Setup up Kitex with the Server utility package as mentioned above. <a name="step4"></a>
+
+Here's an example of setting up a Kitex server with Docker :
+
+```
+  config, err := LoadConfiguration("serviceConfig.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+  gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName)
+	advertisedPort := os.Getenv("PORT")
+
+	advertisedPort = GetFreePort()
+
+	id, err := gatewayClient.connectServer(config.ServiceURL, advertisedPort)
+    if err != nil {
+    log.Fatal(err.Error())
+	}
+
+	go gatewayClient.updateHealthLoop(id, 5)
+
+	url := config.URL
+	port := config.Port
+	addrDocker, _ := net.ResolveTCPAddr("tcp", url+":"+port)
+
+	svr := asset_management.NewServer(new(AssetManagementImpl),
+	server.WithServiceAddr(addrDocker),
+  server.WithLimit(&limit.Option{MaxConnections: 100000, MaxQPS: 100000}),
+	server.WithReadWriteTimeout(100*time.Second))
+
+	kitexerr := svr.Run()
+
+	if kitexerr != nil {
+	log.Println(kitexerr.Error())
+	}
+```
+
+And on LocalHost :
+
+```
+  config, err := LoadConfiguration("serviceConfig.json")
+    if err != nil {
+      log.Fatal(err)
+    }
+
+  var addr = getAddr() // Function in utils.go
+
+	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName)
+
+	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	go gatewayClient.updateHealthLoop(id, 5)
+
+	svr := asset_management.NewServer(new(AssetManagementImpl),
+		server.WithServiceAddr(addr),
+		server.WithLimit(&limit.Option{MaxConnections: 100000, MaxQPS: 100000}),
+		server.WithReadWriteTimeout(100*time.Second))
+
+	kitexerr := svr.Run()
+
+	if kitexerr != nil {
+		log.Println(kitexerr.Error())
+	}
+```
+
+#### 5. Register a service <a name="step5"></a>
+
+Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset Service (in the rpc_services) folder. Therefore we'd send a request with the following JSON :
 
 ```
 [
     {
-      "OwnerName": "John Doe 2",
-      "OwnerId": "hellowworld",
+      "OwnerName": "John Doe",
+      "OwnerId": "UserName",
       "Services": [
         {
           "ServiceId": "1",
           "ServiceName": "AssetManagement",
           "IdlContent": "namespace Go asset.management\n\nstruct QueryAssetRequest {\n    1: string ID;\n}\n\nstruct QueryAssetResponse {\n    1: bool   Exist;\n    2: string ID;\n    3: string Name;\n    4: string Market;\n}\n\nstruct InsertAssetRequest {\n    1: string ID;\n    2: string Name;\n    3: string Market;\n}\n\nstruct InsertAssetResponse {\n    1: bool Ok;\n    2: string Msg;\n}\n\nservice AssetManagement {\n    QueryAssetResponse queryAsset(1: QueryAssetRequest req);\n    InsertAssetResponse insertAsset(1: InsertAssetRequest req);\n}\n",
           "Version": "1.0",
-          "ServiceDescription": "Service A Description",
+          "ServiceDescription": "Service Description",
           "ServerCount": 2,
           "Paths": [
             {
@@ -172,11 +267,80 @@ During production, the gatewayAddress should be updated to the absolute URL of t
 ]
 ```
 
+A reponse will be received :
+
+```
+
+```
+
+#### 6. Update your service <a name="step6"></a>
+
+This step can actually be done anytime after registration but placing it here made sense.
+
+**Step 1:**
+
+Initialise the Hertz Server using the command: `go run .` from the respective directory
+
+To check if the server is running, hit the following GET endpoint
+`"http://localhost:4200/ping"`
+
+It should reply with the message :
+
+```
+{
+    "message": "pong"
+}
+```
+
+1. Asset Management
+
+##### Public endpoints:
+
+- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
+- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
+
+2. User Service
+
+##### Public endpoints:
+
+- (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
+- (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
+- (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
+
+The expected data for the above endpoints is provided below in Step 4.
+
+Once initialised they are automatically connected to consul, for example :
+
+**Step 4:**
+
+Send a POST or GET requests to the "/{serviceName}/{path}", in this case `http://localhost:4200/AssetManagement/newAsset` endpoint, for example:
+
+#### Asset Management
+
+```
+curl -X POST -H "Content-Type: application/json"
+-d '{
+  "ID": "2",
+  "Name": "Google",
+  "Market": "US"
+}'
+"http://localhost:4200/AssetManagement/newAsset"
+```
+
+Now try quering the info,
+
+```
+curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
+```
+
 ## Performance
 
-On Load testing with Postman, we were able to have the following benchmarks:
-The lower the blue line is, the better.
-The red line indicates error rate.
+- Current Performance <a name="currentperf"></a>
+
+- MVP Performance : <a name="mvpperf"></a>
+  On Load testing with Postman, we were able to have the following benchmarks:
+  The lower the blue line is, the better.
+  The red line indicates error rate.
 
 ![performance1](perf-25users-mvp.png)
 2 instances of User Service and 3 instances of Asset Management Service
@@ -203,151 +367,4 @@ Despite the spike in between the server showed great recovery.
 
 Again, after the spike, the gateway showed great recovery.
 
-### Registration :
-
-For now, the registration functionality is NOT integrated with the service registry. However, service information for registration can be sent at the (POST) `:/register` endpoint with the following json format which is accepted with our service registry Consul as well :
-
-```
-[
-  {
-    "Service": {
-      "Name": "first-service",
-      "Tags": [],
-      "Address": "serviceName/path",
-      "Port": 80,
-      "Meta": {
-        "serviceDescription": "Service for managing assets",
-        "serviceVersion": "1.0",
-        "idl":"idlcontent" (Required)
-      },
-      "Check": {
-        "HTTP": "http://serviceAddress/service/myservice/1/health",
-        "Interval": "10s"
-      }
-    }
-  }
-]
-```
-
-The `"idl":"idlcontent"` field is required as require the IDL content to make the RPC calls from the gateway to the service.
-
-Later, we will connect the registration with our registry and IDL mappings.
-
-Moreover, to see all registered service we can hit the endpoint `:/show`. (This will be removed later and was made just for testing purposes)
-
-## Connecting services to the gateway:
-
-Ensure that your servers can perform all the methods indicated in your interface definition during service registry.
-
-- Register your servers via the `:/connect` endpoint each time a new server is booted up. Use the `server_utils.go` file for the methods which can be used in the service to connect to the gateway. Examples are present in the `main.go` of the services.
-- Declare your servers as healthy to our system by making requests to the `:/health` endpoint at least every 10 seconds.
-
-To connect your server to our system, follow these steps:
-
-1. Register your service and receive an API Key.
-2. On server bootup, send a request to `:/connect` with the API Key, service details, server address, and port.
-3. Get a serverID upon successful connection.
-4. Declare your server's health by regularly sending requests to `:/health` with the API Key and serverID.
-   Remember:
-
-Note:
-
-- New servers should register themselves via :/connect.
-- Servers must declare themselves healthy every 10 seconds.
-- Servers are delisted if they don't declare health for 1 minute.
-- If delisted, reconnect..
-
-Load balancing currently uses round-robin, but will be upgraded to weighted round-robin.
-
 For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
-
-## How to use? [^3]
-
-**Step 1:**
-
-Initialise the Hertz Server using the command: `go run .` from the respective directory
-
-To check if the server is running, hit the following GET endpoint
-`"http://localhost:4200/ping"`
-
-It should reply with the message :
-
-```
-{
-    "message": "pong"
-}
-```
-
-**Step 2:**
-
-Start consul agent using `consul agent -dev`. (Consul needs to be installed for this)
-The consul GUI can be accessed at `http://localhost:8500`
-
-**Step 3:**
-
-Initialise multiple Kitex Services from their respective directories by using the command `go run .`
-There can be multiple instances for a service. The service would automatically detect a free port and start the service on that free port locally.
-
-Currently, we have the following functional services :
-
-1. Asset Management
-
-##### Public endpoints:
-
-- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
-- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
-
-2. User Service
-
-##### Public endpoints:
-
-- (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
-- (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
-- (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
-
-The expected data for the above endpoints is provided below in Step 4.
-
-Once initialised they are automatically connected to consul, for example :
-
-![consul](consulservicesconnection.png)
-
-**Step 4:**
-
-Send a POST or GET requests to the "/{serviceName}/{path}" endpoint, for example:
-
-#### Asset Management
-
-```
-curl -X POST -H "Content-Type: application/json"
--d '{
-  "ID": "2",
-  "Name": "Google",
-  "Market": "US"
-}'
-"http://localhost:4200/AssetManagement/newAsset"
-```
-
-Now try quering the info,
-
-```
-curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
-```
-
-#### User service
-
-```
-curl -X POST -H "Content-Type: application/json"
--d '{
-  "id": "3",
-  "name": "Doe",
-  "email": "johndoe@example.com",
-  "age": 24
-}'
-"http://localhost:4200/UserService/newUser"
-```
-
-Now try quering the info,
-
-```
-curl -X GET http://localhost:4200/UserService/getUser?id=2
-```
