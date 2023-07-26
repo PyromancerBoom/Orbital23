@@ -17,7 +17,8 @@ func main() {
 		panic(err)
 	}
 	// Perform health check
-	go repository.MongoHealthCheck()
+	// Commented out to test performance improvement
+	// go repository.MongoHealthCheck()
 
 	go repository.UpdateIDLcache()
 

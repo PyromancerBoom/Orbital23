@@ -178,6 +178,7 @@ func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
 			if err != nil {
 				// Log the error and continue with the health check loop
 				log.Println("Error updating health:", err)
+				log.Println("Trying to reconnect")
 			}
 		}
 	}

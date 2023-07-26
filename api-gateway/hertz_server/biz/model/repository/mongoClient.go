@@ -49,6 +49,8 @@ func ConnectToMongoDB() error {
 
 	Client = c
 
+	zap.L().Debug("Connected to MongoDB")
+
 	return nil
 }
 
