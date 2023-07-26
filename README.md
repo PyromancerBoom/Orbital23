@@ -7,7 +7,8 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
    - [Components](#components)
    - [IDL Management](#idlmanagement)
    - [Server Utility Package](#serverutils)
-3. [Getting Started with an example](#gettingstarted)
+3. [Data Management](#data)
+4. [Getting Started with an example](#gettingstarted)
    1. [Set up Hertz](#step1)
    2. [Set up Consul](#step2)
    3. [Start MongoDB](#step3)
@@ -15,9 +16,9 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
    5. [Registering a service](#step5)
    6. [Updating Data](#step6)
    7. [Send requests](#step7)
-4. [Performance](#performance)
-5. [Limitations and assumptions](#limit)
-6. [Data](#data)
+5. [Performance](#perf)
+6. [Limitations and assumptions](#limit)
+7. [What Else?](#misc)
 
 ## About <a name="about"></a>
 
@@ -141,7 +142,9 @@ During production, the gatewayAddress should be updated to the absolute URL of t
 
 <a href="#top">Back to top</a>
 
-## Data
+## Data <a name="data"></a>
+
+Data is stored in Mongo
 
 1. Asset Management
 
@@ -382,7 +385,7 @@ In MongoDB we can notice the updated changes.
 
 A provision for getting back information for an Admin has not yet been implemented due to time constraints of the project. But it would certainly be a great feature to have.
 
-## Performance
+## Performance <a name="perf"></a>
 
 - Current Performance <a name="currentperf"></a>
 
@@ -415,5 +418,9 @@ Despite the spike in between the server showed great recovery.
 - Ramp up time: 1 min
 
 Again, after the spike, the gateway showed great recovery.
+
+## Limitations <a name="limit"></a>
+
+## What Else? <a name="misc"></a>
 
 For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
