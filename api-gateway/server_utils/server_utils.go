@@ -41,10 +41,11 @@ type ConnectRequest struct {
 
 // Make a client to api gateway with api key, and service name
 // @Params
-// apikey: string
-// serviceName: string
+//   - apikey: string
+//   - serviceName: string
+//
 // @Returns
-// GatewayClient
+//   - GatewayClient
 func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	// If API Key and Service Name are blank or have whitespaces, return an error on console
 	if strings.TrimSpace(apikey) == "" || strings.TrimSpace(serviceName) == "" {
@@ -61,11 +62,12 @@ func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 
 // Connects to the api gateway and returns the server id
 // @Params
-// serverAddress: string
-// serverPort: string
+//   - serverAddress: string
+//   - serverPort: string
+//
 // @Returns
-// serverID: string
-// error: error
+//   - serverID: string
+//   - error if any
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
 	// Construct the URL for the connect request
 	url := client.GatewayAddress + "/connect"
@@ -116,6 +118,12 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 }
 
 // Declares that server instance is healthy
+// @Params
+//   - serverID: string
+//
+// @Returns
+//   - nil
+//   - error if any
 func (client *GatewayClient) updateHealth(serverID string) error {
 
 	url := client.GatewayAddress + "/health"
@@ -155,6 +163,12 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 }
 
 // Keeps declaring server instance is healthy
+// @Params
+//   - id: string
+//   - timeBetweenLoops: int
+//
+// @Returns
+//   - nil
 func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
 	ticker := time.NewTicker(time.Duration(timeBetweenLoops) * time.Second)
 	for {
