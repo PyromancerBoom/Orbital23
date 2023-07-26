@@ -42,6 +42,21 @@ The API Gateway has the following endpoints :
 
 _Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process. However, the API Gateway is designed to be fully functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
 
+PS :
+On windows, Kitex may throw some errors like :
+
+```
+[Error] KITEX: OnRead Error: default codec read failed: EOF
+
+or
+
+default codec read failed: i/o timeout
+
+```
+
+This happens to be due to Windows environment. On running Kitex servers in Linux, the errors seems to go away.
+The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues/932) and [here as well](https://github.com/cloudwego/kitex/issues/964)
+
 <a href="#top">Back to top</a>
 
 ## Features and Design <a name="features"></a>
