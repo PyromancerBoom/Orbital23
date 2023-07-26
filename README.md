@@ -1,5 +1,7 @@
 This is the repository for the ByteDance and Tiktok Orbital 2023.
 
+_Note : Testing is still in process as external orbital project deadline is later_
+
 # Table of Contents
 
 1. [About](#about)
