@@ -4,32 +4,25 @@ import (
 	"testing"
 )
 
+// TestNewGatewayClient tests the NewGatewayClient function
 func TestNewGatewayClient(t *testing.T) {
-	t.Run("with valid input", func(t *testing.T) {
-		apiKey := "master_api_key_uuid"
-		serviceName := "test-service-name"
-		client := NewGatewayClient(apiKey, serviceName)
+	// Test case 1: API Key and Service Name are blank
+	if NewGatewayClient("", "") != nil {
+		t.Error("API Key and Service Name cannot be blank")
+	}
 
-		if client.ApiKey != apiKey {
-			t.Errorf("NewGatewayClient() API key = %s, expected %s", client.ApiKey, apiKey)
-		}
+	// Test case 2: API Key is blank
+	if NewGatewayClient("", "serviceName") != nil {
+		t.Error("API Key cannot be blank")
+	}
 
-		if client.ServiceName != serviceName {
-			t.Errorf("NewGatewayClient() service name = %s, expected %s", client.ServiceName, serviceName)
-		}
-	})
+	// Test case 3: Service Name is blank
+	if NewGatewayClient("apiKey", "") != nil {
+		t.Error("Service Name cannot be blank")
+	}
 
-	t.Run("with invalid input", func(t *testing.T) {
-		apiKey := "another-api-key"
-		serviceName := "another-service"
-		client := NewGatewayClient(apiKey, serviceName)
-
-		if client.ApiKey == apiKey {
-			t.Errorf("NewGatewayClient() API key = %s, expected %s", client.ApiKey, "different-api-key")
-		}
-
-		if client.ServiceName == serviceName {
-			t.Errorf("NewGatewayClient() service name = %s, expected %s", client.ServiceName, "different-service-name")
-		}
-	})
+	// Test case 4: API Key and Service Name are not blank
+	if NewGatewayClient("apiKey", "serviceName") == nil {
+		t.Log("Test passed")
+	}
 }

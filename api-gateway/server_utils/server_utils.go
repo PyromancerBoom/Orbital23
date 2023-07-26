@@ -46,6 +46,12 @@ type ConnectRequest struct {
 // @Returns
 // GatewayClient
 func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
+	// If API Key and Service Name are blank or have whitespaces, return an error on console
+	if strings.TrimSpace(apikey) == "" || strings.TrimSpace(serviceName) == "" {
+		log.Println("API Key and Service Name cannot be blank")
+		return nil
+	}
+
 	return &GatewayClient{
 		ApiKey:         apikey,
 		ServiceName:    serviceName,
