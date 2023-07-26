@@ -45,6 +45,8 @@ The API Gateway has the following endpoints :
 - _POST /health_
   This endpoint handles health checks for a service. Services ping to /health to update their healthchecks.
 
+_Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process. However, the API Gateway is designed to be fully functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
+
 <a href="#top">Back to top</a>
 
 ## Features and Design <a name="features"></a>
