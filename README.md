@@ -161,9 +161,7 @@ Public endpoints:
 - (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
 - (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
 
-The expected data for the above endpoints is provided below in Step 4.
-
-Once initialised they are automatically connected to consul, for example :
+<a href="#top">Back to top</a>
 
 ## Getting Started with an example <a name="gettingstarted"></a>
 
@@ -261,6 +259,8 @@ And on LocalHost :
 	}
 ```
 
+<a href="#top">Back to top</a>
+
 #### 5. Register a service <a name="step5"></a>
 
 Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset Service (in the rpc_services) folder. Therefore we'd send a request with the following JSON :
@@ -305,6 +305,8 @@ Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset S
 ```
 
 A response with the API Key and Status will be recieved.
+
+<a href="#top">Back to top</a>
 
 #### 6. Sending requests <a name="step6"></a>
 
@@ -385,14 +387,17 @@ In MongoDB we can notice the updated changes.
 
 A provision for getting back information for an Admin has not yet been implemented due to time constraints of the project. But it would certainly be a great feature to have.
 
+<a href="#top">Back to top</a>
+
 ## Performance <a name="perf"></a>
 
-- Current Performance <a name="currentperf"></a>
+#### Current Performance <a name="currentperf"></a>
 
-- MVP Performance : <a name="mvpperf"></a>
-  On Load testing with Postman, we were able to have the following benchmarks:
-  The lower the blue line is, the better.
-  The red line indicates error rate.
+#### MVP Performance : <a name="mvpperf"></a>
+
+On Load testing with Postman, we were able to have the following benchmarks:
+The lower the blue line is, the better.
+The red line indicates error rate.
 
 ![performance1](perf-25users-mvp.png)
 2 instances of User Service and 3 instances of Asset Management Service
@@ -419,6 +424,8 @@ Despite the spike in between the server showed great recovery.
 
 Again, after the spike, the gateway showed great recovery.
 
+<a href="#top">Back to top</a>
+
 ## Limitations <a name="limit"></a>
 
 On thorough testing we found some limitations such as :
@@ -429,3 +436,5 @@ On thorough testing we found some limitations such as :
 ## What Else? <a name="misc"></a>
 
 For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
+
+<a href="#top">Back to top</a>
