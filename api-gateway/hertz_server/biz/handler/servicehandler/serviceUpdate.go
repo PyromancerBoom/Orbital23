@@ -1,6 +1,7 @@
 package servicehandler
 
 import (
+	"api-gateway/hertz_server/biz/model/cache"
 	repository "api-gateway/hertz_server/biz/model/repository"
 	"bytes"
 	"context"
@@ -89,6 +90,8 @@ func Update(ctx context.Context, c *app.RequestContext) {
 
 	response := make(map[string]string)
 	response["Message"] = "Updated successfully. You're good to GO :D"
+
+	cache.UpdateAllCache()
 
 	c.JSON(consts.StatusOK, response)
 }

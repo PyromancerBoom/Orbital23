@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"api-gateway/hertz_server/biz/model/cache"
 	repository "api-gateway/hertz_server/biz/model/repository"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -83,6 +84,8 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	response := make(map[string]string)
 	response["Message"] = "Registered successfully. You're good to GO :D"
 	response["api-key"] = apiKey
+
+	cache.UpdateAllCache()
 
 	c.JSON(consts.StatusOK, response)
 }
