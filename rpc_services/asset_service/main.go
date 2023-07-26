@@ -23,13 +23,15 @@ func main() {
 	// --------------------- Uncomment below to host in local ---------------------
 	var addr = getAddr() // Function in utils.go
 
-	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName)
+	gatewayAddress := "http://0.0.0.0:4200"
+	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName, gatewayAddress)
 
 	id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	print(id)
 	go gatewayClient.updateHealthLoop(id, 5)
 
 	svr := asset_management.NewServer(new(AssetManagementImpl),
@@ -45,7 +47,8 @@ func main() {
 
 	// --------------------- Uncomment below to host in docker ---------------------
 
-	// gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName)
+	// gatewayAddress = "http://host.docker.internal:4200"
+	// gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName, gatewayAddress)
 	// // advertisedPort := os.Getenv("PORT")
 
 	// advertisedPort = GetFreePort()
