@@ -12,7 +12,9 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
    2. [Set up Consul](#step2)
    3. [Start MongoDB](#step3)
    4. [Setting up kitex](#step4)
-   5. [Send requests](#step5)
+   5. [Registering a service](#step5)
+   6. [Updating Data](#step6)
+   7. [Send requests](#step7)
 4. [Performance](#performance)
 5. [Limitations and assumptions](#limit)
 6. [Data](#data)
@@ -44,7 +46,7 @@ The API Gateway has the following endpoints :
 
 <a href="#top">Back to top</a>
 
-### Features and Design <a name="features"></a>
+## Features and Design <a name="features"></a>
 
 ### The project has the following features : <a name="components"></a>
 
@@ -139,11 +141,43 @@ During production, the gatewayAddress should be updated to the absolute URL of t
 
 <a href="#top">Back to top</a>
 
+## Data
+
+1. Asset Management
+
+Public endpoints:
+
+- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
+- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
+
+2. User Service
+
+##### Public endpoints:
+
+- (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
+- (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
+- (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
+
+The expected data for the above endpoints is provided below in Step 4.
+
+Once initialised they are automatically connected to consul, for example :
+
 ## Getting Started with an example <a name="gettingstarted"></a>
 
 #### 1. Build and run the Hertz server <a name="step1"></a>
 
-Run `go build; go run .` to build and run the API Gateway server
+Run `go build; go run .` to build and run the API Gateway server.
+
+To check if the server is running, hit the following GET endpoint
+`"http://0.0.0.0:4200/ping"`
+
+It should reply with the message :
+
+```
+{
+    "message": "pong"
+}
+```
 
 #### 2. Start Consul <a name="step2"></a>
 
@@ -269,7 +303,27 @@ Send a post request to `0.0.0.0:4200`. Let's say we want to register the Asset S
 
 A response with the API Key and Status will be recieved.
 
-#### 6. Update your service <a name="step6"></a>
+#### 6. Sending requests <a name="step6"></a>
+
+Send a POST or GET requests to the "/{serviceName}/{path}", in this case `http://localhost:4200/AssetManagement/newAsset` endpoint, for example:
+
+```
+curl -X POST -H "Content-Type: application/json"
+-d '{
+  "ID": "2",
+  "Name": "Google",
+  "Market": "US"
+}'
+"http://localhost:4200/AssetManagement/newAsset"
+```
+
+Now try quering the info,
+
+```
+curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
+```
+
+#### 7. Update your service <a name="step7"></a>
 
 This step can actually be done anytime after registration but placing it here made sense.
 
@@ -327,62 +381,6 @@ With the above updated blank IDL, we try sending a request now, and but it will 
 In MongoDB we can notice the updated changes.
 
 A provision for getting back information for an Admin has not yet been implemented due to time constraints of the project. But it would certainly be a great feature to have.
-
-**Step 1:**
-
-Initialise the Hertz Server using the command: `go run .` from the respective directory
-
-To check if the server is running, hit the following GET endpoint
-`"http://localhost:4200/ping"`
-
-It should reply with the message :
-
-```
-{
-    "message": "pong"
-}
-```
-
-1. Asset Management
-
-##### Public endpoints:
-
-- (POST) `/AssetManagement/newAsset` which maps to the private "insertAsset" endpoint of the service
-- (GET) `/AssetManagement/getAsset` which maps to the private "queryAsset" endpoint of the service
-
-2. User Service
-
-##### Public endpoints:
-
-- (POST) `/UserService/newUser` which maps to the "insertUser" endpoint of the service
-- (POST) ` / UserService/insertUser` which also maps to the same "insertUser" endpoint of the service
-- (GET) `/AssetManagement/getUser` which maps to the private "queryUser" endpoint of the service
-
-The expected data for the above endpoints is provided below in Step 4.
-
-Once initialised they are automatically connected to consul, for example :
-
-**Step 4:**
-
-Send a POST or GET requests to the "/{serviceName}/{path}", in this case `http://localhost:4200/AssetManagement/newAsset` endpoint, for example:
-
-#### Asset Management
-
-```
-curl -X POST -H "Content-Type: application/json"
--d '{
-  "ID": "2",
-  "Name": "Google",
-  "Market": "US"
-}'
-"http://localhost:4200/AssetManagement/newAsset"
-```
-
-Now try quering the info,
-
-```
-curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
-```
 
 ## Performance
 
