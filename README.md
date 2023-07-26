@@ -17,7 +17,7 @@ This is the repository for the ByteDance and Tiktok Orbital 2023.
    6. [Updating Data](#step6)
    7. [Send requests](#step7)
 5. [Performance](#perf)
-6. [Limitations and assumptions](#limit)
+6. [Limitations](#limit)
 7. [What Else?](#misc)
 
 ## About <a name="about"></a>
@@ -222,15 +222,21 @@ It should reply with the message :
 }
 ```
 
+<a href="#top">Back to top</a>
+
 #### 2. Start Consul <a name="step2"></a>
 
 Assuming Consul is already installed, run `consul agent -dev`. This will start Consul on `localhost:8500` with a beautiful GUI of all Services connected.
 
 ![consul](consulservicesconnection.png)
 
+<a href="#top">Back to top</a>
+
 #### 3. Start MongoDB <a name="step3"></a>
 
 Start MongoDB server on `localhost:27017`
+
+<a href="#top">Back to top</a>
 
 #### 4. Setup up Kitex with the Server utility package as mentioned above. <a name="step4"></a>
 
@@ -376,6 +382,8 @@ Now try quering the info,
 ```
 curl -X GET http://localhost:4200/AssetManagement/getAsset?ID=2
 ```
+
+<a href="#top">Back to top</a>
 
 #### 7. Update your service <a name="step7"></a>
 
