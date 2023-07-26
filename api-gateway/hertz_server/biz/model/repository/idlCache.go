@@ -1,5 +1,11 @@
 package repository
 
+// NOTE ------------------------
+
+// To update once, use the UpdateIDLcache function
+// To change implementation and use regular caching use the UpdateIDLcacheLoop function
+// This is to maintain modularity in code and handle future changes easily
+
 import (
 	"fmt"
 	"time"
@@ -22,7 +28,7 @@ const updateInterval = time.Second * 5
 // It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
 // @Returns:
 // - error: An error if any
-func updateIDLcache() error {
+func UpdateIDLcache() error {
 	// Update the admins cache
 	err := UpdateAdminCache()
 	if err != nil {
@@ -47,6 +53,8 @@ func updateIDLcache() error {
 			}
 		}
 	}
+
+	zap.L().Debug("Cached")
 	return nil
 }
 
@@ -57,7 +65,7 @@ func updateIDLcache() error {
 // - error: An error if any
 func UpdateIDLcacheLoop() error {
 	// Run the function immediately to update the cache initially
-	if err := updateIDLcache(); err != nil {
+	if err := UpdateIDLcache(); err != nil {
 		zap.L().Error("Error updating IDL cache.", zap.Error(err))
 	}
 
@@ -69,7 +77,7 @@ func UpdateIDLcacheLoop() error {
 		select {
 		case <-ticker.C:
 			// zap.L().Info("IDL Mappings", zap.Any("IDL Mappings", IDLMappings))
-			if err := updateIDLcache(); err != nil {
+			if err := UpdateIDLcache(); err != nil {
 				zap.L().Error("Error updating IDL cache.", zap.Error(err))
 			}
 			// else {

@@ -17,6 +17,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// Define master api key for testing purposees only
+const MASTERAPIKEY = "masterapikey"
+
 // Utility Function to check if ownerID is already registered in the database
 // @Params:
 // - ownerId: string - The owner ID to check
@@ -39,6 +42,13 @@ func ownerIdExists(ownerId string) bool {
 // @Returns:
 // - bool: true if valid, false otherwise
 func apiKeyValid(apiKey string, ownerId string) bool {
+
+	// Temporary implementation to accept master key for easy testing
+	// TODO: Remove on final code
+	if apiKey == MASTERAPIKEY {
+		return true
+	}
+	// ----------
 	adminConfig, err := repository.GetAdminInfoByID(ownerId)
 	if err != nil {
 		zap.L().Error("Admin config not found: ", zap.Error(err))
