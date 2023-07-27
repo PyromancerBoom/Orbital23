@@ -8,9 +8,12 @@ import (
 
 // Struct to Unmarshal json in
 type Settings struct {
-	ServerPort string `json:"serverPort"`
-	TTL        int    `json:"timeToLift"`
-	TTD        int    `json:"timeToDie"`
+	ServerPort   string `json:"serverPort"`
+	MasterApiKey string `json:"maskerKey"`
+
+	ConsulAddress string `json:"consulAddress"`
+	TTL           int    `json:"timeToLift"`
+	TTD           int    `json:"timeToDie"`
 
 	DbUrl                 string `json:"dbUrl"`
 	DbName                string `json:"dbName"`

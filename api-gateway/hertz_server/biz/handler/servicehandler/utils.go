@@ -30,20 +30,31 @@ var (
 	registryResolver discovery.Resolver
 	err              error
 	consulClient     *consul.Client
-	serverSettings   = settings.GetSettings()
+	serverSettings   settings.Settings
 
-	ttl        = time.Duration(serverSettings.TTL) * time.Second
-	ttd        = time.Duration(serverSettings.TTD) * time.Second
-	consulAddr = "127.0.0.1:8500"
-)
-
-const (
+	ttl        time.Duration
+	ttd        time.Duration
+	consulAddr string
 
 	// Define master api key for testing purposees only
-	MASTERAPIKEY = "master_api_key_uuid"
+	MASTERAPIKEY string
 )
 
 func init() {
+
+	err := settings.InitialiseSettings("serverconfig.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	serverSettings = settings.GetSettings()
+
+	ttl = time.Duration(serverSettings.TTD) * time.Second
+	ttd = time.Duration(serverSettings.TTD) * time.Second
+	consulAddr = serverSettings.ConsulAddress
+
+	MASTERAPIKEY = serverSettings.MasterApiKey
+
 	// Get registry to enable resolving serverIDs
 	registryResolver, err = consul_kitex.NewConsulResolver(consulAddr)
 	if err != nil {

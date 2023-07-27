@@ -1,7 +1,9 @@
 {
     "serverPort" : "4200",
+    "maskerKey" : "master_api_key_uuid",
 
-    "timeToLift": 30,
+    "consulAddress" : "127.0.0.1:8500",
+    "timeToLift": 45,
     "timeToDie": 90,
 
 
