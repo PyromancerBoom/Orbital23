@@ -13,7 +13,6 @@ require (
 	github.com/kitex-contrib/registry-consul v0.0.0-20230406075225-7d341f036654
 	go.mongodb.org/mongo-driver v1.12.0
 	go.uber.org/zap v1.24.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -73,4 +72,5 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/genproto v0.0.0-20210513213006-bf773b8c8384 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

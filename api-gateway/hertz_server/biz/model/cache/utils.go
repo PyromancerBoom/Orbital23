@@ -21,5 +21,10 @@ func UpdateCache() error {
 		return err
 	}
 
+	err = updatePathMaskCache()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

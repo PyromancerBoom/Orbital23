@@ -17,11 +17,8 @@ import (
 
 	"go.uber.org/zap"
 
-	client "github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
-	genericClient "github.com/cloudwego/kitex/client/genericclient"
 	"github.com/cloudwego/kitex/pkg/discovery"
-	"github.com/cloudwego/kitex/pkg/generic"
 
 	cache "api-gateway/hertz_server/biz/model/cache"
 )
@@ -72,45 +69,24 @@ func ProcessPostRequest(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// Checking if service and method are valid
-	value, err := cache.GetServiceDetails(serviceName, path)
-	if err != nil {
-		zap.L().Error("Error while getting service", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-	zap.L().Info("Checked that service and method are valid")
-	// Print the service using zap
-	zap.L().Info("Service: ", zap.Any("Details: ", value))
-
-	// provider initialisation
-	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-	zap.L().Info("Provider initialised")
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(resolver))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
 	jsonString := string(reqBody)
+
+	//This throws an error if the serviceName and path does not exist.
+	genClient, err := cache.GetGenericClient(serviceName, path)
+	if err != nil {
+		zap.L().Error("Error in fetching client", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
+
+	methodName, err := cache.GetExposedMethodFromPath(path)
+	if err != nil {
+		zap.L().Error("Error fetching method name.", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
 
 	// Make generic Call and get back response
 	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
+	response, err := genClient.GenericCall(ctx, methodName, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
@@ -140,33 +116,10 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	serviceName := c.Param("serviceName")
 	path := c.Param("path")
 
-	// Checking if service and method are valid
-	value, err := cache.GetServiceDetails(serviceName, path)
+	//This throws an error if the serviceName and path does not exist.
+	genClient, err := cache.GetGenericClient(serviceName, path)
 	if err != nil {
-		zap.L().Error("Error while getting service", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
-
-	// Provider initialisation
-	provider, err := generic.NewThriftContentProvider(value.IDL, nil)
-	if err != nil {
-		zap.L().Error("Error while initializing provider", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	thriftGeneric, err := generic.JSONThriftGeneric(provider)
-	if err != nil {
-		zap.L().Error("Error while creating JSONThriftGeneric", zap.Error(err))
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
-	}
-
-	// Fetch hostport from registry later
-	genClient, err := genericClient.NewClient(serviceName, thriftGeneric,
-		client.WithResolver(resolver))
-	if err != nil {
-		zap.L().Error("Error while initializing generic client", zap.Error(err))
+		zap.L().Error("Error in fetching client", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
 
@@ -177,7 +130,6 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	queryParams.VisitAll(func(key, value []byte) {
 		params[string(key)] = string(value)
 	})
-
 	zap.L().Info("QueryArgs fetched", zap.Any("Params: ", params))
 
 	// Make Json string from request
@@ -188,19 +140,19 @@ func ProcessGetRequest(ctx context.Context, c *app.RequestContext) {
 	}
 	jsonString := string(jsonBytes)
 
+	methodName, err := cache.GetExposedMethodFromPath(path)
+	if err != nil {
+		zap.L().Error("Error fetching method name.", zap.Error(err))
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
+
 	// Make generic Call and get back response using WithRPC Timeout
 	zap.L().Info("Making generic Call and getting back response")
-	response, err := genClient.GenericCall(ctx, value.Method, jsonString, options...)
+	response, err := genClient.GenericCall(ctx, methodName, jsonString, options...)
 	if err != nil {
 		zap.L().Error("Error while making generic call", zap.Error(err))
 		c.String(consts.StatusInternalServerError, err.Error())
 	}
-
-	// response, err := genClient.GenericCall(ctx, value.Method, jsonString)
-	// if err != nil {
-	// 	zap.L().Error("Error while making generic call", zap.Error(err))
-	// 	c.String(consts.StatusInternalServerError, err.Error())
-	// }
 
 	c.String(consts.StatusOK, response.(string))
 	zap.L().Info("(GET) Execution complete")

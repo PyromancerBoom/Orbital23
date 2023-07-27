@@ -15,8 +15,9 @@ import (
 
 // ServiceDetails represents the details of the service, including IDL.
 type ServiceDetails struct {
-	Method string
-	IDL    string
+	ServiceName string
+	Method      string
+	IDL         string
 }
 
 // HashMap of ServiceName+Path: IDL
@@ -39,8 +40,9 @@ func updateIDLcache() error {
 				key := fmt.Sprintf("%s+%s", service.ServiceName, path.MethodPath)
 				// Populate the IDLMappings map with ServiceDetails
 				idlMappings[key] = ServiceDetails{
-					Method: path.ExposedMethod,
-					IDL:    service.IdlContent,
+					ServiceName: service.ServiceName,
+					Method:      path.ExposedMethod,
+					IDL:         service.IdlContent,
 				}
 			}
 		}

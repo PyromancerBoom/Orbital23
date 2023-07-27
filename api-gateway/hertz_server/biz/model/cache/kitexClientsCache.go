@@ -28,7 +28,7 @@ func updateKitexClientsCache() error {
 		zap.L().Error("Error while getting registry", zap.Error(err))
 	}
 
-	// Loop through all key value pair in the idlMapping
+	// Loop through all key-value pairs in the idlMapping
 	for keyName, serviceDetails := range idlMappings {
 
 		// provider initialisation
@@ -44,8 +44,7 @@ func updateKitexClientsCache() error {
 			return err
 		}
 
-		// Fetch hostport from registry later
-		kitexGenClient, err := genericClient.NewClient(keyName, thriftGeneric, client.WithResolver(registry))
+		kitexGenClient, err := genericClient.NewClient(serviceDetails.ServiceName, thriftGeneric, client.WithResolver(registry))
 		if err != nil {
 			zap.L().Error("Error while initializing generic client", zap.Error(err))
 			return err
