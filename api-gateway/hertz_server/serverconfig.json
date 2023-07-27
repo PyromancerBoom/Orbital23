@@ -1,0 +1,15 @@
+{
+    "serverPort" : "4200",
+
+    "timeToLift": 30,
+    "timeToDie": 90,
+
+
+    "dbUrl": "mongodb://localhost:27017",
+    "dbName": "api_gateway_db",
+    "dbCollectionName" : "admin_services",
+    "dbPingInterval": 30,
+    "dbFailedPingInterval": 5,
+    "dbMaxPingFailDuration": 180
+
+}

@@ -13,6 +13,7 @@ This package contains utility methods for the servicehandler package.
 
 import (
 	repository "api-gateway/hertz_server/biz/model/repository"
+	"api-gateway/hertz_server/biz/model/settings"
 	"fmt"
 	"log"
 	"net"
@@ -29,12 +30,14 @@ var (
 	registryResolver discovery.Resolver
 	err              error
 	consulClient     *consul.Client
+	serverSettings   = settings.GetSettings()
+
+	ttl        = time.Duration(serverSettings.TTL) * time.Second
+	ttd        = time.Duration(serverSettings.TTD) * time.Second
+	consulAddr = "127.0.0.1:8500"
 )
 
 const (
-	ttl        = 10 * time.Second
-	ttd        = 6 * ttl
-	consulAddr = "127.0.0.1:8500"
 
 	// Define master api key for testing purposees only
 	MASTERAPIKEY = "master_api_key_uuid"
