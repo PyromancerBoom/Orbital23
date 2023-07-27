@@ -1,24 +1,14 @@
-package server_utils
+package main
 
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 	"time"
-)
-
-const (
-	// For Dockerised services on localhost
-	// gatewayAddress = "http://host.docker.internal:4200"
-
-	// For services on LocalHost
-	gatewayAddress = "http://0.0.0.0:4200"
-
-	// Absolute URL for gatewayAddress can be updated and abstracted in the package
-	// during production
 )
 
 type UpdateHealthRequest struct {
@@ -33,26 +23,13 @@ type GatewayClient struct {
 }
 
 type ConnectRequest struct {
-	ApiKey      string `json:"Apikey"`
+	ApiKey      string `json:"ApiKey"`
 	ServiceName string `json:"ServiceName"`
 	Address     string `json:"ServerAddress"`
 	Port        string `json:"ServerPort"`
 }
 
-// Make a client to api gateway with api key, and service name
-// @Params
-//   - apikey: string
-//   - serviceName: string
-//
-// @Returns
-//   - GatewayClient
-func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
-	// If API Key and Service Name are blank or have whitespaces, return an error on console
-	if strings.TrimSpace(apikey) == "" || strings.TrimSpace(serviceName) == "" {
-		log.Println("API Key and Service Name cannot be blank")
-		return nil
-	}
-
+func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
 	return &GatewayClient{
 		ApiKey:         apikey,
 		ServiceName:    serviceName,
@@ -60,37 +37,24 @@ func NewGatewayClient(apikey string, serviceName string) *GatewayClient {
 	}
 }
 
-// Connects to the api gateway and returns the server id
-// @Params
-//   - serverAddress: string
-//   - serverPort: string
-//
-// @Returns
-//   - serverID: string
-//   - error if any
+// Connect server to gateway
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
-	// Construct the URL for the connect request
 	url := client.GatewayAddress + "/connect"
 
-	// Create a new ConnectRequest object with the specified parameters
 	req := &ConnectRequest{ApiKey: client.ApiKey, ServiceName: client.ServiceName, Address: serverAddress, Port: serverPort}
 
-	// Marshal the ConnectRequest object into JSON
 	b, err := json.Marshal(req)
 	if err != nil {
 		return "", err
 	}
 
-	// Create a new HTTP request with the JSON payload
 	r, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
 	if err != nil {
 		return "", err
 	}
 
-	// Set the Content-Type header to application/json
 	r.Header.Add("Content-Type", "application/json")
 
-	// Send the HTTP request and get the response
 	httpCli := &http.Client{}
 	res, err := httpCli.Do(r)
 	if err != nil {
@@ -99,7 +63,6 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 
 	defer res.Body.Close()
 
-	// Read the response body into a byte array
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return "", err
@@ -107,23 +70,20 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 
 	j := make(map[string]json.RawMessage)
 
-	// Unmarshal JSON into a map[string]json.RawMessage
+	// unmarschal JSON
 	e := json.Unmarshal(body, &j)
 	if e != nil {
 		return "", err
 	}
 
-	// Extract the ServerID field from the JSON response and return it as a string
+	if string(j["ServerID"]) == "" || string(j["Status"]) == "failed" {
+		return "", errors.New("Error connecting to gateway. Message from gateway: " + string(j["Message"]))
+	}
+
 	return strings.Trim(string(j["ServerID"]), "\""), nil
 }
 
 // Declares that server instance is healthy
-// @Params
-//   - serverID: string
-//
-// @Returns
-//   - nil
-//   - error if any
 func (client *GatewayClient) updateHealth(serverID string) error {
 
 	url := client.GatewayAddress + "/health"
@@ -163,12 +123,6 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 }
 
 // Keeps declaring server instance is healthy
-// @Params
-//   - id: string
-//   - timeBetweenLoops: int
-//
-// @Returns
-//   - nil
 func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
 	ticker := time.NewTicker(time.Duration(timeBetweenLoops) * time.Second)
 	for {
@@ -178,7 +132,6 @@ func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
 			if err != nil {
 				// Log the error and continue with the health check loop
 				log.Println("Error updating health:", err)
-				log.Println("Trying to reconnect")
 			}
 		}
 	}
