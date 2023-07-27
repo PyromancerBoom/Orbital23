@@ -460,6 +460,15 @@ A provision for getting back information for an Admin has not yet been implement
 
 #### Current Performance <a name="currentperf"></a>
 
+On Load testing with Apache JMeter, we were abe to get the following benchmarks
+
+![performance1](perf-50users-final.png)
+3 instances of AssetManagement, 1 registry proxy server (for proxied health checks)
+
+- Users : 50
+- Total time: 3 mins
+- Ramp up time : 1sec
+
 #### MVP Performance : <a name="mvpperf"></a>
 
 On Load testing with Postman, we were able to have the following benchmarks:
