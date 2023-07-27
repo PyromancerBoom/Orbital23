@@ -1,8 +1,12 @@
 {
     "apikey": "master_api_key_uuid",
     "ServiceName": "AssetManagement",
-    "url": "0.0.0.0",
-    "port": "8080",
+    "dockerUrl": "0.0.0.0",
+    "dockerPort": "8080",
     "env": "Stage",
-    "serviceurl": "localhost" 
+    "serviceurl": "localhost",
+    "serverPort": "5894", 
+    "IsDockerised": false,
+    "healthCheckFrequency": 15,
+    "gatewayAddress": "http://0.0.0.0:4200"
 }

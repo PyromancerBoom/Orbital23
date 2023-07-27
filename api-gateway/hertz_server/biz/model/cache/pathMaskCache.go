@@ -30,7 +30,7 @@ func updatePathMaskCache() error {
 		}
 	}
 
-	zap.L().Debug("Cached IDLs.")
+	zap.L().Debug("Cached Path Masks.")
 	return nil
 }
 

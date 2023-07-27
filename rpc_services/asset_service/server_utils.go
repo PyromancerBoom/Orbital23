@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,7 +23,7 @@ type GatewayClient struct {
 }
 
 type ConnectRequest struct {
-	ApiKey      string `json:"Apikey"`
+	ApiKey      string `json:"ApiKey"`
 	ServiceName string `json:"ServiceName"`
 	Address     string `json:"ServerAddress"`
 	Port        string `json:"ServerPort"`
@@ -36,6 +37,7 @@ func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) 
 	}
 }
 
+// Connect server to gateway
 func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
 	url := client.GatewayAddress + "/connect"
 
@@ -72,6 +74,10 @@ func (client *GatewayClient) connectServer(serverAddress string, serverPort stri
 	e := json.Unmarshal(body, &j)
 	if e != nil {
 		return "", err
+	}
+
+	if string(j["ServerID"]) == "" || string(j["Status"]) == "failed" {
+		return "", errors.New("Error connecting to gateway. Message from gateway: " + string(j["Message"]))
 	}
 
 	return strings.Trim(string(j["ServerID"]), "\""), nil

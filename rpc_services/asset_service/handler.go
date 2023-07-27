@@ -43,6 +43,8 @@ func (s *AssetManagementImpl) QueryAsset(ctx context.Context, req *asset_managem
 		Market: "Static Market",
 	}
 
+	println("Query asset.")
+
 	return resp, nil
 }
 

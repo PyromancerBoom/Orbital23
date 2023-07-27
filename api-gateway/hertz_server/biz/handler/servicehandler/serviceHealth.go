@@ -1,15 +1,16 @@
 package servicehandler
 
 import (
+	"api-gateway/hertz_server/biz/model/cache"
+	"bytes"
 	"context"
-	"fmt"
 	"time"
 
-	consul "github.com/hashicorp/consul/api"
 	"go.uber.org/zap"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/client/callopt"
 )
 
 type HealthRequest struct {
@@ -17,65 +18,91 @@ type HealthRequest struct {
 	ApiKey   string `json:"ApiKey"`
 }
 
-var consulClient *consul.Client
-
-func init() {
-	var err error
-	consulClient, err = consul.NewClient(&consul.Config{})
-	if err != nil {
-		zap.L().Error("Failed to create consul client", zap.Error(err))
-	}
-}
-
 // HealthCheck is the handler for health check requests
 // @Route = /health
 func HealthCheck(ctx context.Context, c *app.RequestContext) {
+
+	serverIsHealthy, err := checkIfServiceHealthy("RegistryProxy")
+	if err != nil {
+		zap.L().Warn(err.Error())
+	}
+
+	//even if we get an error from checking server health, we can still deal with it by trying to perform health request by the gateway itself
+	if (err != nil) || (!serverIsHealthy) {
+		zap.L().Info("Performing health check request.")
+		performHealthCheckRequest(ctx, c)
+	} else {
+		zap.L().Info("Proxying health check request.")
+		proxyHealthCheckRequst(ctx, c)
+	}
+
+}
+
+func proxyHealthCheckRequst(ctx context.Context, c *app.RequestContext) {
+	reqBody, err := c.Body()
+
+	if err != nil {
+		zap.L().Error("Error while getting request body", zap.Error(err))
+		c.String(consts.StatusBadRequest, "Request body is missing.")
+		return
+	}
+
+	trimmedReqBody := bytes.TrimSpace(reqBody)
+	if len(trimmedReqBody) == 0 {
+		zap.L().Warn("Request body is empty")
+		c.String(consts.StatusBadRequest, "Request body is empty.")
+		return
+	}
+
+	jsonString := string(reqBody)
+
+	genClient, err := cache.GetGenericClient("RegistryProxy", "healthCheckServer")
+	if err != nil {
+		zap.L().Error(err.Error())
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response, err := genClient.GenericCall(ctx, "healthCheckServer", jsonString, callopt.WithRPCTimeout(5*time.Second))
+	if err != nil {
+		zap.L().Error("Error while making generic call", zap.Error(err))
+
+		if err.Error() == "service discovery error: no service found" {
+			c.String(consts.StatusInternalServerError, "Server connection services are currently down.")
+		} else {
+			c.String(consts.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	c.String(consts.StatusOK, response.(string))
+}
+
+func performHealthCheckRequest(ctx context.Context, c *app.RequestContext) {
 	var req HealthRequest
 	err := c.BindAndValidate(&req)
 	if err != nil {
+		zap.L().Error(err.Error())
 		c.String(consts.StatusExpectationFailed, "Invalid Request.")
 		return
 	}
 
-	// Not required. Health checks need only be done for authorised connected servers
 	if !authoriseHealthCheckRight(req.ApiKey, req.ServerID) {
+		zap.L().Info("Server " + req.ServerID + "Unauthorized.")
 		c.String(consts.StatusUnauthorized, "Unauthorized.")
 		return
 	}
 
-	err2 := updateAsHealthy(req.ServerID)
-	if err2 != nil {
+	err = updateAsHealthy(req.ServerID)
+	if err != nil {
+		zap.L().Error(err.Error())
 		c.String(consts.StatusInternalServerError, "Unable to process health update request.")
 		return
 	}
 
 	res := make(map[string]string)
 	res["Status"] = "status OK"
-	res["Message"] = "Successfully Updated the healh of server"
+	res["Message"] = "Successfully Updated the heatlh of server"
 
 	c.JSON(consts.StatusOK, res)
-}
-
-// Updates a service as Healthy
-// @Params
-// checkID: The ID of the service to be updated
-// @Returns
-// error: If any error occurs while updating the service
-func updateAsHealthy(checkID string) error {
-	maxRetry := 10
-	for retry := 0; retry < maxRetry; retry++ {
-		err := consulClient.Agent().UpdateTTL(checkID, "online", consul.HealthPassing)
-		if err == nil {
-			return nil // Health update successful
-		}
-
-		zap.L().Error("Failed to update health. Retrying health update in 5 seconds...", zap.Error(err))
-		time.Sleep(5 * time.Second)
-	}
-	return fmt.Errorf("failed to update health after %d retries", maxRetry)
-}
-
-// Mocked
-func authoriseHealthCheckRight(apiKey string, serverID string) bool {
-	return true
 }

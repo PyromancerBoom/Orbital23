@@ -6,15 +6,20 @@ import (
 	"io/ioutil"
 	"net"
 	"strconv"
+	"strings"
 )
 
 type Configuration struct {
-	Apikey      string `json:"apikey"`
-	ServiceName string `json:"servicename"`
-	URL         string `json:"url"`
-	Port        string `json:"port"`
-	Env         string `json:"env"`
-	ServiceURL  string `json:"serviceurl"`
+	Apikey               string `json:"apikey"`
+	ServiceName          string `json:"servicename"`
+	DockerUrl            string `json:"dockerUrl"`
+	DockerPort           string `json:"dockerPort"`
+	Env                  string `json:"env"`
+	ServiceURL           string `json:"serviceurl"`
+	ServerPort           string `json:"serverPort"`
+	HealthCheckFrequency int    `json:"healthCheckFrequency"`
+	IsDockerised         bool   `json:"isDockerised"`
+	GatewayAddress       string `json:"gatewayAddress"`
 }
 
 func LoadConfiguration(filename string) (Configuration, error) {
@@ -54,4 +59,15 @@ func GetFreePort() (port int, err error) {
 		}
 	}
 	return
+}
+
+// Make an address from address and port
+func MakeAddress(address string, port string) (*net.TCPAddr, error) {
+	a := strings.TrimSpace(address) + ":" + strings.TrimSpace(port)
+
+	addr, err := net.ResolveTCPAddr("tcp", a)
+	if err != nil {
+		return nil, err
+	}
+	return addr, nil
 }
