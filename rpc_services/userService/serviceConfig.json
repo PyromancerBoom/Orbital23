@@ -7,6 +7,6 @@
     "serviceurl": "localhost",
     "serverPort": "0", 
     "IsDockerised": false,
-    "healthCheckFrequency": 15,
+    "healthCheckFrequency": 5,
     "gatewayAddress": "http://0.0.0.0:4200"
 }

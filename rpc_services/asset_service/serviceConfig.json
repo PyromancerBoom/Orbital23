@@ -5,7 +5,7 @@
     "dockerPort": "8080",
     "env": "Stage",
     "serviceurl": "localhost",
-    "serverPort": "5894", 
+    "serverPort": "0", 
     "IsDockerised": false,
     "healthCheckFrequency": 15,
     "gatewayAddress": "http://0.0.0.0:4200"

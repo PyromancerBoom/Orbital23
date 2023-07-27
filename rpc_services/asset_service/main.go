@@ -57,6 +57,7 @@ func main() {
 		if kitexerr != nil {
 			log.Println(kitexerr.Error())
 		}
+
 	} else {
 
 		// --------------------- Server is hosted in docker ---------------------
