@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	settings, err := LoadSettings("settings.json")
+	settings, err := LoadSettings("serviceConfig.json")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
