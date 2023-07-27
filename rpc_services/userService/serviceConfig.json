@@ -1,0 +1,12 @@
+{
+    "apikey": "master_api_key_uuid",
+    "ServiceName": "UserService",
+    "dockerUrl": "0.0.0.0",
+    "dockerPort": "8080",
+    "env": "Stage",
+    "serviceurl": "localhost",
+    "serverPort": "0", 
+    "IsDockerised": false,
+    "healthCheckFrequency": 15,
+    "gatewayAddress": "http://0.0.0.0:4200"
+}

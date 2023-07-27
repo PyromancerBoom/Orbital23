@@ -36,7 +36,7 @@ func (s *UserServiceImpl) QueryUser(ctx context.Context, req *userservice.QueryU
 		ID:    "100",
 		Name:  "John NOT Doe",
 		Email: "John doe's fancy email",
-		Age:   "200",
+		Age:   200,
 	}, nil
 
 }
