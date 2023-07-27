@@ -1,15 +1,7 @@
 package cache
 
-// NOTE ------------------------
-
-// To update once, use the UpdateIDLcache function
-// To change implementation and use regular caching use the UpdateIDLcacheLoop function
-// This is to maintain modularity in code and handle future changes easily
-
 import (
 	"fmt"
-	"time"
-
 	"go.uber.org/zap"
 )
 
@@ -52,35 +44,6 @@ func updateIDLcache() error {
 	return nil
 }
 
-// UpdateIDLcacheLoop calls the updateIDLcache in a loop concurrently to keep updating
-// the IDL Mappings in an interval (updateInterval)
-// It fetches data from the AdminsCache and stores service names and their corresponding IDL content.
-// @Returns:
-// - error: An error if any
-func UpdateIDLcacheLoop(updateInterval time.Duration) error {
-	// Run the function immediately to update the cache initially
-	if err := updateIDLcache(); err != nil {
-		zap.L().Error("Error updating IDL cache.", zap.Error(err))
-	}
-
-	// Run the function in a loop at the specified interval
-	ticker := time.NewTicker(updateInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ticker.C:
-			// zap.L().Info("IDL Mappings", zap.Any("IDL Mappings", IDLMappings))
-			if err := updateAdminCache(); err != nil {
-				zap.L().Error("Error updating IDL cache.", zap.Error(err))
-			}
-			// else {
-			// 	zap.L().Debug("Cached")
-			// }
-		}
-	}
-}
-
 // GetServiceDetails retrieves the complete ServiceDetails struct for a given service name and path from the IDLMappings cache.
 // If the service name and path combination is not found in the cache, it returns an error.
 // @Params:
@@ -101,22 +64,3 @@ func GetServiceDetails(serviceName string, path string) (ServiceDetails, error) 
 
 	return idlDetails, nil
 }
-
-// GetServiceIDL retrieves the IDL content for a given service name from the IDLMappings cache.
-// If the service name is not found in the cache, it returns an error.
-// @Params:
-// - serviceName: string - The name of the service for which to retrieve the IDL content.
-// @Returns:
-// - string: The IDL content for the specified service name.
-// - error: An error if the service name does not exist in the cache.
-// func GetServiceIDL(serviceName string) (string, error) {
-// 	idlstring, ok := IDLMappings[serviceName]
-
-// 	// Throw an error if the IDL file is not found.
-// 	if !ok {
-// 		zap.L().Error("The service does not exist.", zap.String("serviceName", serviceName))
-// 		return "", errors.New("The service does not exist.")
-// 	}
-
-// 	return idlstring, nil
-// }

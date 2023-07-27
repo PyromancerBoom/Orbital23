@@ -39,7 +39,7 @@ func updatePathMaskCache() error {
 // @Params:
 // - methodPath: string - The masked method path.
 // @Returns:
-// - string: Name of the exposed method.
+// - string: Name of the actual method.
 // - error: An error if the given methodPath does not exist.
 func GetExposedMethodFromPath(methodPath string) (string, error) {
 	methodName, ok := pathCache[methodPath]
