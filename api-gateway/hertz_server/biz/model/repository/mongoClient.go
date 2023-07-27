@@ -19,8 +19,10 @@ package repository
 */
 
 import (
+	"api-gateway/hertz_server/biz/model/settings"
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -30,9 +32,23 @@ import (
 
 var (
 	Client          *mongo.Client
-	db_name         string = "api_gateway_db"
-	collection_name string = "admin_services"
+	serverSettings  settings.Settings
+	db_name         string
+	collection_name string
+	db_url          string
 )
+
+func init() {
+	err := settings.InitialiseSettings("serverconfig.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	serverSettings = settings.GetSettings()
+	db_name = serverSettings.DbName
+	collection_name = serverSettings.DbColletionName
+	db_url = serverSettings.DbUrl
+}
 
 // Establishes connection to MongoDB
 // @Params:
@@ -40,7 +56,7 @@ var (
 // @Returns:
 // - error: An error if any
 func ConnectToMongoDB() error {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI(db_url)
 	c, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		zap.L().Error("Failed to connect to MongoDB", zap.Error(err))
@@ -74,9 +90,9 @@ func CloseMongoDB() error {
 // Perform MongoDB health check by pinging the server every 30 sec normally.
 // If health check fails, ping every 5 seconds until MongoDB server comes back online.
 func MongoHealthCheck() {
-	normalPingInterval := 30 * time.Second
-	failedPingInterval := 5 * time.Second
-	maxFailedPingDuration := 3 * time.Minute
+	normalPingInterval := time.Duration(serverSettings.DbPingInterval) * time.Second
+	failedPingInterval := time.Duration(serverSettings.DbFailedPingInterval) * time.Second
+	maxFailedPingDuration := time.Duration(serverSettings.DbMaxFailPingDuration) * time.Minute
 
 	ticker := time.NewTicker(normalPingInterval)
 	pingInterval := normalPingInterval
