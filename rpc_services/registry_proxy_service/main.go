@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	registry_proxy_service "registry_proxy/kitex_gen/registry_proxy_service/registryproxy"
-	"strconv"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/limit"
@@ -16,12 +14,26 @@ import (
 
 func main() {
 
-	r, err := consul.NewConsulRegister("127.0.0.1:8500")
+	settings, err := LoadSettings("settings.json")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	r, err := consul.NewConsulRegister(settings.ConsulAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	addr := getAddr()
+	//if the port is set to 0, get a random port.
+	var addr *net.TCPAddr
+	if settings.ServerPort == "0" {
+		addr = getAddr() // Function in utils.go
+	} else {
+		addr, err = MakeAddress("127.0.0.1", settings.ServerPort) // Function in utils.go
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
 
 	svr := registry_proxy_service.NewServer(
 		new(RegistryProxyImpl),
@@ -40,30 +52,4 @@ func main() {
 	if err != nil {
 		log.Println(err.Error())
 	}
-}
-
-func getAddr() *net.TCPAddr {
-
-	port, _ := GetFreePort()
-
-	a := "127.0.0.1:" + strconv.Itoa(port)
-
-	addr, err := net.ResolveTCPAddr("tcp", a)
-	if err != nil {
-		fmt.Println("Error occured." + err.Error() + "Retrying")
-		return getAddr()
-	}
-	return addr
-}
-
-func GetFreePort() (port int, err error) {
-	var a *net.TCPAddr
-	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
-		var l *net.TCPListener
-		if l, err = net.ListenTCP("tcp", a); err == nil {
-			defer l.Close()
-			return l.Addr().(*net.TCPAddr).Port, nil
-		}
-	}
-	return
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	consul "github.com/hashicorp/consul/api"
@@ -94,4 +95,41 @@ func updateAsHealthy(checkID string) error {
 		time.Sleep(5 * time.Second)
 	}
 	return fmt.Errorf("failed to update health after %d retries", maxRetry)
+}
+
+func getAddr() *net.TCPAddr {
+
+	port, _ := GetFreePort()
+
+	a := "127.0.0.1:" + strconv.Itoa(port)
+
+	addr, err := net.ResolveTCPAddr("tcp", a)
+	if err != nil {
+		fmt.Println("Error occured." + err.Error() + "Retrying")
+		return getAddr()
+	}
+	return addr
+}
+
+func GetFreePort() (port int, err error) {
+	var a *net.TCPAddr
+	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
+		var l *net.TCPListener
+		if l, err = net.ListenTCP("tcp", a); err == nil {
+			defer l.Close()
+			return l.Addr().(*net.TCPAddr).Port, nil
+		}
+	}
+	return
+}
+
+// Make an address from address and port
+func MakeAddress(address string, port string) (*net.TCPAddr, error) {
+	a := strings.TrimSpace(address) + ":" + strings.TrimSpace(port)
+
+	addr, err := net.ResolveTCPAddr("tcp", a)
+	if err != nil {
+		return nil, err
+	}
+	return addr, nil
 }
