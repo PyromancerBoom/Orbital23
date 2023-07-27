@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"api-gateway/hertz_server/biz/model/settings"
 	"errors"
 
 	"github.com/cloudwego/kitex/client"
@@ -23,7 +24,7 @@ func updateKitexClientsCache() error {
 	kitexGenericClientsMap = make(map[string]genericClient.Client)
 
 	// Makes a registry object to be used for all the generic clients
-	registry, err := consul.NewConsulResolver("127.0.0.1:8500")
+	registry, err := consul.NewConsulResolver(settings.GetSettings().ConsulAddress)
 	if err != nil {
 		zap.L().Error("Error while getting registry", zap.Error(err))
 	}
