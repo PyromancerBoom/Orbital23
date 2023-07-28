@@ -456,6 +456,48 @@ A provision for getting back information for an Admin has not yet been implement
 
 <a href="#top">Back to top</a>
 
+#### 8. Setup Registry Proxy Server(s) **[Optional]** <a name="step8"></a>
+
+If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from 2600 req/s to 3000 req/s. 
+
+You may setup this server by:
+
+1. Register this service in the gateway. You may do so by sending a `POST` request to `/register` endpoint as such:
+```
+[
+    {
+        "OwnerName": "XXXXX",
+        "OwnerId": "XXXXX",
+        "Services": [
+            {
+                "ServiceId": "X",
+                "ServiceName": "RegistryProxy",
+                "IdlContent": "namespace Go registy.proxy\n\nstruct ConnectRequest {\n    1: string ApiKey;\n    2: string ServiceName\n    3: string ServerAddress\n    4: string ServerPort\n}\n\nstruct ConnectResponse {\n    1: string Status;\n    2: string Message;\n    3: string ServerID;\n}\n\nstruct HealtRequest {\n    1: string ApiKey;\n    2: string ServerID;\n}\n\nstruct HealthResponse {\n    1: string Status;\n    2: string Message;\n}\n\nservice RegistryProxy {\n    ConnectResponse connectServer(1: ConnectRequest req);\n    HealthResponse healthCheckServer(1: HealtRequest req);\n}\n",
+                "Version": "1.0",
+                "ServiceDescription": "Service for proxying health checks and coneection requests",
+                "ServerCount": 0,
+                "Paths": [
+                    {
+                        "ExposedMethod": "healthCheckServer",
+                        "MethodPath": "healthCheckServer"
+                    },
+                    {
+                        "ExposedMethod": "connectServer",
+                        "MethodPath": "connectServer"
+                    }
+                ],
+                "RegisteredServers": [
+                ]
+            }
+        ]
+    }
+]
+```
+2. Booting up and instance of registry proxy from the rpc_services provided by running `go run .` in the /rpc_services/registry_proxy_service directory.
+
+<a href="#top">Back to top</a>
+
+
 ## Performance <a name="perf"></a>
 
 #### Current Performance <a name="currentperf"></a>
