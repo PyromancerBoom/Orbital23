@@ -5,6 +5,7 @@ This package contains utility methods for the servicehandler package.
 */
 
 import (
+	"api-gateway/hertz_server/biz/model/cache"
 	repository "api-gateway/hertz_server/biz/model/repository"
 	"api-gateway/hertz_server/biz/model/settings"
 	"fmt"
@@ -25,6 +26,9 @@ var (
 	consulClient     *consul.Client
 	serverSettings   settings.Settings
 
+	ttlInt int
+	ttdInt int
+
 	ttl        time.Duration
 	ttd        time.Duration
 	consulAddr string
@@ -41,6 +45,9 @@ func init() {
 	}
 
 	serverSettings = settings.GetSettings()
+
+	ttlInt = serverSettings.TTL
+	ttdInt = serverSettings.TTD
 
 	ttl = time.Duration(serverSettings.TTD) * time.Second
 	ttd = time.Duration(serverSettings.TTD) * time.Second
@@ -142,7 +149,7 @@ func checkIfServiceHealthy(serviceName string) (bool, error) {
 // 1: apikey is valid
 // and API key has a registered service with the provided name
 func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTERAPIKEY)
+	return (apiKey == MASTERAPIKEY) || cache.HasServiceAccess(apiKey, serviceName)
 }
 
 // Validates address
