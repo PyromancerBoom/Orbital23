@@ -27,15 +27,7 @@ type RegistryProxyImpl struct{}
 func (s *RegistryProxyImpl) ConnectServer(ctx context.Context, req *registry_proxy_service.ConnectRequest) (resp *registry_proxy_service.ConnectResponse, err error) {
 	// TODO: Your code here...
 
-	if !authoriseConnect(req.ApiKey, req.ServiceName) {
-
-		zap.L().Info("Unauthorized connection for server using " + req.ApiKey)
-		return &registry_proxy_service.ConnectResponse{
-			Status:   "failed",
-			Message:  "Server connection unauthorized.",
-			ServerID: "",
-		}, nil
-	}
+	//Server only proxies authorised connections, so no need for auth..
 
 	err = validateAddress(req.ServerAddress, req.ServerPort)
 	if err != nil {
@@ -50,7 +42,7 @@ func (s *RegistryProxyImpl) ConnectServer(ctx context.Context, req *registry_pro
 
 	serverId := uuid.New().String()
 
-	err = registerServer(req.ServerAddress, req.ServerPort, serverId, req.ServiceName, req.ApiKey)
+	err = registerServer(req.ServerAddress, req.ServerPort, serverId, req.ServiceName, req.ApiKey, int(req.TTL), int(req.TTD))
 	if err != nil {
 
 		zap.L().Error("Error registering server with key "+req.ApiKey, zap.Error(err))
@@ -92,6 +84,6 @@ func (s *RegistryProxyImpl) HealthCheckServer(ctx context.Context, req *registry
 
 	return &registry_proxy_service.HealthResponse{
 		Status:  "ok",
-		Message: "Successfully updated server health",
+		Message: "Successfully updated server health.",
 	}, nil
 }

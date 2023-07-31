@@ -5,6 +5,8 @@ struct ConnectRequest {
     2: string ServiceName
     3: string ServerAddress
     4: string ServerPort
+    5: i64 TTL
+    6: i64 TTD
 }
 
 struct ConnectResponse {

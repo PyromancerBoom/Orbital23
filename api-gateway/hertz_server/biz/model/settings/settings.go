@@ -26,6 +26,7 @@ type Settings struct {
 var setting Settings
 
 // Intialise settings
+// Returns error, if any
 func InitialiseSettings(filename string) error {
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -38,6 +39,7 @@ func InitialiseSettings(filename string) error {
 	return nil
 }
 
+// Returns reference to a settings object
 func GetSettings() Settings {
 	return setting
 }

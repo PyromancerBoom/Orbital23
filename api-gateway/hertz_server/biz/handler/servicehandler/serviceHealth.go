@@ -101,8 +101,8 @@ func performHealthCheckRequest(ctx context.Context, c *app.RequestContext) {
 	}
 
 	res := make(map[string]string)
-	res["Status"] = "status OK"
-	res["Message"] = "Successfully Updated the heatlh of server"
+	res["Status"] = "ok"
+	res["Message"] = "Successfully updated server health."
 
 	c.JSON(consts.StatusOK, res)
 }

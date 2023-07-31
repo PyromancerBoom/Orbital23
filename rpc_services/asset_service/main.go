@@ -25,6 +25,8 @@ func main() {
 
 	if config.IsDockerised == false {
 
+		log.Println("Is not dockerised")
+
 		// --------------------- Server is hosted in local ---------------------
 
 		//if the port is set to 0, get a random port.

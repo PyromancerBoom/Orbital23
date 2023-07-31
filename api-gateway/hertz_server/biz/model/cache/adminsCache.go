@@ -24,3 +24,17 @@ func updateAdminCache() error {
 	zap.L().Debug("Cached Admins.")
 	return nil
 }
+
+func HasServiceAccess(apiKey string, serviceName string) bool {
+	for _, admin := range adminsCache {
+		if admin.ApiKey == apiKey {
+			for _, service := range admin.Services {
+				if service.ServiceName == serviceName {
+					return true
+				}
+			}
+			return false
+		}
+	}
+	return false
+}

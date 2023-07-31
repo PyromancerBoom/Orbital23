@@ -13,27 +13,12 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 
-	consul "github.com/kitex-contrib/registry-consul"
-
 	"go.uber.org/zap"
 
 	"github.com/cloudwego/kitex/client/callopt"
-	"github.com/cloudwego/kitex/pkg/discovery"
 
 	cache "api-gateway/hertz_server/biz/model/cache"
 )
-
-var resolver discovery.Resolver
-
-// init is called during package initialization and sets up the resolver.
-func init() {
-	// Get registry to enable resolving serverIDs
-	var err error
-	resolver, err = consul.NewConsulResolver("127.0.0.1:8500")
-	if err != nil {
-		zap.L().Error("Error while getting registry", zap.Error(err))
-	}
-}
 
 // ProcessPostRequest .
 // @router /{:serviceName}/{:serviceMethod} [POST]

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -20,14 +21,6 @@ const (
 	MASTERAPIKEY = "master_api_key_uuid"
 )
 
-// Add logic here
-// Auhorize only if
-// 1: apikey is valid
-// and API key has a registered service with the provided name
-func authoriseConnect(apiKey string, serviceName string) bool {
-	return (apiKey == MASTERAPIKEY)
-}
-
 // Validates address
 func validateAddress(address string, port string) error {
 	_, err := strconv.Atoi(port)
@@ -36,20 +29,20 @@ func validateAddress(address string, port string) error {
 	}
 
 	if net.ParseIP(address) == nil {
-		return err
+		return errors.New("Invalid Address.")
 	}
 	return nil
 }
 
 // Registers the server
-func registerServer(address string, port string, serverId string, serviceName string, apikey string) error {
+func registerServer(address string, port string, serverId string, serviceName string, apikey string, ttl int, ttd int) error {
 
 	portNum, _ := strconv.Atoi(port)
 
 	check := &consul.AgentServiceCheck{
-		DeregisterCriticalServiceAfter: ttd.String(),
+		DeregisterCriticalServiceAfter: (time.Duration(ttd) * time.Second).String(),
 		TLSSkipVerify:                  true,
-		TTL:                            ttl.String(),
+		TTL:                            (time.Duration(ttl) * time.Second).String(),
 		CheckID:                        serverId,
 	}
 
