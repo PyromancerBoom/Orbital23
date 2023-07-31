@@ -18,6 +18,7 @@ _Note : Testing is still in process as external orbital project deadline is late
    5. [Registering a service](#step5)
    6. [Updating Data](#step6)
    7. [Send requests](#step7)
+   8. [Proxy to Ramp Up Performance](#step8)
 5. [Performance](#perf)
 6. [Limitations](#limit)
 7. [What Else?](#misc)
@@ -83,7 +84,7 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 Note: This service is kept optional because it may actually be a bottleneck if only a few servers are making requests to the :/health or :/connect endpoints. It is advised to boot this service up only when there are many servers connected to the system.
 
-  <a href="#top">Back to top</a>
+<a href="#top">Back to top</a>
 
 ### IDL Management <a name="idlmanagement"></a>
 
@@ -462,11 +463,12 @@ A provision for getting back information for an Admin has not yet been implement
 
 #### 8. Setup Registry Proxy Server(s) **[Optional]** <a name="step8"></a>
 
-If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from *2600 req/s* to *3000 req/s* for 50 users and 3 rpc servers. 
+If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from _2600 req/s_ to _3000 req/s_ for 50 users and 3 rpc servers.
 
 You may setup this server by:
 
 1. Register this service in the gateway. You may do so by sending a `POST` request to `/register` endpoint as such:
+
 ```
 [
     {
@@ -497,12 +499,12 @@ You may setup this server by:
     }
 ]
 ```
+
 2. Booting up and instance of registry proxy from the rpc_services provided by running `go run .` in the /rpc_services/registry_proxy_service directory.
 
 Shortly after the server is booted up, the gateway will detect the server and start to proxy health check requests and server connection requests to this registry proxy server, freeing up more resources for the gateway to handle other requests.
 
 <a href="#top">Back to top</a>
-
 
 ## Performance <a name="perf"></a>
 
