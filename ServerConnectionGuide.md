@@ -2,8 +2,6 @@
 
 Once your service is registered under our system, you will receive an api-key which you can use to register your servers in our system. There is currently no limit to the number of servers you can enlist to our system. However, our system only supports RPC servers as the gateway merely acts as a proxy between HTTP network requests to RPC calls through thrift binary encoding.
 
-Note: Since service registration is not supported right now in the MVP, only AssetManagement and UserService servers can be registered into the system. However, after the implementation of service registration through the `:/register` endpoint, servers of any registered services may be connected.
-
 ## Requirements to connect to our system:
 
 1. Service Owner must ensure his servers are able to perform all the methods he indicated in his interface definition during the service registration in the `"/register` endpoint. We shall only forward the requests, it is his/her duty to ensure his/her servers are capable of performing the defined functions.
