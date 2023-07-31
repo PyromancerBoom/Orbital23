@@ -1,4 +1,4 @@
-package main
+package server_utils
 
 /*
 Exported Methods in this package :
@@ -45,6 +45,10 @@ type ConnectRequest struct {
 }
 
 func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
+	if apikey == "" || serviceName == "" || gatewayAddress == "" {
+		log.Println("Error creating GatewayClient. API Key, Service Name and Gateway Address cannot be blank")
+		return nil
+	}
 	return &GatewayClient{
 		ApiKey:         apikey,
 		ServiceName:    serviceName,
