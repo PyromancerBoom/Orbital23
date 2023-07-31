@@ -177,7 +177,7 @@ func main() {
 ```
 
 3. Gateway Address Configuration:
-   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided serviceConfig.json for each service in the rpc_services folder :
+   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided serviceConfig.json for each service in the rpc_services folder. These settings are used to start up RPC server properly :
 
 ```
 {
@@ -194,7 +194,7 @@ func main() {
 }
 ```
 
-If you are running the service in Docker locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
+If you are running the service in Docker locally, set the address to "http://host.docker.internal:4200" and change "IsDockerised" to true. For services on localhost, it can be set to "http://0.0.0.0:4200" with "IsDockerised":false.
 
 During production, the gatewayAddress would be updated to the absolute URL of the API Gateway and can be abstracted within the Server utility package to avoid hardcoding.
 
