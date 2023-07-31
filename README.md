@@ -19,7 +19,7 @@ This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital
    7. [Send requests](#step7)
    8. [Proxy to Ramp Up Performance](#step8)
 5. [Performance](#perf)
-6. [Limitations](#limit)
+6. [Limitations/Issues](#limit)
 7. [What Else?](#misc)
 
 ## About <a name="about"></a>
@@ -576,7 +576,7 @@ Again, after the spike, the gateway showed great recovery.
 
 <a href="#top">Back to top</a>
 
-## Limitations <a name="limit"></a>
+## Limitations/Issues<a name="limit"></a>
 
 On thorough testing we found some limitations such as :
 
@@ -587,6 +587,6 @@ On thorough testing we found some limitations such as :
 
 ## What Else? <a name="misc"></a>
 
-- Nothing for now :p
+- Nothing for now :p. Hope you liked this project.
 
 <a href="#top">Back to top</a>
