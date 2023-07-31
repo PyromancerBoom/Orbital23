@@ -52,7 +52,7 @@ The API Gateway has the following endpoints :
   - The User service is similar to the asset service used for registering and returning info about people using that service.
   - As for Registry Proxy service, it was made to test the gateway by "mocking" some of the functionalities of the gateway. By simply connecting the Registry proxy service, the gateway will function automatically (More on this in the Getting Started Guide).
 
-- The IDL File just contains the IDLs for the RPC Services and Gateway. **_Please note that this is NOT the IDL Management system. These files are only provided for reference_**\_ Thus, the gateway will function even if the idl folder is removed.
+- The idl folder just contains the IDLs for the RPC Services and Gateway we made when developign this project. **_Please note that this is NOT the IDL Management system. These files are only provided for reference_**\_ Thus, the gateway will function even if the idl folder is removed.
 
 _Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process keeping in mind the architecture. However, the API Gateway is designed to be functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
 
