@@ -262,6 +262,28 @@ It should reply with the message :
 
 #### Settings for gateway <a name="hertzsettings"></a>
 
+The gateway has a `serverconfig.json` file which the admin may change if he wants to change some of the settings.
+
+```json
+{
+  "serverPort": "4200", // Host port of the gateway
+  "maskerKey": "master_api_key_uuid", // Specify any master api key (can be used if the masterkey gets leaked)
+
+  "consulAddress": "127.0.0.1:8500", // Address of the consul service registry
+  "timeToLift": 45, // Time in seconds before a service is declared unhealthy, if it fails to declare itself healthy by pinging the :/health endpoint
+  "timeToDie": 90, // Time in seconds before a service is removed from the registry, if it fails to declare itself healthy by pinging the :/health endpoint
+
+  "dbUrl": "mongodb://localhost:27017", // Url of the mongoDb used for IDL and Service Management
+  "dbName": "api_gateway_db", // Name of the mongoDb database
+  "dbCollectionName": "admin_services", // Name of the collections
+  "dbPingInterval": 30, // How frequently gateway should ping the mongoDb database
+  "dbFailedPingInterval": 5, // How frequently gateway should ping the mongoDb database if it pinging has failed once or more
+  "dbMaxPingFailDuration": 180 // After how many tries to stop the pinging
+}
+```
+
+- If you want to change the consul service registry address, change the `consulAddress` field here (api-gateway/hertz_server/`serverconfig.json`) **and** the `consulAddress` field in the `serviceConfig.json` file inside the /rpc_services/registry_proxy_service directory.
+
 <a href="#top">Back to top</a>
 
 #### 2. Start Consul <a name="step2"></a>
