@@ -21,7 +21,6 @@ func main() {
 	initLogger()
 
 	serverSettings := settings.GetSettings()
-	// hostURL := "127.0.0.1:4200"
 	hostURL := "0.0.0.0:" + serverSettings.ServerPort
 
 	if err := repository.ConnectToMongoDB(); err != nil {
@@ -30,7 +29,6 @@ func main() {
 	defer repository.CloseMongoDB()
 
 	// Perform health check
-	// Commented out to test performance improvement
 	go repository.MongoHealthCheck()
 
 	go cache.UpdateCache()

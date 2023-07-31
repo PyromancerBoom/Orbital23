@@ -24,6 +24,9 @@ GetApiKey
 -- func GetApiKey(ownerID string) (string, error)
 Fetches the API key from the database based on the owner ID and returns the API key as a string.
 
+-- func GetAllAdmins() ([]AdminConfig, error)
+Fetch an array of all Admins from the database
+
 */
 
 import (

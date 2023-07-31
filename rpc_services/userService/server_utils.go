@@ -30,6 +30,10 @@ type ConnectRequest struct {
 }
 
 func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient {
+	if apikey == "" || serviceName == "" || gatewayAddress == "" {
+		log.Println("Error creating GatewayClient. API Key, Service Name and Gateway Address cannot be blank")
+		return nil
+	}
 	return &GatewayClient{
 		ApiKey:         apikey,
 		ServiceName:    serviceName,
@@ -38,7 +42,7 @@ func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) 
 }
 
 // Connect server to gateway
-func (client *GatewayClient) connectServer(serverAddress string, serverPort string) (string, error) {
+func (client *GatewayClient) ConnectServer(serverAddress string, serverPort string) (string, error) {
 	url := client.GatewayAddress + "/connect"
 
 	req := &ConnectRequest{ApiKey: client.ApiKey, ServiceName: client.ServiceName, Address: serverAddress, Port: serverPort}
@@ -123,7 +127,7 @@ func (client *GatewayClient) updateHealth(serverID string) error {
 }
 
 // Keeps declaring server instance is healthy
-func (client *GatewayClient) updateHealthLoop(id string, timeBetweenLoops int) {
+func (client *GatewayClient) UpdateHealthLoop(id string, timeBetweenLoops int) {
 	ticker := time.NewTicker(time.Duration(timeBetweenLoops) * time.Second)
 	for {
 		select {

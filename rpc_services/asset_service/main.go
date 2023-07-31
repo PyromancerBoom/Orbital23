@@ -40,12 +40,12 @@ func main() {
 
 		gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName, config.GatewayAddress)
 
-		id, err := gatewayClient.connectServer(addr.IP.String(), strconv.Itoa(addr.Port))
+		id, err := gatewayClient.ConnectServer(addr.IP.String(), strconv.Itoa(addr.Port))
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 
-		go gatewayClient.updateHealthLoop(id, config.HealthCheckFrequency)
+		go gatewayClient.UpdateHealthLoop(id, config.HealthCheckFrequency)
 
 		svr := asset_management.NewServer(new(AssetManagementImpl),
 			server.WithServiceAddr(addr),
@@ -70,15 +70,12 @@ func main() {
 
 		advertisedPort := os.Getenv("PORT")
 
-		//still a bit confused about this. recheck with docker.
-		//advertisedPort = GetFreePort()
-
-		id, err := gatewayClient.connectServer(config.ServiceURL, advertisedPort)
+		id, err := gatewayClient.ConnectServer(config.ServiceURL, advertisedPort)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
 
-		go gatewayClient.updateHealthLoop(id, config.HealthCheckFrequency)
+		go gatewayClient.UpdateHealthLoop(id, config.HealthCheckFrequency)
 
 		url := config.DockerUrl
 		port := config.DockerPort

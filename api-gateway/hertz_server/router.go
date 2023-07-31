@@ -12,11 +12,19 @@ import (
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
+
+	// Route for ping (HealthCheck of Hertz Server)
 	r.GET("/ping", handler.Ping)
 
-	// your code ...
+	// Route for admin registration
 	r.POST("/register", servicehandler.Register)
+
+	// Route for admin info updates
 	r.PUT("/update", servicehandler.Update)
+
+	// Route to connect servers
 	r.POST("/connect", servicehandler.Connect)
+
+	// Route for healthchecks
 	r.POST("/health", servicehandler.HealthCheck)
 }

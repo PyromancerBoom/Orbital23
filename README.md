@@ -1,11 +1,12 @@
-This is the repository for the ByteDance and Tiktok Orbital 2023.
+This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital.
 
-_Note : Testing is still in process as external orbital project deadline is later_
+This README markdown file aims to provide a comprehensive documentation for this project.
 
 # Table of Contents
 
 1. [About](#about)
 2. [Features and Design](#features)
+   - [Architecture Diagram](#diagram)
    - [Components](#components)
    - [IDL Management](#idlmanagement)
    - [Server Utility Package](#serverutils)
@@ -18,8 +19,9 @@ _Note : Testing is still in process as external orbital project deadline is late
    5. [Registering a service](#step5)
    6. [Updating Data](#step6)
    7. [Send requests](#step7)
+   8. [Proxy to Ramp Up Performance](#step8)
 5. [Performance](#perf)
-6. [Limitations](#limit)
+6. [Limitations/Issues](#limit)
 7. [What Else?](#misc)
 
 ## About <a name="about"></a>
@@ -28,7 +30,7 @@ This is the project for our API Gateway based on one scalable Hertz server which
 
 The API Gateway has the following endpoints :
 
-- _GET and POST /:serviceName/:path_ - Every service has a registered URL on which it's users send requests on.
+- _GET and POST /:serviceName/:path_ - Every service has a registered URL on which its users send requests.
 
 - _GET /ping_ - This endpoint checks the availability of the API gateway. Run it to verify if the server is running or not
 
@@ -36,50 +38,66 @@ The API Gateway has the following endpoints :
 
 - _PUT /update_ - Server to Update details of Registered services
 
-- _POST /connect_ - Once services are registered, their servers are connected through this endpoint automatically with the help of server utility package.
+- _POST /connect_ - Once services are registered, their servers are connected through this endpoint automatically with the help of the server utility package.
 
-- _POST /health_ - This endpoint handles health checks for a service. Services ping to /health to update their healthchecks.
+- _POST /health_ - This endpoint handles health checks for a service. Services ping to /health to update their health checks.
 
-_Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process. However, the API Gateway is designed to be fully functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
+#### About the directory:
+
+- The api-gateway folder contains the api gateway server and a server_utils package which is required for a smooth setup of Kitex servers.
+
+- The rpc_services contains the services used throughout the development of the project. It has 3 services - Asset Service, User service, and Registry Proxy service. Details have been provided throughout this documentation. But TLDR:
+
+  - Asset Service is used to store some info about Assets and fetch that info.
+  - The User service is similar to the asset service used for registering and returning info about people using that service.
+  - As for Registry Proxy service, it was made to test the gateway by "mocking" some of the functionalities of the gateway. By simply connecting the Registry proxy service, the gateway will function automatically (More on this in the Getting Started Guide).
+
+- The IDL File just contains the IDLs for the RPC Services and Gateway. **_Please note that this is NOT the IDL Management system. These files are only provided for reference_**\_ Thus, the gateway will function even if the idl folder is removed.
+
+_Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process keeping in mind the architecture. However, the API Gateway is designed to be functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
 
 PS :
-On windows, Kitex may throw some errors like :
+On Windows, Kitex may throw some errors like :
 
 ```
 [Error] KITEX: OnRead Error: default codec read failed: EOF
-
-or
-
 default codec read failed: i/o timeout
-
 ```
 
-This happens to be due to Windows environment. On running Kitex servers in Linux, the errors seems to go away.
+This happens to be due to the Windows environment. On running Kitex servers in Linux, the errors seem to go away.
 The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues/932) and [here as well](https://github.com/cloudwego/kitex/issues/964)
 
 <a href="#top">Back to top</a>
 
 ## Features and Design <a name="features"></a>
 
+### Architecture Diagram <a name="diagram"></a>
+
+![gateway_design](gateway_design.png)
+
 ### The project has the following features : <a name="components"></a>
 
 1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers performing load balancing, service discovery, health checks, etc. It accepts incoming HTTP requests and decodes on which service to make a generic RPC call and returns a response.
 
-2. Service Registration and Caching: A user can send in POST requests on `:/register` to register their services. The JSON payload includes details about the owner, their services, IDLs and masked service URLs. This data is stored in MongoDB and is also cached inside the gateway server for quick access. Refer to the <a href="#data">Data</a>section below for the exact info on how data is stored.
+2. Service Registration and Caching: A user can send in POST requests on `/register` to register their services. The JSON payload includes details about the owner, their services, IDLs, and masked service URLs. This data is stored in MongoDB and is also cached inside the gateway server for quick access. Refer to the <a href="#data">Data</a> section below for the exact info on how data is stored.
 
-3. RPC Protocal Translation: The API Gateway forwards incoming API requests to the Kitex servers using the internal RPC clients within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services. This is done with their Thrift IDL information sent on registration.
+3. RPC Protocol Translation: The API Gateway forwards incoming API requests to the Kitex servers using the internal RPC clients within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services. This is done with their Thrift IDL information sent on registration.
 
-4. Automated Server Connection: The API Gateway provides another package called _server_utils_ to make it easy for Services can automate the registration of their servers to our system by making an HTTP POST request at the `:/connect` endpoint of the API Gateway using their registered API key. This enables services to scale up or down dynamically according to their needs.
+4. Automated Server Connection: The API Gateway provides another package called _server_utils_ to make it easy for Services can automate the registration of their servers to our system by making an HTTP POST request at the `/connect` endpoint of the API Gateway using their registered API key. This enables services to scale up or down dynamically according to their needs.
 
 5. Health Checks: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. This is part of the Server Utility Package and can be easily automated. For this, we have used Consul.
 
 6. Discovery and Load Balancing: The gateway uses Consul's resolver for service discovery and load balancing. It uses Consul’s DNS interface to resolve service names. It can be used to discover services registered with Consul and load balance requests between them. The MVP version of the NewConsulResolver implements round-robin load balancing, distributing the requests equally among the connected RPC servers.
 
-7. Service Registry: Consul has been integrated as the service registry as well. It is completely isolated from the RPC servers. The servers have to therefore, interact with the Gateway for Consul related business. This was done to prevent malicious attacks on the service registry. The consul service registry provides a beautiful graphical view of all the connected servers to help admins track, manage and troubleshoot connections. This also allows us for more freedom in logic handling for tasks related to the Registry.
+7. Service Registry: Consul has been integrated as the service registry as well. It is completely isolated from the RPC servers. The servers have to, therefore, interact with the Gateway for Consul-related business. This was done to prevent malicious attacks on the service registry. The consul service registry provides a beautiful graphical view of all the connected servers to help admins track, manage and troubleshoot connections. This also allows us more freedom in logic handling for tasks related to the Registry.
 
-- Consul Agent is for the purpose of Service Registry, Health Checks, Discovery, Load Balancing. It is hosted on `localhost:8500` for this project. The logic for exact functioning however has been coded manually.
+- Consul Agent is for Service Registry, Health Checks, Discovery, and Load Balancing. It is hosted on `localhost:8500` for this project. The logic for exact functioning however has been coded manually.
 
-  <a href="#top">Back to top</a>
+8. Registry Proxy Server: An RPC server that can perform health checks, on behalf of the gateway has been included in the project as well. This RPC server is a special server that has direct access to the Consul Service Registry. When servers ping the `/health` or `/connect` endpoint of the gateway, the gateway can proxy handling this request to this RPC service (if one or more of the Registry Proxy servers are online). This frees up space and resources so that the gateway can handle other requests. This is an optional server that the admin may decide to boot up; if the gateway detects it's offline, then it will perform a health check and connection requests itself.
+
+Note: This service is kept optional because it may be a bottleneck if only a few servers are making requests to the `/health` or `/connect` endpoints. It is advised to boot this service up only when there are many servers connected to the system.
+
+<a href="#top">Back to top</a>
 
 ### IDL Management <a name="idlmanagement"></a>
 
@@ -109,7 +127,28 @@ To use the Server Utility Package, import it into your main package or copy-past
 
 2. Example Usage:
 
+The package exports 3 methods which are needed to start your Kitex server :
+
+```
+func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient
+```
+
+The above function makes a new client to talk to the gateway server
+
+```
+func (client *GatewayClient) ConnectServer(serverAddress string, serverPort string) (string, error)
+```
+
+Use the above method to connect the server to the gateway server. Methods needs to be called on the gateway client.
+
+```
+func (client *GatewayClient) UpdateHealthLoop(id string, timeBetweenLoops int)
+```
+
+The above methods keeps declaring server instance is healthy. Methods needs to be called on the gateway client.
+<br>
 The following code snippet demonstrates how to use the Server Utility Package to connect a backend RPC server to the API Gateway and perform health checks:
+(The full usage can be found in rpc_services/asset_service)
 
 ```
 
@@ -117,44 +156,47 @@ func main() {
   // Other code above
 
 	// Initialize Gateway Client with API key and service name
-	gatewayClient := server_utils.NewGatewayClient(configuration.Apikey, configuration.ServiceName)
+	gatewayAddress := config.GatewayAddress
+	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName, gatewayAddress)
 
 	// Connect to the API Gateway and get the server ID
-	id, err := gatewayClient.ConnectServer(configuration.ServiceURL, advertisedPort)
-	if err != nil {
-		log.Fatal(err.Error())
+	id, err := gatewayClient.ConnectServer(config.ServiceURL, advertisedPort)
+		if err != nil {
+			log.Fatal(err.Error())
 	}
 
 	// Perform health checks in a separate goroutine (every 5 seconds)
-	go gatewayClient.UpdateHealthLoop(id, 5)
+	go gatewayClient.UpdateHealthLoop(id, config.HealthCheckFrequency)
 
 	// Your server's main logic here
 }
 ```
 
 3. Gateway Address Configuration:
-   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided right at the beginning of the Server Utils file :
+   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided serviceConfig.json for each service in the rpc_services folder :
 
 ```
-const (
-	// For Dockerised services on localhost
-	// gatewayAddress = "http://host.docker.internal:4200"
-
-	// For services on LocalHost
-	gatewayAddress = "http://0.0.0.0:4200"
-
-	// Absolute URL for gatewayAddress can be updated and abstracted in the package
-	// during production
-)
+{
+    "apikey": "master_api_key_uuid",
+    "ServiceName": "UserService",
+    "dockerUrl": "0.0.0.0",
+    "dockerPort": "8080",
+    "env": "Stage",
+    "serviceurl": "localhost",
+    "serverPort": "0",
+    "IsDockerised": true,
+    "healthCheckFrequency": 15,
+    "gatewayAddress": "http://host.docker.internal:4200"
+}
 ```
 
-If you are running the service in Docker, locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
+If you are running the service in Docker locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
 
-During production, the gatewayAddress should be updated to the absolute URL of the API Gateway and can be abstracted within the package to avoid hardcoding.
+During production, the gatewayAddress would be updated to the absolute URL of the API Gateway and can be abstracted within the Server utility package to avoid hardcoding.
 
 <a href="#top">Back to top</a>
 
-## Data <a name="data"></a>
+## Data Management<a name="data"></a>
 
 Data is stored in MongoDB for this Project for ease of use and flexibility. The MongoDB client is configured to connect to Mongo at `localhost:27107`
 
@@ -203,6 +245,7 @@ For each unique owner, a document is made in MongoDB, with the following data :
     {
       "ServiceId": "service2",
       ... and so on
+    }
   ]
 }
 ```
@@ -316,6 +359,8 @@ And on LocalHost :
 		log.Println(kitexerr.Error())
 	}
 ```
+
+_This has been implemented in the Asset Service, feel free to use that as an example.(the main.go file inside the Asset Service)_
 
 <a href="#top">Back to top</a>
 
@@ -456,6 +501,51 @@ A provision for getting back information for an Admin has not yet been implement
 
 <a href="#top">Back to top</a>
 
+#### 8. Setup Registry Proxy Server(s) **[Optional]** <a name="step8"></a>
+
+If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from ~_2600 req/s_ to ~_3000 req/s_ for 50 users and 3 rpc servers.
+
+You may setup this server by:
+
+1. Register this service in the gateway. You may do so by sending a `POST` request to `/register` endpoint as such:
+
+```
+[
+    {
+        "OwnerName": "XXXXX",
+        "OwnerId": "XXXXX",
+        "Services": [
+            {
+                "ServiceId": "X",
+                "ServiceName": "RegistryProxy",
+                "IdlContent": "namespace Go registy.proxy\n\nstruct ConnectRequest {\n    1: string ApiKey;\n    2: string ServiceName\n    3: string ServerAddress\n    4: string ServerPort\n}\n\nstruct ConnectResponse {\n    1: string Status;\n    2: string Message;\n    3: string ServerID;\n}\n\nstruct HealtRequest {\n    1: string ApiKey;\n    2: string ServerID;\n}\n\nstruct HealthResponse {\n    1: string Status;\n    2: string Message;\n}\n\nservice RegistryProxy {\n    ConnectResponse connectServer(1: ConnectRequest req);\n    HealthResponse healthCheckServer(1: HealtRequest req);\n}\n",
+                "Version": "1.0",
+                "ServiceDescription": "Service for proxying health checks and coneection requests",
+                "ServerCount": 0,
+                "Paths": [
+                    {
+                        "ExposedMethod": "healthCheckServer",
+                        "MethodPath": "healthCheckServer"
+                    },
+                    {
+                        "ExposedMethod": "connectServer",
+                        "MethodPath": "connectServer"
+                    }
+                ],
+                "RegisteredServers": [
+                ]
+            }
+        ]
+    }
+]
+```
+
+2. Booting up and instance of registry proxy from the rpc_services provided by running `go run .` in the /rpc_services/registry_proxy_service directory.
+
+Shortly after the server is booted up, the gateway will detect the server and start to proxy health check requests and server connection requests to this registry proxy server, freeing up more resources for the gateway to handle other requests.
+
+<a href="#top">Back to top</a>
+
 ## Performance <a name="perf"></a>
 
 #### Current Performance <a name="currentperf"></a>
@@ -502,15 +592,17 @@ Again, after the spike, the gateway showed great recovery.
 
 <a href="#top">Back to top</a>
 
-## Limitations <a name="limit"></a>
+## Limitations/Issues<a name="limit"></a>
 
 On thorough testing we found some limitations such as :
 
 - Kitex Servers cannot reconnect if the Gateway server goes down, even for a second. The server_utility package needs to be updated for this.
-- While the Gateway is designed to be Scalable, the only non-scalable aspect as of now is the Data Management.
+- While the Gateway is designed to be Scalable, the only non-scalable aspect as of now is the Data Management with the Database and service registry.
+
+<a href="#top">Back to top</a>
 
 ## What Else? <a name="misc"></a>
 
-For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
+- Nothing for now :p. Hope you liked this project.
 
 <a href="#top">Back to top</a>
