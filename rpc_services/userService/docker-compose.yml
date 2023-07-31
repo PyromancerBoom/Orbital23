@@ -1,0 +1,19 @@
+version: '3'
+services:
+  instance1:
+    image: userservice
+    ports: 
+      - "8080:8000"
+    environment:
+      - PORT=8080
+    volumes:
+      - ./serviceConfig.json:/app/serviceConfig.json
+
+  instance2:
+    image: userservice
+    ports: 
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    volumes:
+      - ./serviceConfig.json:/app/serviceConfig.json

@@ -6,7 +6,7 @@
     "env": "Stage",
     "serviceurl": "localhost",
     "serverPort": "0", 
-    "IsDockerised": false,
-    "healthCheckFrequency": 5,
-    "gatewayAddress": "http://0.0.0.0:4200"
+    "IsDockerised": true,
+    "healthCheckFrequency": 15,
+    "gatewayAddress": "http://host.docker.internal:4200"
 }

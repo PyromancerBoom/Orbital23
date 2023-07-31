@@ -67,9 +67,6 @@ func main() {
 
 		advertisedPort := os.Getenv("PORT")
 
-		//still a bit confused about this. recheck with docker.
-		//advertisedPort = GetFreePort()
-
 		id, err := gatewayClient.connectServer(config.ServiceURL, advertisedPort)
 		if err != nil {
 			log.Fatal(err.Error())
