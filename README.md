@@ -17,6 +17,7 @@ This README markdown file aims to provide a comprehensive documentation for this
    2. [Set up Consul](#step2)
    3. [Start MongoDB](#step3)
    4. [Setting up kitex](#step4)
+      - [Settings for Kitex](#kitexsettings)
    5. [Registering a service](#step5)
    6. [Updating Data](#step6)
    7. [Send requests](#step7)
@@ -177,28 +178,6 @@ func main() {
 	// Your server's main logic here
 }
 ```
-
-3. Gateway Address Configuration:
-   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided serviceConfig.json for each service in the rpc_services folder. These settings are used to start up RPC server properly :
-
-```
-{
-    "apikey": "master_api_key_uuid",
-    "ServiceName": "UserService",
-    "dockerUrl": "0.0.0.0",
-    "dockerPort": "8080",
-    "env": "Stage",
-    "serviceurl": "localhost",
-    "serverPort": "0",
-    "IsDockerised": true,
-    "healthCheckFrequency": 15,
-    "gatewayAddress": "http://host.docker.internal:4200"
-}
-```
-
-If you are running the service in Docker locally, set the address to "http://host.docker.internal:4200" and change "IsDockerised" to true. For services on localhost, it can be set to "http://0.0.0.0:4200" with "IsDockerised":false.
-
-During production, the gatewayAddress would be updated to the absolute URL of the API Gateway and can be abstracted within the Server utility package to avoid hardcoding.
 
 <a href="#top">Back to top</a>
 
@@ -367,6 +346,30 @@ And on LocalHost :
 		log.Println(kitexerr.Error())
 	}
 ```
+
+### Kitex Settings <a name="kitexsettings"></a>
+
+The RPC services (asset service and user service) we provided have a `serviceConfig.json` file where the server configurations are kept. This is provided in case the admin changes things around, they can edit the `serviceConfig.json` file instead of changing source code. This makes sure that the server can be launched with different settings without having to rebuild the project or the docker image. These settings are used to start up RPC server properly :
+
+```
+{
+    "apikey": "master_api_key_uuid", //apikey to be used for server connection
+    "ServiceName": "AssetManagement", //name of the service
+    "dockerUrl": "0.0.0.0", //Address of gateway in docker
+    "dockerPort": "8080", //Port of the gateway in docker
+    "env": "Stage", //
+    "serviceurl": "localhost", //Url of the server.
+    "serverPort": "0", //Port to be used by server. Keep 0 for random port.
+    "IsDockerised": false, //Change to true if docker is being used.
+    "healthCheckFrequency": 15, //How frequently, in seconds, do you want to perform health checks?
+    "gatewayAddress": "http://localhost:4200" //address of the gateway.
+}
+```
+
+To launch the Kitex server in Docker: 1. Change `IsDockerised` to `true` 2. Change `gatewayAddress` to the new address. Eg. "`
+http://host.docker.internal:4200`" i.e., if gateway is on the same machine hosted locally.
+
+During production, the gatewayAddress would be updated to the absolute URL of the API Gateway and can be abstracted within the Server utility package to avoid hardcoding.
 
 _This has been implemented in the Asset Service, feel free to use that as an example.(the main.go file inside the Asset Service)_
 
