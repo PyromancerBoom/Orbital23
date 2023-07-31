@@ -191,28 +191,29 @@ For each unique owner, a document is made in MongoDB, with the following data :
 
 ```
 {
-  "ApiKey": "your-api-key", // Appended by the Gateway
-  "OwnerName": "John Doe",
-  "OwnerId": "user123",
-  "Services": [
+  "ApiKey": "your-api-key", // Generated and Appended by the Gateway. Unique for each user. Master api key used for testing is "master_api_key_uuid"
+  "OwnerName": "John Doe", // Name of the Admin
+  "OwnerId": "user123", // Unique user name for the Admin
+  "Services": [ // The various services registered by the admin
     {
-      "ServiceId": "service1",
-      "ServiceName": "Service One",
-      "IdlContent": "<Thrift IDL content for Service One>",
-      "Version": "1.0.0",
-      "ServiceDescription": "This is Service One description.",
-      "ServerCount": 3,
-      "Paths": [
+      "ServiceId": "service1", // Identifier for each service
+      "ServiceName": "Service One", // Name of service. Used for making API calls as well
+      "IdlContent": "<Thrift IDL content for Service One>", // IDL Content which helps define the structure of the service's API
+      "Version": "1.0.0", // Version of the Service
+      "ServiceDescription": "This is Service One description.", // Description about the service
+      "ServerCount": 3, // Number of servers. Mocked for this project, but accounted for. We can connect as many as required with the correct API key or master key
+      "Paths": [ // Paths provide flexibility in the URL for each service.
         {
-          "MethodPath": "/method1",
-          "ExposedMethod": "GET"
+          "MethodPath": "/method1", // This is the method which the path should correspond to
+          "ExposedMethod": "GET" // This is the path in the URL "gateway/{serviceName}/{path}"
         },
         {
           "MethodPath": "/method2",
           "ExposedMethod": "POST"
         }
       ],
-      "RegisteredServers": [
+      "RegisteredServers": [ // These are the registered servers which are allowed to connect to the gateway
+                            // Again, this has been mocked, but accounted for. All servers are allowed to connect with any URL as long as API key is correct.
         {
           "ServerUrl": "http://server1.example.com",
           "Port": 8080
@@ -227,7 +228,7 @@ For each unique owner, a document is made in MongoDB, with the following data :
         }
       ]
     },
-    {
+    {  // We can register more services here
       "ServiceId": "service2",
       ... and so on
     }
@@ -239,7 +240,7 @@ The IDL must be provided by stringifying it. A tool like https://jsonformatter.o
 
 A user can register multiple services, and multiple registered servers for their services and along with some flexibility in exposed URLs, the method is masked with Path field.
 
-_For ease of testing, regardless of how many Registered Servers are there, we can connect more, and with different ServerURLs. "Mocking" the authentication of RPC servers this way will save time on testing._
+_For ease of testing, regardless of how many Registered Servers are there, we can connect more, and with different ServerURLs. "Mocking" the authentication of RPC servers this way will save time on testing. This is done with the master api key, which can be used instead of the generated api key. While the gateway can perfectly function with the generated api key as well, the master api key makes the testing simpler._
 
 <a href="#top">Back to top</a>
 
