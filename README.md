@@ -120,7 +120,7 @@ During service registration with POST /register, service owners include their se
   The Data Model allows services to keep track of their IDLs and versions. Although one limitation (due to time constraints) is that only the latest IDL version is stored. IDLs can be updated using the `/update` endpoint.
 
 - Synchronization:
-  Ensuring IDL information remains consistent and synchronized between components is crucial, which is why IDLs are cached regularly.
+  Ensuring IDL information remains consistent and synchronized between components is crucial, which is why IDLs are cached upon service registration/updatation.
 
   <a href="#top">Back to top</a>
 
