@@ -84,6 +84,6 @@ func (s *RegistryProxyImpl) HealthCheckServer(ctx context.Context, req *registry
 
 	return &registry_proxy_service.HealthResponse{
 		Status:  "ok",
-		Message: "Successfully updated server health",
+		Message: "Successfully updated server health.",
 	}, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -28,7 +29,7 @@ func validateAddress(address string, port string) error {
 	}
 
 	if net.ParseIP(address) == nil {
-		return err
+		return errors.New("Invalid Address.")
 	}
 	return nil
 }

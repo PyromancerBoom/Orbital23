@@ -70,7 +70,13 @@ func performServerConnectionRequest(ctx context.Context, c *app.RequestContext, 
 
 	if validateAddress(req.ServerAddress, req.ServerPort) != nil {
 		zap.L().Info("Invalid address" + req.ServerAddress + "for server connection.")
-		c.String(consts.StatusBadRequest, "Address is invalid.")
+
+		res := make(map[string]string)
+		res["Status"] = "failed"
+		res["Message"] = "Server address is invalid."
+		res["ServerID"] = ""
+
+		c.JSON(consts.StatusBadRequest, res)
 		return
 	}
 

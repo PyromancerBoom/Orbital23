@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"time"
 
+	"errors"
+
 	"github.com/cloudwego/kitex/pkg/discovery"
 	consul "github.com/hashicorp/consul/api"
 	consul_kitex "github.com/kitex-contrib/registry-consul"
@@ -154,13 +156,15 @@ func authoriseConnect(apiKey string, serviceName string) bool {
 
 // Validates address
 func validateAddress(address string, port string) error {
+	print(address)
 	_, err := strconv.Atoi(port)
 	if err != nil {
 		return err
 	}
 
-	if net.ParseIP(address) == nil {
-		return err
+	val := net.ParseIP(address)
+	if val == nil {
+		return errors.New("Invalid Address.")
 	}
 	return nil
 }
