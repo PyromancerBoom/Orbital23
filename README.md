@@ -21,8 +21,9 @@ This README markdown file aims to provide a comprehensive documentation for this
    7. [Send requests](#step7)
    8. [Proxy to Ramp Up Performance](#step8)
 5. [Performance](#perf)
-6. [Limitations/Issues](#limit)
-7. [What Else?](#misc)
+6. [Testing](#tests)
+7. [Limitations/Issues](#limit)
+8. [What Else?](#misc)
 
 ## About <a name="about"></a>
 
@@ -55,6 +56,8 @@ The API Gateway has the following endpoints :
 - The idl folder just contains the IDLs for the RPC Services and Gateway we made when developign this project. **_Please note that this is NOT the IDL Management system. These files are only provided for reference_**\_ Thus, the gateway will function even if the idl folder is removed.
 
 _Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process keeping in mind the architecture. However, the API Gateway is designed to be functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
+
+**For better testing of gateway, the RPC services may return a static response. This was done on purpose. However, the code can be uncommented to return dynamic responses.**
 
 PS :
 On Windows, Kitex may throw some errors like :
@@ -591,6 +594,12 @@ Despite the spike in between the server showed great recovery.
 Again, after the spike, the gateway showed great recovery.
 
 <a href="#top">Back to top</a>
+
+## Testing <a name="tests"></a>
+
+While there are not many unit tests, the project has been tested for functionality and integration.
+
+These testcases can be imported in postman for ease and can be found here : [GatewayTests.json](./GatewayTests.json)
 
 ## Limitations/Issues<a name="limit"></a>
 
