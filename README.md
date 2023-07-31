@@ -113,7 +113,28 @@ To use the Server Utility Package, import it into your main package or copy-past
 
 2. Example Usage:
 
+The package exports 3 methods which are needed to start your Kitex server :
+
+```
+func NewGatewayClient(apikey string, serviceName string, gatewayAddress string) *GatewayClient
+```
+
+The above function makes a new client to talk to the gateway server
+
+```
+func (client *GatewayClient) ConnectServer(serverAddress string, serverPort string) (string, error)
+```
+
+Use the above method to connect the server to the gateway server. Methods needs to be called on the gateway client.
+
+```
+func (client *GatewayClient) UpdateHealthLoop(id string, timeBetweenLoops int)
+```
+
+The above methods keeps declaring server instance is healthy. Methods needs to be called on the gateway client.
+<br>
 The following code snippet demonstrates how to use the Server Utility Package to connect a backend RPC server to the API Gateway and perform health checks:
+(The full usage can be found in rpc_services/asset_service)
 
 ```
 
@@ -121,44 +142,47 @@ func main() {
   // Other code above
 
 	// Initialize Gateway Client with API key and service name
-	gatewayClient := server_utils.NewGatewayClient(configuration.Apikey, configuration.ServiceName)
+	gatewayAddress := config.GatewayAddress
+	gatewayClient := NewGatewayClient(config.Apikey, config.ServiceName, gatewayAddress)
 
 	// Connect to the API Gateway and get the server ID
-	id, err := gatewayClient.ConnectServer(configuration.ServiceURL, advertisedPort)
-	if err != nil {
-		log.Fatal(err.Error())
+	id, err := gatewayClient.ConnectServer(config.ServiceURL, advertisedPort)
+		if err != nil {
+			log.Fatal(err.Error())
 	}
 
 	// Perform health checks in a separate goroutine (every 5 seconds)
-	go gatewayClient.UpdateHealthLoop(id, 5)
+	go gatewayClient.UpdateHealthLoop(id, config.HealthCheckFrequency)
 
 	// Your server's main logic here
 }
 ```
 
 3. Gateway Address Configuration:
-   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided right at the beginning of the Server Utils file :
+   The code snippet provided above assumes that the Gateway Address is set correctly. But since this project is in development, you will have to set the address manually. Info on this is provided serviceConfig.json for each service in the rpc_services folder :
 
 ```
-const (
-	// For Dockerised services on localhost
-	// gatewayAddress = "http://host.docker.internal:4200"
-
-	// For services on LocalHost
-	gatewayAddress = "http://0.0.0.0:4200"
-
-	// Absolute URL for gatewayAddress can be updated and abstracted in the package
-	// during production
-)
+{
+    "apikey": "master_api_key_uuid",
+    "ServiceName": "UserService",
+    "dockerUrl": "0.0.0.0",
+    "dockerPort": "8080",
+    "env": "Stage",
+    "serviceurl": "localhost",
+    "serverPort": "0",
+    "IsDockerised": true,
+    "healthCheckFrequency": 15,
+    "gatewayAddress": "http://host.docker.internal:4200"
+}
 ```
 
-If you are running the service in Docker, locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
+If you are running the service in Docker locally, set the address to "http://host.docker.internal:4200", and for services on localhost, it can be set to "http://0.0.0.0:4200".
 
-During production, the gatewayAddress should be updated to the absolute URL of the API Gateway and can be abstracted within the package to avoid hardcoding.
+During production, the gatewayAddress would be updated to the absolute URL of the API Gateway and can be abstracted within the Server utility package to avoid hardcoding.
 
 <a href="#top">Back to top</a>
 
-## Data <a name="data"></a>
+## Data Management<a name="data"></a>
 
 Data is stored in MongoDB for this Project for ease of use and flexibility. The MongoDB client is configured to connect to Mongo at `localhost:27107`
 
