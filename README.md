@@ -60,11 +60,11 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers performing load balancing, service discovery, health checks, etc. It accepts incoming HTTP requests and decodes on which service to make a generic RPC call and returns a response.
 
-2. Service Registration and Caching: A user can send in POST requests on `:/register` to register their services. The JSON payload includes details about the owner, their services, IDLs, and masked service URLs. This data is stored in MongoDB and is also cached inside the gateway server for quick access. Refer to the <a href="#data">Data</a>section below for the exact info on how data is stored.
+2. Service Registration and Caching: A user can send in POST requests on `/register` to register their services. The JSON payload includes details about the owner, their services, IDLs, and masked service URLs. This data is stored in MongoDB and is also cached inside the gateway server for quick access. Refer to the <a href="#data">Data</a> section below for the exact info on how data is stored.
 
 3. RPC Protocol Translation: The API Gateway forwards incoming API requests to the Kitex servers using the internal RPC clients within the Hertz server. It enables communication between the client and the respective RPC servers responsible for handling specific services. This is done with their Thrift IDL information sent on registration.
 
-4. Automated Server Connection: The API Gateway provides another package called _server_utils_ to make it easy for Services can automate the registration of their servers to our system by making an HTTP POST request at the `:/connect` endpoint of the API Gateway using their registered API key. This enables services to scale up or down dynamically according to their needs.
+4. Automated Server Connection: The API Gateway provides another package called _server_utils_ to make it easy for Services can automate the registration of their servers to our system by making an HTTP POST request at the `/connect` endpoint of the API Gateway using their registered API key. This enables services to scale up or down dynamically according to their needs.
 
 5. Health Checks: Servers connected to the API Gateway need to declare their health by making periodic requests to the `:/health` endpoint at least every 10 seconds. This ensures that the API Gateway considers the servers healthy and forwards requests to them. This is part of the Server Utility Package and can be easily automated. For this, we have used Consul.
 
@@ -202,6 +202,7 @@ For each unique owner, a document is made in MongoDB, with the following data :
     {
       "ServiceId": "service2",
       ... and so on
+    }
   ]
 }
 ```
@@ -457,7 +458,7 @@ A provision for getting back information for an Admin has not yet been implement
 
 #### 8. Setup Registry Proxy Server(s) **[Optional]** <a name="step8"></a>
 
-If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from _2600 req/s_ to _3000 req/s_ for 50 users and 3 rpc servers.
+If the server load is getting too high and many rpc servers are connected, you may decide to connect a special RPC server we made, the Registry Proxy Service. The purpose of this special RPC server is to allow the gateway to proxy all the health check requests/server connection requests from different servers so that the gatway can have resources to handle more service requests. By adding this server, we were able to ramp up performance from ~_2600 req/s_ to ~_3000 req/s_ for 50 users and 3 rpc servers.
 
 You may setup this server by:
 
@@ -551,10 +552,12 @@ Again, after the spike, the gateway showed great recovery.
 On thorough testing we found some limitations such as :
 
 - Kitex Servers cannot reconnect if the Gateway server goes down, even for a second. The server_utility package needs to be updated for this.
-- While the Gateway is designed to be Scalable, the only non-scalable aspect as of now is the Data Management.
+- While the Gateway is designed to be Scalable, the only non-scalable aspect as of now is the Data Management with the Database and service registry.
+
+<a href="#top">Back to top</a>
 
 ## What Else? <a name="misc"></a>
 
-For the detailed guide on service connection, check out [Server Connection Guide](ServerConnectionGuide.md)
+- Nothing for now :p
 
 <a href="#top">Back to top</a>
