@@ -1,4 +1,6 @@
-This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital
+This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital.
+
+This README markdown file aims to provide a comprehensive documentation for this project.
 
 # Table of Contents
 
