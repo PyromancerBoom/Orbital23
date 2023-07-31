@@ -4,6 +4,7 @@ This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital
 
 1. [About](#about)
 2. [Features and Design](#features)
+   - [Architecture Diagram](#diagram)
    - [Components](#components)
    - [IDL Management](#idlmanagement)
    - [Server Utility Package](#serverutils)
@@ -56,7 +57,7 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 ## Features and Design <a name="features"></a>
 
-![gateway_design](gateway_design.png)
+![gateway_design](gateway_design.png) <a name="diagram"></a>
 
 ### The project has the following features : <a name="components"></a>
 
