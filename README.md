@@ -40,11 +40,17 @@ The API Gateway has the following endpoints :
 
 - _POST /health_ - This endpoint handles health checks for a service. Services ping to /health to update their health checks.
 
-The api-gateway folder contains the api gateway server and a server_utils package which is required for a smooth setup of Kitex servers.
+#### About the directory:
 
-The rpc_services contains the services used throughout the development of the project. It has 3 services - Asset Service, User service, and Registry Proxy service. Details have been provided throughout this documentation. But TLDR; Asset Service is used to store some info about Assets and fetch that info. The User service is similar to the asset service used for registering and returning info about people using that service. As for Registry Proxy service, it was made to test the gateway by "mocking" some of the functionalities of the gateway. By simply connecting the Registry proxy service, the gateway will function automatically (More on this in the Getting Started Guide).
+- The api-gateway folder contains the api gateway server and a server_utils package which is required for a smooth setup of Kitex servers.
 
-The IDL File just contains the IDLs for the RPC Services and Gateway. **This is NOT the IDL Management system. These files are only provided for reference** Thus, the gateway will function even if the idl folder is removed.
+- The rpc_services contains the services used throughout the development of the project. It has 3 services - Asset Service, User service, and Registry Proxy service. Details have been provided throughout this documentation. But TLDR:
+
+1.  Asset Service is used to store some info about Assets and fetch that info.
+2.  The User service is similar to the asset service used for registering and returning info about people using that service.
+3.  As for Registry Proxy service, it was made to test the gateway by "mocking" some of the functionalities of the gateway. By simply connecting the Registry proxy service, the gateway will function automatically (More on this in the Getting Started Guide).
+
+- The IDL File just contains the IDLs for the RPC Services and Gateway. **This is NOT the IDL Management system. These files are only provided for reference** Thus, the gateway will function even if the idl folder is removed.
 
 _Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process keeping in mind the architecture. However, the API Gateway is designed to be functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
 
