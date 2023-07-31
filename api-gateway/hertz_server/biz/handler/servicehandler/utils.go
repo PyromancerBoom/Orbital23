@@ -2,13 +2,6 @@ package servicehandler
 
 /*
 This package contains utility methods for the servicehandler package.
-
-- func ownerIdExists(ownerId string) bool
-  Checks if the ownerID is already registered in the database.
-
-
-- func apiKeyValid(apiKey string, ownerId string) bool
-  Checks if the provided API key is valid for the given ownerID.
 */
 
 import (

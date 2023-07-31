@@ -29,8 +29,6 @@ func initLogger() {
 		panic(err)
 	}
 	defer logger.Sync()
-
-	// Replace the global logger with our own.
 	zap.ReplaceGlobals(logger)
 
 	// Use the logger in other files.
