@@ -264,7 +264,7 @@ It should reply with the message :
 
 The gateway has a `serverconfig.json` file which the admin may change if he wants to change some of the settings.
 
-```json
+```
 {
   "serverPort": "4200", // Host port of the gateway
   "maskerKey": "master_api_key_uuid", // Specify any master api key (can be used if the masterkey gets leaked)
