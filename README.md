@@ -50,7 +50,7 @@ The API Gateway has the following endpoints :
 
   - Asset Service is used to store some info about Assets and fetch that info.
   - The User service is similar to the asset service used for registering and returning info about people using that service.
-  - As for Registry Proxy service, it was made to test the gateway by "mocking" some of the functionalities of the gateway. By simply connecting the Registry proxy service, the gateway will function automatically (More on this in the Getting Started Guide).
+  - As for Registry Proxy service, it is a special service which performs server health checks and connection requests made to the gateway. By simply booting up the Registry proxy service, the gateway will start forwarding connection and health check requests to the RegistryProxy service. (More on this in the Getting Started Guide).
 
 - The idl folder just contains the IDLs for the RPC Services and Gateway we made when developign this project. **_Please note that this is NOT the IDL Management system. These files are only provided for reference_**\_ Thus, the gateway will function even if the idl folder is removed.
 
@@ -95,8 +95,9 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 8. Registry Proxy Server: An RPC server that can perform health checks, on behalf of the gateway has been included in the project as well. This RPC server is a special server that has direct access to the Consul Service Registry. When servers ping the `/health` or `/connect` endpoint of the gateway, the gateway can proxy handling this request to this RPC service (if one or more of the Registry Proxy servers are online). This frees up space and resources so that the gateway can handle other requests. This is an optional server that the admin may decide to boot up; if the gateway detects it's offline, then it will perform a health check and connection requests itself.
 
-Note: This service is kept optional because it may be a bottleneck if only a few servers are making requests to the `/health` or `/connect` endpoints. It is advised to boot this service up only when there are many servers connected to the system.
-
+Note: 
+- This service is kept optional because it may be a bottleneck if only a few servers are making requests to the `/health` or `/connect` endpoints. It is advised to boot this service up only when there are many servers connected to the system.
+- There may be multiple instances of this service running at the same time. A round robin load balancing is used to determine connection.
 <a href="#top">Back to top</a>
 
 ### IDL Management <a name="idlmanagement"></a>
