@@ -79,6 +79,10 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 - Consul Agent is for the purpose of Service Registry, Health Checks, Discovery, Load Balancing. It is hosted on `localhost:8500` for this project. The logic for exact functioning however has been coded manually.
 
+8. Registry Proxy Server: An RPC server which can perform health checks, on behalf of the gateway has been included in the project as well. This RPC server is a special server which has direct access to the Consul Service Registry. When servers ping the :/health or :/connect endpoint of the gateway, the gateway can proxy handling this request to this rpc service (if one or more of Registry Proxy servers are online). This frees up space and resources so that the gateway can handle other requests. This is an optional server that the admin may decide to boot up; if the gateway detects its offline, then it will perform health check and connection requests itself.
+
+Note: This service is kept optional because it may actually be a bottleneck if only a few servers are making requests to the :/health or :/connect endpoints. It is advised to boot this service up only when there are many servers connected to the system.
+
   <a href="#top">Back to top</a>
 
 ### IDL Management <a name="idlmanagement"></a>
