@@ -14,7 +14,7 @@ Once your service is registered under our system, you will receive an api-key wh
 
 ### Step 1:
 
-Register your server in our system via `:/register` endpoint. Guide can be found ![here](Service_Registration_Guide.md)
+Register your server in our system via `:/register` endpoint. Guide can be found ![here](/Service_Registration_Guide.md)
 
 ### Step 2:
 
@@ -68,8 +68,9 @@ Make the (RPC) server declare it is online and healthy by making http requests t
 ```
 
 **Note:**
-Time before server declared offline: specified as `TTL` in ![serverconfig.json](api-gateway/hertz_server/serverconfig.json) 
-Time before server is delisted from sstem: specified as `TTD` in ![serverconfig.json](api-gateway/hertz_server/serverconfig.json) 
+
+- Time before server declared offline: specified as `TTL` in ![serverconfig.json](/api-gateway/hertz_server/serverconfig.json) 
+- Time before server is delisted from sstem: specified as `TTD` in ![serverconfig.json](/api-gateway/hertz_server/serverconfig.json) 
 
 If server is delisted/is not listed, you will get an Internal Server Error response with the message "Unable to process health update request." when trying to update the server's health.
 
