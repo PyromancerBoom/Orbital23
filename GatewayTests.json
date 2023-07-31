@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "",
+		"name": "API Gateway tests",
+		"description": "Tests for API Gateway server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "",
+		"_collection_link": ""
+	},
+	"item": [
+		{
+			"name": "Gateway Health Check",
+			"item": [
+				{
+					"name": "Health check on API Gateway server",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4200/ping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"ping"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Registration and update",
+			"item": [
+				{
+					"name": "Register a single service",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n    \"OwnerName\": \"John\",\r\n    \"OwnerId\": \"dummy1\",\r\n    \"Services\": [\r\n      {\r\n        \"ServiceId\": \"1\",\r\n        \"ServiceName\": \"DummyService1\",\r\n        \"IdlContent\": \"IDL Content \\n In String format\",\r\n        \"Version\": \"1.0\",\r\n        \"ServiceDescription\": \"Service A Description\",\r\n        \"ServerCount\": 2,\r\n        \"Paths\": [\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod1\",\r\n            \"MethodPath\": \"somePath1\"\r\n          },\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod2\",\r\n            \"MethodPath\": \"somePath1\"\r\n          }\r\n        ],\r\n        \"RegisteredServers\": [\r\n          {\r\n            \"ServerUrl\": \"http://localhost:8000\",\r\n            \"Port\": 8000\r\n          },\r\n          {\r\n            \"ServerUrl\": \"http://localhost:8001\",\r\n            \"Port\": 8001\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register mutliple services",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n    \"OwnerName\": \"John Doe\",\r\n    \"OwnerId\": \"dummy2\",\r\n    \"Services\": [\r\n      {\r\n        \"ServiceId\": \"1\",\r\n        \"ServiceName\": \"JohnService1\",\r\n        \"IdlContent\": \"IDL Content \\n In String format\",\r\n        \"Version\": \"1.0\",\r\n        \"ServiceDescription\": \"Service A Description\",\r\n        \"ServerCount\": 2,\r\n        \"Paths\": [\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod1\",\r\n            \"MethodPath\": \"somePath1\"\r\n          },\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod2\",\r\n            \"MethodPath\": \"somePath1\"\r\n          }\r\n        ],\r\n        \"RegisteredServers\": [\r\n          {\r\n            \"ServerUrl\": \"http://localhost:8000\",\r\n            \"Port\": 8000\r\n          },\r\n          {\r\n            \"ServerUrl\": \"http://localhost:8001\",\r\n            \"Port\": 8001\r\n          }\r\n        ]\r\n      },\r\n      {\r\n        \"ServiceId\": \"1\",\r\n        \"ServiceName\": \"JohnService2\",\r\n        \"IdlContent\": \"IDL Content \\n In String format\",\r\n        \"Version\": \"4.0\",\r\n        \"ServiceDescription\": \"Service B Description\",\r\n        \"ServerCount\": 2,\r\n        \"Paths\": [\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod1test\",\r\n            \"MethodPath\": \"somePath1test\"\r\n          },\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod2test\",\r\n            \"MethodPath\": \"somePath1test\"\r\n          }\r\n        ],\r\n        \"RegisteredServers\": [\r\n          {\r\n            \"ServerUrl\": \"http://localhost:4000\",\r\n            \"Port\": 4000\r\n          },\r\n          {\r\n            \"ServerUrl\": \"http://localhost:4500\",\r\n            \"Port\": 4500\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Admin with no services",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n      \"OwnerName\": \"John Doe with no service\",\r\n      \"OwnerId\": \"000000111122333\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with Empty Body",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Asset Service",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n      \"OwnerName\": \"John Doe\",\r\n      \"OwnerId\": \"johndoe1234\",\r\n      \"Services\": [\r\n        {\r\n          \"ServiceId\": \"101\",\r\n          \"ServiceName\": \"AssetManagement\",\r\n          \"IdlContent\": \"namespace Go asset.management\\n\\nstruct QueryAssetRequest {\\n    1: string ID;\\n}\\n\\nstruct QueryAssetResponse {\\n    1: bool   Exist;\\n    2: string ID;\\n    3: string Name;\\n    4: string Market;\\n}\\n\\nstruct InsertAssetRequest {\\n    1: string ID;\\n    2: string Name;\\n    3: string Market;\\n}\\n\\nstruct InsertAssetResponse {\\n    1: bool Ok;\\n    2: string Msg;\\n}\\n\\nservice AssetManagement {\\n    QueryAssetResponse queryAsset(1: QueryAssetRequest req);\\n    InsertAssetResponse insertAsset(1: InsertAssetRequest req);\\n}\\n\",\r\n          \"Version\": \"1.0\",\r\n          \"ServiceDescription\": \"Service A Description\",\r\n          \"ServerCount\": 2,\r\n          \"Paths\": [\r\n            {\r\n              \"ExposedMethod\": \"insertAsset\",\r\n              \"MethodPath\": \"newAsset\"\r\n            },\r\n            {\r\n              \"ExposedMethod\": \"queryAsset\",\r\n              \"MethodPath\": \"getAsset\"\r\n            }\r\n          ],\r\n          \"RegisteredServers\": [\r\n            {\r\n              \"ServerUrl\": \"http://localhost:8080\",\r\n              \"Port\": 8080\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Re-register asset service",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n      \"OwnerName\": \"John Doe\",\r\n      \"OwnerId\": \"johndoe1234\",\r\n      \"Services\": [\r\n        {\r\n          \"ServiceId\": \"101\",\r\n          \"ServiceName\": \"AssetManagement\",\r\n          \"IdlContent\": \"namespace Go asset.management\\n\\nstruct QueryAssetRequest {\\n    1: string ID;\\n}\\n\\nstruct QueryAssetResponse {\\n    1: bool   Exist;\\n    2: string ID;\\n    3: string Name;\\n    4: string Market;\\n}\\n\\nstruct InsertAssetRequest {\\n    1: string ID;\\n    2: string Name;\\n    3: string Market;\\n}\\n\\nstruct InsertAssetResponse {\\n    1: bool Ok;\\n    2: string Msg;\\n}\\n\\nservice AssetManagement {\\n    QueryAssetResponse queryAsset(1: QueryAssetRequest req);\\n    InsertAssetResponse insertAsset(1: InsertAssetRequest req);\\n}\\n\",\r\n          \"Version\": \"1.0\",\r\n          \"ServiceDescription\": \"Service A Description\",\r\n          \"ServerCount\": 2,\r\n          \"Paths\": [\r\n            {\r\n              \"ExposedMethod\": \"insertAsset\",\r\n              \"MethodPath\": \"newAsset\"\r\n            },\r\n            {\r\n              \"ExposedMethod\": \"queryAsset\",\r\n              \"MethodPath\": \"getAsset\"\r\n            }\r\n          ],\r\n          \"RegisteredServers\": [\r\n            {\r\n              \"ServerUrl\": \"http://localhost:8080\",\r\n              \"Port\": 8080\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with Invalid format",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"owner\": \"what\",\r\n  \"SomeInvalid Field\" : \"Some content\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a service",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "master_api_key_uuid",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n  {\r\n    \"OwnerName\": \"John Updated\",\r\n    \"OwnerId\": \"dummy1\",\r\n    \"Services\": [\r\n      {\r\n        \"ServiceId\": \"1\",\r\n        \"ServiceName\": \"DummyService1\",\r\n        \"IdlContent\": \"IDL Content \\n In String format\",\r\n        \"Version\": \"1.0\",\r\n        \"ServiceDescription\": \"Service A Description Updated\",\r\n        \"ServerCount\": 2,\r\n        \"Paths\": [\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod1\",\r\n            \"MethodPath\": \"somePath1\"\r\n          },\r\n          {\r\n            \"ExposedMethod\": \"exposedMethod2\",\r\n            \"MethodPath\": \"somePath1\"\r\n          }\r\n        ],\r\n        \"RegisteredServers\": [\r\n          {\r\n            \"ServerUrl\": \"http://localhost:8000\",\r\n            \"Port\": 8000\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/update?ownerid=dummy1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"update"
+							],
+							"query": [
+								{
+									"key": "ownerid",
+									"value": "dummy1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update asset service",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "master_api_key_uuid",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n      \"OwnerName\": \"John Doe Updated\",\r\n      \"OwnerId\": \"johndoe1234\",\r\n      \"Services\": [\r\n        {\r\n          \"ServiceId\": \"101\",\r\n          \"ServiceName\": \"AssetManagement\",\r\n          \"IdlContent\": \"namespace Go asset.management\\n\\nstruct QueryAssetRequest {\\n    1: string ID;\\n}\\n\\nstruct QueryAssetResponse {\\n    1: bool   Exist;\\n    2: string ID;\\n    3: string Name;\\n    4: string Market;\\n}\\n\\nstruct InsertAssetRequest {\\n    1: string ID;\\n    2: string Name;\\n    3: string Market;\\n}\\n\\nstruct InsertAssetResponse {\\n    1: bool Ok;\\n    2: string Msg;\\n}\\n\\nservice AssetManagement {\\n    QueryAssetResponse queryAsset(1: QueryAssetRequest req);\\n    InsertAssetResponse insertAsset(1: InsertAssetRequest req);\\n}\\n\",\r\n          \"Version\": \"1.0\",\r\n          \"ServiceDescription\": \"Service A Description\",\r\n          \"ServerCount\": 2,\r\n          \"Paths\": [\r\n            {\r\n              \"ExposedMethod\": \"insertAsset\",\r\n              \"MethodPath\": \"newAsset\"\r\n            },\r\n            {\r\n              \"ExposedMethod\": \"queryAsset\",\r\n              \"MethodPath\": \"getAsset\"\r\n            }\r\n          ],\r\n          \"RegisteredServers\": [\r\n            {\r\n              \"ServerUrl\": \"http://localhost:8080\",\r\n              \"Port\": 8080\r\n            },\r\n            {\r\n              \"ServerUrl\": \"http://localhost:8000\",\r\n              \"Port\": 8000\r\n            },\r\n            {\r\n              \"ServerUrl\": \"http://localhost:8084\",\r\n              \"Port\": 8084\r\n            }\r\n          ]\r\n        }\r\n      ]\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/update?ownerid=johndoe1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"update"
+							],
+							"query": [
+								{
+									"key": "ownerid",
+									"value": "johndoe1234"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Connection",
+			"item": [
+				{
+					"name": "Unauthorised Server",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ApiKey\":\"36e991d3-646d-414a-ac66-0c0e8a310ced\",\r\n    \"ServerAddress\":\"127.0.0.1\",\r\n    \"ServerPort\":\"9999\",\r\n    \"ServiceName\":\"UserService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/connect",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"connect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authorised Server",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"ApiKey\":\"master_api_key_uuid\",\r\n    \"ServerAddress\":\"127.0.0.1\",\r\n    \"ServerPort\":\"9999\",\r\n    \"ServiceName\":\"UserService\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/connect",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"connect"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "RPC Calls to services",
+			"item": [
+				{
+					"name": "Invalid Service, Valid Path",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4200/someInvalidService/someInvalidPath",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"someInvalidService",
+								"someInvalidPath"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Valid Service, Invalid Path",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4200/AssetManagement/someInvalidPath",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"AssetManagement",
+								"someInvalidPath"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Service, Invalid Path",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4200/someInvalidService/newAsset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"someInvalidService",
+								"newAsset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AssetService - Register a new asset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ID\": \"1\",\r\n  \"Name\": \"ByteDance\",\r\n  \"Market\": \"Somewhere\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4200/AssetManagement/newAsset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"AssetManagement",
+								"newAsset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AssetService - Fetch an asset",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:4200/AssetManagement/getAsset?ID=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4200",
+							"path": [
+								"AssetManagement",
+								"getAsset"
+							],
+							"query": [
+								{
+									"key": "ID",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
