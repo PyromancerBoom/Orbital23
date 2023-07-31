@@ -1,6 +1,4 @@
-This is the repository for the ByteDance and Tiktok Orbital 2023.
-
-_Note : Testing is still in process as external orbital project deadline is later_
+This is the repository for the ByteDance and Tiktok Project for 2023 NUS Orbital
 
 # Table of Contents
 
@@ -29,7 +27,7 @@ This is the project for our API Gateway based on one scalable Hertz server which
 
 The API Gateway has the following endpoints :
 
-- _GET and POST /:serviceName/:path_ - Every service has a registered URL on which it's users send requests on.
+- _GET and POST /:serviceName/:path_ - Every service has a registered URL on which its users send requests.
 
 - _GET /ping_ - This endpoint checks the availability of the API gateway. Run it to verify if the server is running or not
 
@@ -37,25 +35,21 @@ The API Gateway has the following endpoints :
 
 - _PUT /update_ - Server to Update details of Registered services
 
-- _POST /connect_ - Once services are registered, their servers are connected through this endpoint automatically with the help of server utility package.
+- _POST /connect_ - Once services are registered, their servers are connected through this endpoint automatically with the help of the server utility package.
 
-- _POST /health_ - This endpoint handles health checks for a service. Services ping to /health to update their healthchecks.
+- _POST /health_ - This endpoint handles health checks for a service. Services ping to /health to update their health checks.
 
-_Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process. However, the API Gateway is designed to be fully functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
+_Please note that certain details in this project have been "mocked" during development to simplify testing and expedite the process keeping in mind the architecture. However, the API Gateway is designed to be functional, scalable, and modular, ensuring it can accommodate future updates and enhancements seamlessly. Despite the mocked data, the implementation follows best practices and adheres to the intended functionality, allowing for efficient communication between services and robust handling of incoming requests._
 
 PS :
-On windows, Kitex may throw some errors like :
+On Windows, Kitex may throw some errors like :
 
 ```
 [Error] KITEX: OnRead Error: default codec read failed: EOF
-
-or
-
 default codec read failed: i/o timeout
-
 ```
 
-This happens to be due to Windows environment. On running Kitex servers in Linux, the errors seems to go away.
+This happens to be due to the Windows environment. On running Kitex servers in Linux, the errors seem to go away.
 The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues/932) and [here as well](https://github.com/cloudwego/kitex/issues/964)
 
 <a href="#top">Back to top</a>
