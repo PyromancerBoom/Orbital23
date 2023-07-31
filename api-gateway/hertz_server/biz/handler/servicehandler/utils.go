@@ -156,7 +156,6 @@ func authoriseConnect(apiKey string, serviceName string) bool {
 
 // Validates address
 func validateAddress(address string, port string) error {
-	print(address)
 	_, err := strconv.Atoi(port)
 	if err != nil {
 		return err
