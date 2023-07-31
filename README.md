@@ -57,7 +57,9 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 ## Features and Design <a name="features"></a>
 
-![gateway_design](gateway_design.png) <a name="diagram"></a>
+### Architecture Diagram <a name="diagram"></a>
+
+![gateway_design](gateway_design.png)
 
 ### The project has the following features : <a name="components"></a>
 
