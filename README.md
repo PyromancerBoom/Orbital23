@@ -56,6 +56,8 @@ The issue has been discussed in [here](https://github.com/cloudwego/kitex/issues
 
 ## Features and Design <a name="features"></a>
 
+![gateway_design](gateway_design.png)
+
 ### The project has the following features : <a name="components"></a>
 
 1. API Gateway Server: The API Gateway is implemented as a Hertz server that listens to requests on port 4200. It exposes multiple endpoints in the format `/{serviceName}/{path}` for both POST and GET requests. The API Gateway acts as an intermediary between user requests and the Kitex RPC servers performing load balancing, service discovery, health checks, etc. It accepts incoming HTTP requests and decodes on which service to make a generic RPC call and returns a response.
